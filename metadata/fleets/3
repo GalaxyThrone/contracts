@@ -1,0 +1,31 @@
+{
+  "description": "Cruisers are armored almost three times of that of the heavy fighters, and possess more than twice the firepower of any combat ship in existence. They also possess speeds that far surpassed any spacecraft ever made.",
+  "image": "https://bafybeidgyhaejodbn4dqtnzqua74bredbljrbgxxjge2znc5zrklc2ogai.ipfs.nftstorage.link/3.png",
+  "name": "Cruiser",
+  "attributes": [
+    {
+      "trait_type": "Attack",
+      "value": "400"
+    },
+    {
+      "trait_type": "Shield",
+      "value": "600"
+    },
+    {
+      "trait_type": "Metal Price",
+      "value": "5000"
+    },
+    {
+      "trait_type": "Crystal Price",
+      "value": "3000"
+    },
+    {
+      "trait_type": "Ethereus Price",
+      "value": "1000"
+    },
+    {
+      "trait_type": "Craft Time",
+      "value": "14400"
+    }
+  ]
+}

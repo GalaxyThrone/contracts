@@ -1,0 +1,31 @@
+{
+  "description": "The Warship is highly specialized in the interception of hostile fleets. This ship is deadly when it comes to destroying attacking fleets. With its improved laser cannons, it holds a privileged position among the heavy ships.",
+  "image": "https://bafybeidgyhaejodbn4dqtnzqua74bredbljrbgxxjge2znc5zrklc2ogai.ipfs.nftstorage.link/5.png",
+  "name": "Warship",
+  "attributes": [
+    {
+      "trait_type": "Attack",
+      "value": "300"
+    },
+    {
+      "trait_type": "Shield",
+      "value": "300"
+    },
+    {
+      "trait_type": "Metal Price",
+      "value": "3000"
+    },
+    {
+      "trait_type": "Crystal Price",
+      "value": "1500"
+    },
+    {
+      "trait_type": "Ethereus Price",
+      "value": "800"
+    },
+    {
+      "trait_type": "Craft Time",
+      "value": "7200"
+    }
+  ]
+}

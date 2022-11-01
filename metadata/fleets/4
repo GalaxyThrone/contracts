@@ -1,0 +1,31 @@
+{
+  "description": "The Raider is a more powerful version of the Fighter. Although the Raider is more powerful than the Fighter, it isn't used as much as the fighter because of the high Crystal to Metal ratio compared to the Fighter.",
+  "image": "https://bafybeidgyhaejodbn4dqtnzqua74bredbljrbgxxjge2znc5zrklc2ogai.ipfs.nftstorage.link/4.png",
+  "name": "Raider",
+  "attributes": [
+    {
+      "trait_type": "Attack",
+      "value": "80"
+    },
+    {
+      "trait_type": "Shield",
+      "value": "100"
+    },
+    {
+      "trait_type": "Metal Price",
+      "value": "600"
+    },
+    {
+      "trait_type": "Crystal Price",
+      "value": "300"
+    },
+    {
+      "trait_type": "Ethereus Price",
+      "value": "150"
+    },
+    {
+      "trait_type": "Craft Time",
+      "value": "3600"
+    }
+  ]
+}

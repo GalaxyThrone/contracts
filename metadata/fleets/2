@@ -1,0 +1,31 @@
+{
+  "description": "Frigate are the backbone of any military fleet. Heavy armor, powerful weapon systems, and a high cruising speed, combine to make this ship a tough opponent to fight against.",
+  "image": "https://bafybeidgyhaejodbn4dqtnzqua74bredbljrbgxxjge2znc5zrklc2ogai.ipfs.nftstorage.link/2.png",
+  "name": "Frigate",
+  "attributes": [
+    {
+      "trait_type": "Attack",
+      "value": "200"
+    },
+    {
+      "trait_type": "Shield",
+      "value": "300"
+    },
+    {
+      "trait_type": "Metal Price",
+      "value": "2000"
+    },
+    {
+      "trait_type": "Crystal Price",
+      "value": "500"
+    },
+    {
+      "trait_type": "Ethereus Price",
+      "value": "400"
+    },
+    {
+      "trait_type": "Craft Time",
+      "value": "7200"
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "description": "The Space Station is the most powerful defense in the game. It is fairly expensive, but well worth its price.",
+  "image": "https://bafybeieidjyt5xlr4sill4d3ij2tzlgyogv4xde5ty2ki2nkfncfw7rqfy.ipfs.nftstorage.link/1.png",
+  "name": "Space Station",
+  "attributes": [
+    {
+      "trait_type": "Attack",
+      "value": "300"
+    },
+    {
+      "trait_type": "Shield",
+      "value": "600"
+    },
+    {
+      "trait_type": "Metal Price",
+      "value": "15000"
+    },
+    {
+      "trait_type": "Crystal Price",
+      "value": "5000"
+    },
+    {
+      "trait_type": "Ethereus Price",
+      "value": "7000"
+    },
+    {
+      "trait_type": "Craft Time",
+      "value": "10800"
+    }
+  ]
+}

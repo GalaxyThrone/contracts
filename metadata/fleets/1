@@ -1,0 +1,31 @@
+{
+  "description": "Fighters serve best as support ships in battle. Their agility and speed, paired with the number in which they often appear, can provide a shield-like buffer for bigger ships that are not quite as maneuverable.",
+  "image": "https://bafybeidgyhaejodbn4dqtnzqua74bredbljrbgxxjge2znc5zrklc2ogai.ipfs.nftstorage.link/1.png",
+  "name": "Fighter",
+  "attributes": [
+    {
+      "trait_type": "Attack",
+      "value": "30"
+    },
+    {
+      "trait_type": "Shield",
+      "value": "20"
+    },
+    {
+      "trait_type": "Metal Price",
+      "value": "300"
+    },
+    {
+      "trait_type": "Crystal Price",
+      "value": "200"
+    },
+    {
+      "trait_type": "Ethereus Price",
+      "value": "500"
+    },
+    {
+      "trait_type": "Craft Time",
+      "value": "1800"
+    }
+  ]
+}

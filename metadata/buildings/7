@@ -1,0 +1,31 @@
+{
+  "description": "The Shipyard is responsible for constructing all ships and defensive structures.",
+  "image": "https://bafybeieidjyt5xlr4sill4d3ij2tzlgyogv4xde5ty2ki2nkfncfw7rqfy.ipfs.nftstorage.link/7.png",
+  "name": "Shipyard",
+  "attributes": [
+    {
+      "trait_type": "Attack",
+      "value": "0"
+    },
+    {
+      "trait_type": "Shield",
+      "value": "0"
+    },
+    {
+      "trait_type": "Metal Price",
+      "value": "1000"
+    },
+    {
+      "trait_type": "Crystal Price",
+      "value": "800"
+    },
+    {
+      "trait_type": "Ethereus Price",
+      "value": "700"
+    },
+    {
+      "trait_type": "Craft Time",
+      "value": "7200"
+    }
+  ]
+}

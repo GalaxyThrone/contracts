@@ -1,0 +1,31 @@
+{
+  "description": "A Metal Miner is a building that produces Metal. Metal is one of the 3 basic resources required by all emerging and established empires for the construction of structures and ships.",
+  "image": "https://bafybeieidjyt5xlr4sill4d3ij2tzlgyogv4xde5ty2ki2nkfncfw7rqfy.ipfs.nftstorage.link/5.png",
+  "name": "Metal Miner",
+  "attributes": [
+    {
+      "trait_type": "Attack",
+      "value": "0"
+    },
+    {
+      "trait_type": "Shield",
+      "value": "0"
+    },
+    {
+      "trait_type": "Metal Price",
+      "value": "0"
+    },
+    {
+      "trait_type": "Crystal Price",
+      "value": "300"
+    },
+    {
+      "trait_type": "Ethereus Price",
+      "value": "200"
+    },
+    {
+      "trait_type": "Craft Time",
+      "value": "3600"
+    }
+  ]
+}

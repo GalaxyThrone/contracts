@@ -1,0 +1,31 @@
+{
+  "description": "The Ion Cannon is a defensive structure, well known for its relatively high Shield Power.",
+  "image": "https://bafybeieidjyt5xlr4sill4d3ij2tzlgyogv4xde5ty2ki2nkfncfw7rqfy.ipfs.nftstorage.link/3.png",
+  "name": "Cannon",
+  "attributes": [
+    {
+      "trait_type": "Attack",
+      "value": "50"
+    },
+    {
+      "trait_type": "Shield",
+      "value": "50"
+    },
+    {
+      "trait_type": "Metal Price",
+      "value": "1000"
+    },
+    {
+      "trait_type": "Crystal Price",
+      "value": "500"
+    },
+    {
+      "trait_type": "Ethereus Price",
+      "value": "200"
+    },
+    {
+      "trait_type": "Craft Time",
+      "value": "1800"
+    }
+  ]
+}

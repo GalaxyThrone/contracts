@@ -1,0 +1,31 @@
+{
+  "description": "The Plasma Tower is a stronger defense system than cannon, even if it is more expensive, worth its price.",
+  "image": "https://bafybeieidjyt5xlr4sill4d3ij2tzlgyogv4xde5ty2ki2nkfncfw7rqfy.ipfs.nftstorage.link/2.png",
+  "name": "Tower",
+  "attributes": [
+    {
+      "trait_type": "Attack",
+      "value": "100"
+    },
+    {
+      "trait_type": "Shield",
+      "value": "100"
+    },
+    {
+      "trait_type": "Metal Price",
+      "value": "3000"
+    },
+    {
+      "trait_type": "Crystal Price",
+      "value": "1000"
+    },
+    {
+      "trait_type": "Ethereus Price",
+      "value": "1000"
+    },
+    {
+      "trait_type": "Craft Time",
+      "value": "7200"
+    }
+  ]
+}
