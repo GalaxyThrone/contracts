@@ -60,7 +60,7 @@ export async function deployDiamond() {
     "AdminFacet",
     "BuildingsFacet",
     "FleetsFacet",
-    "GameFacet",
+    "VRFFacet",
   ];
   const cut = [];
   for (const FacetName of FacetNames) {

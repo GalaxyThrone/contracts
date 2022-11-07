@@ -24,6 +24,14 @@ struct SendTerraform {
     uint256 timestamp;
 }
 
+struct RequestConfig {
+    uint64 subId;
+    uint32 callbackGasLimit;
+    uint16 requestConfirmations;
+    uint32 numWords;
+    bytes32 keyHash;
+}
+
 struct AppStorage {
     address crystal;
     address ethereus;
@@ -40,6 +48,13 @@ struct AppStorage {
     mapping(uint256 => SendTerraform) sendTerraform;
     uint256 sendCargoId;
     uint256 sendTerraformId;
+    // heroId => vrf/reg data
+    mapping(uint256 => address) vrfRequestIdToAddress;
+    mapping(address => bool) registrationStarted;
+    //VRF
+    address vrfCoordinator;
+    address linkAddress;
+    RequestConfig requestConfig;
 }
 
 library LibAppStorage {
