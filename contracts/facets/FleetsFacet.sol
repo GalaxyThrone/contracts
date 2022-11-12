@@ -365,43 +365,20 @@ contract FleetsFacet is Modifiers {
 
         //defender has higher atk than attacker
         if (battleResult < 0) {
-            //burn nfts and unassign ship from planets, also reduce defenderShip Array
-            for (uint256 i = 0; i < defenderShips.length; i++) {
-                uint256 defenderShipHealth = IShips(s.ships)
-                    .getShipStats(defenderShips[i])
+            //burn attacker nfts that lost
+            for (uint256 i = 0; i < attackerShips.length; i++) {
+                uint256 attackerShipHealth = IShips(s.ships)
+                    .getShipStats(attackerShips[i])
                     .health;
 
-                if (battleResult > defenderShipHealth) {
-                    battleResult -= defenderShipHealth;
+                if (battleResult > attackerShipHealth) {
+                    battleResult -= attackerShipHealth;
 
-                    IShips(s.ships).burnShip(defenderShips[i]);
-                    IShips(s.ships).deleteShipFromPlanet([defenderShips[i]]);
-                    delete defenderShips[i];
+                    IShips(s.ships).burnShip(attackerShips[i]);
+                    IShips(s.ships).deleteShipFromPlanet([attackerShips[i]]);
+                    delete attackerShips[i];
                 }
             }
-
-            //update planet defense array mapping @TODO remove / refactor
-            IPlanets(s.planets).assignDefensePlanet(
-                attackToResolve.toPlanet,
-                defenderShips
-            );
-
-            for (uint256 i = 0; i < attackerShips.length; i++) {
-                IShips(s.ships).assignShipToPlanet(
-                    attackerShips[i],
-                    attackToResolve.fromPlanet
-                );
-            }
-
-            //update planet defense array mapping @TODO remove / refactor
-            IPlanets(s.planets).assignDefensePlanet(
-                attackToResolve.fromPlanet,
-                attackerShips
-            );
-
-            IPlanets(s.planets).resolveLostAttack(
-                attackToResolve.attackInstanceId
-            );
         }
 
         //draw -> currently leads to zero losses, only a retreat
