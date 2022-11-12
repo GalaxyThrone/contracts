@@ -15,7 +15,7 @@ contract FleetsFacet is Modifiers {
         external
         onlyPlanetOwner(_planetId)
     {
-        IFleets fleetsContract = IFleets(s.fleets);
+        IFleets fleetsContract = IShips(s.ships);
         uint256[3] memory price = fleetsContract.getPrice(_fleetId);
         uint256 craftTime = fleetsContract.getCraftTime(_fleetId);
         uint256 craftedFrom = fleetsContract.getCraftedFrom(_fleetId);
@@ -53,6 +53,7 @@ contract FleetsFacet is Modifiers {
         IShips(s.ships).assignShipToPlanet(shipId, _planetId);
     }
 
+    //@notice Disabled for V0.01
     function sendCargo(
         uint256 _fromPlanetId,
         uint256 _toPlanetId,
@@ -72,6 +73,7 @@ contract FleetsFacet is Modifiers {
         // emit event
     }
 
+    //@notice Disabled for V0.01
     function returnCargo(uint256 _sendCargoId) external {
         require(
             msg.sender ==
@@ -106,6 +108,7 @@ contract FleetsFacet is Modifiers {
         delete s.sendCargo[_sendCargoId];
     }
 
+    //@notice Disabled for V0.01
     function sendTerraform(
         uint256 _fromPlanetId,
         uint256 _toPlanetId,
@@ -124,6 +127,7 @@ contract FleetsFacet is Modifiers {
         // emit event
     }
 
+    //@notice Disabled for V0.01
     function endTerraform(uint256 _sendTerraformId) external {
         require(
             msg.sender ==
@@ -460,4 +464,21 @@ contract FleetsFacet is Modifiers {
             );
         }
     }
+
+    //@TODO @Marco where to offload this, probably a seperate facet?
+
+    //@TODO store alliance somewhere. (AppStorage?)
+    //@TODO join/leave a certain mapping.
+    //@TODO when attack/sending friendlies check if the owner of the Target is in the same Alliance as the owner.
+    //@TODO Getter Function if target is friendly
+    //@TODO Getter Function available alliances and their members.
+    //@TODO
+
+    function createAlliance() external {}
+
+    function joinAlliance() external {}
+
+    function leaveAlliance() external {}
+
+    function checkAlliance() external {}
 }
