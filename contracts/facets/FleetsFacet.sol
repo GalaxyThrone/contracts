@@ -375,6 +375,25 @@ contract FleetsFacet is Modifiers {
                     delete attackerShips[i];
                 }
             }
+
+            //sending ships home
+
+            for (uint256 i = 0; i < attackerShips.length; i++) {
+                IShips(s.ships).assignShipToPlanet(
+                    attackerShips[i],
+                    attackToResolve.fromPlanet
+                );
+            }
+
+            //update planet defense array mapping @TODO remove / refactor
+            IPlanets(s.planets).assignDefensePlanet(
+                attackToResolve.fromPlanet,
+                attackerShips
+            );
+
+            IPlanets(s.planets).resolveLostAttack(
+                attackToResolve.attackInstanceId
+            );
         }
 
         //draw -> currently leads to zero losses, only a retreat
