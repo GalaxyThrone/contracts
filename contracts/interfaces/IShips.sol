@@ -12,6 +12,7 @@ interface IShips {
         returns (uint256[3] memory);
 
     struct ShipType {
+        uint256 shipType;
         uint256[3] price; // [metal, crystal, ethereus]
         uint256 attack;
         uint256 health;
@@ -19,6 +20,13 @@ interface IShips {
         uint256 craftTime;
         uint256 craftedFrom;
         string name;
+        uint256 moduleSlots;
+        ShipModule[] equippedShipModule;
+    }
+
+    struct ShipModule {
+        uint256 attackBoostStat;
+        uint256 healthBoostStat;
     }
 
     function getCraftTime(uint256 _fleetId) external view returns (uint256);
@@ -42,4 +50,7 @@ interface IShips {
         external
         view
         returns (uint256);
+
+
+    function getDefensePlanet(uint256 _planetId) external view returns (uint256[] memory)
 }

@@ -17,8 +17,14 @@ interface IPlanets {
 
     function addFleet(
         uint256 _planetId,
-        uint256 _fleetId,
-        uint256 _tokenId
+        uint256 _shipType,
+        uint256 amount
+    ) external;
+
+    function removeFleet(
+        uint256 _planetId,
+        uint256 _shipType,
+        uint256 amount
     ) external;
 
     function getBuildings(uint256 _planetId, uint256 _buildingId)
@@ -63,11 +69,6 @@ interface IPlanets {
     function getDefensePlanet(uint256 planetId)
         external
         returns (uint256[] memory);
-
-    function assignDefensePlanet(
-        uint256 _planetId,
-        uint256[] memory _newDefenseShips
-    ) external;
 
     function resolveLostAttack(uint256 attackIdResolved) external;
 
