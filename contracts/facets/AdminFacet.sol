@@ -11,7 +11,8 @@ contract AdminFacet is Modifiers {
         address _metal,
         address _buildings,
         address _fleets,
-        address _planets
+        address _planets,
+        address _governanceToken
     ) external onlyOwner {
         s.crystal = _crystal;
         s.ethereus = _ethereus;
@@ -19,6 +20,7 @@ contract AdminFacet is Modifiers {
         s.buildings = _buildings;
         s.fleets = _fleets;
         s.planets = _planets;
+        s.governanceToken = _governanceToken;
     }
 
     function initPlanets(uint256 _amount) external onlyOwner {
