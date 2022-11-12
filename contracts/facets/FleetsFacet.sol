@@ -216,6 +216,8 @@ contract FleetsFacet is Modifiers {
     }
 
     //@TODO for guilds the target doesnt need to be the planet owner as well, alliance member / friendly status / sth
+    //@TODO currently instantenous for hackathon.
+    //@notice perhaps require a specific building for instantenous travel / normal travel for others>
 
     function sendFriendlies(
         uint256 _fromPlanetId,
@@ -232,7 +234,14 @@ contract FleetsFacet is Modifiers {
 
             //unassign ships during attack
             IShips(s.ships).deleteShipFromPlanet(_shipIds[i]);
-            unAssignNewShipTypeAmount(_fromPlanetId, _shipIds);
+        }
+
+        unAssignNewShipTypeAmount(_fromPlanetId, _shipIds);
+
+        AssignNewShipTypeAmount(_toPlanetId, _shipIds);
+
+        for (uint256 i = 0; i < attackerShips.length; i++) {
+            IShips(s.ships).assignShipToPlanet(_shipIds[i], _toPlanetId);
         }
     }
 
