@@ -14,7 +14,11 @@ interface IPlanets {
 
     function addBuilding(uint256 _planetId, uint256 _buildingId) external;
 
-    function addFleet(uint256 _planetId, uint256 _fleetId) external;
+    function addFleet(
+        uint256 _planetId,
+        uint256 _fleetId,
+        uint256 _tokenId
+    ) external;
 
     function getBuildings(uint256 _planetId, uint256 _buildingId)
         external
@@ -47,4 +51,20 @@ interface IPlanets {
         external
         view
         returns (uint256, uint256);
+
+    function planetConquestTransfer(
+        uint256 _tokenId,
+        address _oldOwner,
+        address _newOwner,
+        uint256 _attackIdResolved
+    ) external;
+
+    function getDefensePlanet(uint256 planetId) external;
+
+    function assignDefensePlanet(
+        uint256 _planetId,
+        uint256[] memory _newDefenseShips
+    ) external;
+
+    function resolveLostAttack(uint256 attackIdResolved) external;
 }
