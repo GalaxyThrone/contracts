@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.17;
+pragma solidity 0.8.9;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
@@ -32,8 +32,6 @@ contract Planets is ERC721EnumerableUpgradeable, OwnableUpgradeable {
     mapping(uint256 => Planet) public planets;
     // planetId => fleetId => amount
     mapping(uint256 => mapping(uint256 => uint256)) public fleets;
-    //planetId  => shipIds
-    mapping(uint256 => uint256[]) public fleetShipIds;
 
     // planetId => buildingId => amount
     mapping(uint256 => mapping(uint256 => uint256)) public buildings;
@@ -95,22 +93,18 @@ contract Planets is ERC721EnumerableUpgradeable, OwnableUpgradeable {
 
     function addFleet(
         uint256 _planetId,
-        uint256 _fleetId,
         uint256 _shipType,
         uint256 amount
     ) external onlyGameDiamond {
-        fleets[_planetId][_fleetId] += amount;
-        fleetShipIds[_planetId].push(_tokenId);
+        fleets[_planetId][_shipType] += amount;
     }
 
     function removeFleet(
         uint256 _planetId,
-        uint256 _fleetId,
         uint256 _shipType,
         uint256 amount
     ) external onlyGameDiamond {
-        fleets[_planetId][_fleetId] -= amount;
-        fleetShipIds[_planetId].push(_tokenId);
+        fleets[_planetId][_shipType] -= amount;
     }
 
     function addBoost(
@@ -186,13 +180,6 @@ contract Planets is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         returns (uint256[] memory)
     {
         return fleetShipIds[_planetId];
-    }
-
-    function assignDefensePlanet(
-        uint256 _planetId,
-        uint256[] memory _newDefenseShips
-    ) external onlyGameDiamond {
-        fleetShipIds[_planetId] = _newDefenseShips;
     }
 
     function addAttack(attackStatus memory _attackToBeInitated)

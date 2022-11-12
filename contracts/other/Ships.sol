@@ -9,6 +9,7 @@ contract Ships is ERC721EnumerableUpgradeable, OwnableUpgradeable {
     address public gameDiamond;
 
     struct ShipType {
+        uint256 shipType;
         uint256[3] price; // [metal, crystal, ethereus]
         uint256 attack;
         uint256 health;
@@ -16,7 +17,7 @@ contract Ships is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         uint256 craftTime;
         uint256 craftedFrom;
         string name;
-        uint moduleSlots;
+        uint256 moduleSlots;
         ShipModule[] equippedShipModule;
     }
 
@@ -26,12 +27,12 @@ contract Ships is ERC721EnumerableUpgradeable, OwnableUpgradeable {
     }
 
     //what kind of ship each tokenId actually is
-
     mapping(uint256 => ShipType) public SpaceShips;
 
     //shipId => planetId
     mapping(uint256 => uint256) public assignedPlanet;
 
+    //ship categories template
     mapping(uint256 => ShipType) public shipType;
 
     string private _uri;
@@ -61,10 +62,10 @@ contract Ships is ERC721EnumerableUpgradeable, OwnableUpgradeable {
 
     //done
     //@param
-    function mint(address _account, uint _shipTypeId)
+    function mint(address _account, uint256 _shipTypeId)
         external
         onlyGameDiamond
-        returns (uint)
+        returns (uint256)
     {
         uint256 shipId = totalSupply() + 1;
         SpaceShips[shipId] = shipType[_shipTypeId];
@@ -89,7 +90,7 @@ contract Ships is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         return assignedPlanet[_shipId];
     }
 
-    function assignShipToPlanet(uint256 _shipId, uint _toPlanetId)
+    function assignShipToPlanet(uint256 _shipId, uint256 _toPlanetId)
         external
         onlyGameDiamond
     {
@@ -130,5 +131,28 @@ contract Ships is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         returns (ShipType memory)
     {
         return SpaceShips[_shipId];
+    }
+
+    function getDefensePlanet(uint256 _planetId)
+        external
+        view
+        returns (uint256[] memory)
+    {
+        //@TODO to be refactored / removed / fixed / solved differently
+        uint256 totalFleetSize;
+        for (uint256 i = 0; i < totalSupply() + 1; i++) {
+            if (assignedPlanet[i] == _planetId) {
+                totalFleetSize += 1;
+            }
+        }
+        uint256[] memory defenseFleetToReturn = new uint256[](totalFleetSize);
+
+        for (uint256 i = 0; i < totalSupply() + 1; i++) {
+            if (assignedPlanet[i] == _planetId) {
+                defenseFleetToReturn = i;
+            }
+        }
+
+        return defenseFleetToReturn;
     }
 }

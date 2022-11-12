@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-import {AppStorage, Modifiers, CraftItem, SendCargo, SendTerraform, attackStatus} from "../libraries/AppStorage.sol";
+import {AppStorage, Modifiers, CraftItem, SendCargo, SendTerraform, attackStatus, ShipType} from "../libraries/AppStorage.sol";
 import "../interfaces/IPlanets.sol";
 import "../interfaces/IFleets.sol";
 
@@ -49,7 +49,7 @@ contract FleetsFacet is Modifiers {
         uint256 fleetId = s.craftFleets[_planetId].itemId;
         delete s.craftFleets[_planetId];
 
-        IPlanets(s.planets).addFleet(_planetId, fleetId, shipId);
+        IPlanets(s.planets).addFleet(_planetId, fleetId, 1);
         IShips(s.ships).assignShipToPlanet(shipId, _planetId);
     }
 
@@ -180,17 +180,7 @@ contract FleetsFacet is Modifiers {
 
             //unassign ships during attack
             IShips(s.ships).deleteShipFromPlanet(_shipIds[i]);
-
-            //@TODO this currently removes them all from the defense array for a 0.
-            //@TODO need a func that goes through the array and deletes the specific attacker ships
-            //mapping @TODO remove / refactor
-
-            uint256[] memory placeholderdelete;
-
-            IPlanets(s.planets).assignDefensePlanet(
-                _fromPlanetId,
-                placeholderdelete
-            );
+            unAssignNewShipTypeAmount(_fromPlanetId, _shipIds);
         }
 
         //refactor to  an internal func
@@ -231,6 +221,45 @@ contract FleetsFacet is Modifiers {
         onlyPlanetOwner(_toPlanetId)
     {}
 
+    function assignNewShipTypeAmount(
+        uint256 _toPlanetId,
+        uint256[] memory _shipsTokenIds
+    ) internal {
+        for (uint256 i = 0; i < _shipsTokenIds.length; i++) {
+            IPlanets(s.planets).addFleet(
+                _toPlanetId,
+                IShips(s.ships).getShipStats(_shipsTokenIds[i]).shipType,
+                1
+            );
+        }
+    }
+
+    function assignNewShipTypeAmount(
+        uint256 _toPlanetId,
+        uint256[] memory _shipsTokenIds
+    ) internal {
+        for (uint256 i = 0; i < _shipsTokenIds.length; i++) {
+            IPlanets(s.planets).addFleet(
+                _toPlanetId,
+                IShips(s.ships).getShipStats(_shipsTokenIds[i]).shipType,
+                1
+            );
+        }
+    }
+
+    function unAssignNewShipTypeAmount(
+        uint256 _toPlanetId,
+        uint256[] memory _shipsTokenIds
+    ) internal {
+        for (uint256 i = 0; i < _shipsTokenIds.length; i++) {
+            IPlanets(s.planets).removeFleet(
+                _toPlanetId,
+                IShips(s.ships).getShipStats(_shipsTokenIds[i]).shipType,
+                1
+            );
+        }
+    }
+
     function resolveAttack(uint256 _attackInstanceId) external {
         attackStatus memory attackToResolve = IPlanets(s.planets)
             .getAttackStatus(_attackInstanceId);
@@ -241,7 +270,7 @@ contract FleetsFacet is Modifiers {
         );
 
         uint256[] memory attackerShips = attackToResolve.attackerShipsIds;
-        uint256[] memory defenderShips = IPlanets(s.planets).getDefensePlanet(
+        uint256[] memory defenderShips = IShips(s.ships).getDefensePlanet(
             attackToResolve.toPlanet
         );
 
@@ -303,13 +332,17 @@ contract FleetsFacet is Modifiers {
 
                 //damage to attackerForce, random? @TODO
 
-                //assign attacker fleet to planet defender array (deletes the old defenseships array in the process);
-                IPlanets(s.planets).assignDefensePlanet(
+                //assign attacker ships to new planet
+
+                unAssignNewShipTypeAmount(
+                    attackToResolve.toPlanet,
+                    defenderShips
+                );
+                assignNewShipTypeAmount(
                     attackToResolve.toPlanet,
                     attackerShips
                 );
 
-                //assign attacker ships to new planet
                 for (uint256 i = 0; i < attackerShips.length; i++) {
                     IShips(s.ships).assignShipToPlanet(
                         attackerShips[i],
@@ -334,10 +367,11 @@ contract FleetsFacet is Modifiers {
                     }
                 }
 
-                //update planet defense array mapping @TODO remove / refactor
-                IPlanets(s.planets).assignDefensePlanet(
-                    attackToResolve.toPlanet,
-                    defenderShips
+                //sending ships home
+
+                assignNewShipTypeAmount(
+                    attackToResolve.fromPlanet,
+                    attackerShips
                 );
 
                 for (uint256 i = 0; i < attackerShips.length; i++) {
@@ -346,12 +380,6 @@ contract FleetsFacet is Modifiers {
                         attackToResolve.fromPlanet
                     );
                 }
-
-                //update planet defense array mapping @TODO remove / refactor
-                IPlanets(s.planets).assignDefensePlanet(
-                    attackToResolve.fromPlanet,
-                    attackerShips
-                );
 
                 IPlanets(s.planets).resolveLostAttack(
                     attackToResolve.attackInstanceId
@@ -378,18 +406,14 @@ contract FleetsFacet is Modifiers {
 
             //sending ships home
 
+            assignNewShipTypeAmount(attackToResolve.fromPlanet, attackerShips);
+
             for (uint256 i = 0; i < attackerShips.length; i++) {
                 IShips(s.ships).assignShipToPlanet(
                     attackerShips[i],
                     attackToResolve.fromPlanet
                 );
             }
-
-            //update planet defense array mapping @TODO remove / refactor
-            IPlanets(s.planets).assignDefensePlanet(
-                attackToResolve.fromPlanet,
-                attackerShips
-            );
 
             IPlanets(s.planets).resolveLostAttack(
                 attackToResolve.attackInstanceId
@@ -405,12 +429,8 @@ contract FleetsFacet is Modifiers {
                 );
             }
 
-            //update planet defense array mapping @TODO remove / refactor
-            IPlanets(s.planets).assignDefensePlanet(
-                attackToResolve.fromPlanet,
-                attackerShips
-            );
-
+            //sending ships home
+            assignNewShipTypeAmount(attackToResolve.fromPlanet, attackerShips);
             IPlanets(s.planets).resolveLostAttack(
                 attackToResolve.attackInstanceId
             );

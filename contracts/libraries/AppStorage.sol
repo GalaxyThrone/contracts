@@ -43,6 +43,24 @@ struct attackStatus {
     uint256 attackInstanceId;
 }
 
+struct ShipType {
+    uint256 shipType;
+    uint256[3] price; // [metal, crystal, ethereus]
+    uint256 attack;
+    uint256 health;
+    uint256 cargo;
+    uint256 craftTime;
+    uint256 craftedFrom;
+    string name;
+    uint256 moduleSlots;
+    ShipModule[] equippedShipModule;
+}
+
+struct ShipModule {
+    uint256 attackBoostStat;
+    uint256 healthBoostStat;
+}
+
 struct AppStorage {
     address crystal;
     address ethereus;
