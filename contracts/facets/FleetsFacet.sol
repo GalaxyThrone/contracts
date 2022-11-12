@@ -3,8 +3,6 @@ pragma solidity 0.8.17;
 
 import {AppStorage, Modifiers, CraftItem, SendCargo, SendTerraform, attackStatus, ShipType} from "../libraries/AppStorage.sol";
 import "../interfaces/IPlanets.sol";
-import "../interfaces/IFleets.sol";
-
 import "../interfaces/IShips.sol";
 import "../interfaces/IERC20.sol";
 import "../interfaces/IERC721.sol";
