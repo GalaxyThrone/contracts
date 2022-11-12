@@ -180,8 +180,8 @@ contract FleetsFacet is Modifiers {
 
             //unassign ships during attack
             IShips(s.ships).deleteShipFromPlanet(_shipIds[i]);
-            unAssignNewShipTypeAmount(_fromPlanetId, _shipIds);
         }
+        unAssignNewShipTypeAmount(_fromPlanetId, _shipIds);
 
         //refactor to  an internal func
 
@@ -215,11 +215,26 @@ contract FleetsFacet is Modifiers {
         IPlanets(s.planets).addAttack(attackToBeAdded);
     }
 
-    function sendFriendlies(uint256 _fromPlanetId, uint256 _toPlanetId)
-        external
-        onlyPlanetOwner(_fromPlanetId)
-        onlyPlanetOwner(_toPlanetId)
-    {}
+    //@TODO for guilds the target doesnt need to be the planet owner as well, alliance member / friendly status / sth
+
+    function sendFriendlies(
+        uint256 _fromPlanetId,
+        uint256 _toPlanetId,
+        uint256[] memory _shipIds
+    ) external onlyPlanetOwner(_fromPlanetId) onlyPlanetOwner(_toPlanetId) {
+        //check if ships are assigned to the planet
+        for (uint256 i = 0; i < _shipIds.length; i++) {
+            require(
+                IShips(s.ships).checkAssignedPlanet(_shipIds[i]) ==
+                    _fromPlanetId,
+                "ship is not assigned to this planet!"
+            );
+
+            //unassign ships during attack
+            IShips(s.ships).deleteShipFromPlanet(_shipIds[i]);
+            unAssignNewShipTypeAmount(_fromPlanetId, _shipIds);
+        }
+    }
 
     function assignNewShipTypeAmount(
         uint256 _toPlanetId,
