@@ -174,6 +174,13 @@ contract FleetsFacet is Modifiers {
             "you cannot attack your own planets!"
         );
 
+        require(
+            checkAlliance(IERC721(s.planets).ownerOf(_toPlanetId)) !=
+                checkAlliance(msg.sender) ||
+                checkAlliance(msg.sender) == address(0),
+            "friendly target!"
+        );
+
         //check if ships are assigned to the planet
         for (uint256 i = 0; i < _shipIds.length; i++) {
             require(
@@ -181,7 +188,10 @@ contract FleetsFacet is Modifiers {
                     _fromPlanetId,
                 "ship is not assigned to this planet!"
             );
-
+            require(
+                IERC721(s.ships).ownerOf(_shipIds[i]) == msg.sender,
+                "not your ship!"
+            );
             //unassign ships during attack
             IShips(s.ships).deleteShipFromPlanet(_shipIds[i]);
         }
@@ -219,7 +229,6 @@ contract FleetsFacet is Modifiers {
         IPlanets(s.planets).addAttack(attackToBeAdded);
     }
 
-    //@TODO for guilds the target doesnt need to be the planet owner as well, alliance member / friendly status / sth
     //@TODO currently instantenous for hackathon.
     //@notice perhaps require a specific building for instantenous travel / normal travel for others>
 
@@ -227,8 +236,16 @@ contract FleetsFacet is Modifiers {
         uint256 _fromPlanetId,
         uint256 _toPlanetId,
         uint256[] memory _shipIds
-    ) external onlyPlanetOwner(_fromPlanetId) onlyPlanetOwner(_toPlanetId) {
+    ) external onlyPlanetOwner(_fromPlanetId) {
         //check if ships are assigned to the planet
+
+        require(
+            checkAlliance(IERC721(s.planets).ownerOf(_toPlanetId)) ==
+                checkAlliance(msg.sender) ||
+                msg.sender == IERC721(s.planets).ownerOf(_toPlanetId),
+            "not a friendly target!"
+        );
+
         for (uint256 i = 0; i < _shipIds.length; i++) {
             require(
                 IShips(s.ships).checkAssignedPlanet(_shipIds[i]) ==
@@ -236,7 +253,11 @@ contract FleetsFacet is Modifiers {
                 "ship is not assigned to this planet!"
             );
 
-            //unassign ships during attack
+            require(
+                IERC721(s.ships).ownerOf(_shipIds[i]) == msg.sender,
+                "not your ship!"
+            );
+
             IShips(s.ships).deleteShipFromPlanet(_shipIds[i]);
         }
 
@@ -465,20 +486,48 @@ contract FleetsFacet is Modifiers {
         }
     }
 
-    //@TODO @Marco where to offload this, probably a seperate facet?
+    //@notice alliance functions, saved in AppStorage
 
-    //@TODO store alliance somewhere. (AppStorage?)
-    //@TODO join/leave a certain mapping.
-    //@TODO when attack/sending friendlies check if the owner of the Target is in the same Alliance as the owner.
-    //@TODO Getter Function if target is friendly
-    //@TODO Getter Function available alliances and their members.
-    //@TODO
+    function createAlliance(bytes32 memory _allianceNameToCreate) external {
+        require(
+            s.allianceOwner[_allianceNameToCreate] == address(0),
+            "alliance name is already taken!"
+        );
 
-    function createAlliance() external {}
+        require(s.registered[msg.sender], "VRFFacet: not registered yet!");
 
-    function joinAlliance() external {}
+        //@TODO minimum payment to disallow spam
 
-    function leaveAlliance() external {}
+        s.allianceOwner[_allianceNameToCreate] = msg.sender;
+    }
 
-    function checkAlliance() external {}
+    function inviteToAlliance(
+        address _memberInvited,
+        bytes32 _allianceToInviteTo
+    ) external {
+        require(s.allianceOwner[_allianceToInviteTo] == msg.sender);
+        s.isInvitedToAlliance[_memberInvited] = true;
+    }
+
+    function joinAlliance(bytes32 _allianceToJoin) external {
+        require(
+            s.isInvitedToAlliance[msg.sender] == true,
+            "you are not invited to this alliance!"
+        );
+
+        s.allianceOfPlayer[msg.sender] = _allianceToJoin;
+        delete s.isInvitedToAlliance[msg.sender];
+    }
+
+    function leaveAlliance(bytes32 _allianceToJoin) external {
+        delete s.allianceOfPlayer[msg.sender];
+    }
+
+    function checkAlliance(address _playerToCheck)
+        public
+        view
+        returns (bytes32)
+    {
+        return s.allianceOfPlayer[_playerToCheck];
+    }
 }
