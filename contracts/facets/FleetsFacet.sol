@@ -54,6 +54,7 @@ contract FleetsFacet is Modifiers {
     }
 
     //@notice Disabled for V0.01
+    /*
     function sendCargo(
         uint256 _fromPlanetId,
         uint256 _toPlanetId,
@@ -72,8 +73,9 @@ contract FleetsFacet is Modifiers {
         s.sendCargo[s.sendCargoId] = newSendCargo;
         // emit event
     }
-
+    */
     //@notice Disabled for V0.01
+    /*
     function returnCargo(uint256 _sendCargoId) external {
         require(
             msg.sender ==
@@ -107,8 +109,10 @@ contract FleetsFacet is Modifiers {
         IResource(s.ethereus).mint(msg.sender, cargo);
         delete s.sendCargo[_sendCargoId];
     }
-
+    */
     //@notice Disabled for V0.01
+
+    /*
     function sendTerraform(
         uint256 _fromPlanetId,
         uint256 _toPlanetId,
@@ -126,8 +130,9 @@ contract FleetsFacet is Modifiers {
         s.sendTerraform[s.sendTerraformId] = newSendTerraform;
         // emit event
     }
-
+    */
     //@notice Disabled for V0.01
+    /*
     function endTerraform(uint256 _sendTerraformId) external {
         require(
             msg.sender ==
@@ -152,7 +157,7 @@ contract FleetsFacet is Modifiers {
         );
         //todo: conquer planet
     }
-
+    */
     function getCraftFleets(uint256 _planetId)
         external
         view
