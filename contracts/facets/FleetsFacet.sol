@@ -35,13 +35,16 @@ contract FleetsFacet is Modifiers {
         IERC20(s.ethereus).burnFrom(msg.sender, price[2]);
     }
 
-    function claimFleet(uint256 _planetId) external onlyPlanetOwner(_planetId) {
+    function claimFleet(uint256 _planetId)
+        external
+        onlyPlanetOwnerOrChainRunner(_planetId)
+    {
         require(
             block.timestamp >= s.craftFleets[_planetId].readyTimestamp,
             "FleetsFacet: not ready yet"
         );
         uint256 shipId = IShips(s.ships).mint(
-            msg.sender,
+            IERC721(s.planets).ownerOf(_planetId),
             s.craftFleets[_planetId].itemId
         );
         uint256 fleetId = s.craftFleets[_planetId].itemId;

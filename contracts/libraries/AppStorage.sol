@@ -90,6 +90,9 @@ struct AppStorage {
     address vrfCoordinator;
     address linkAddress;
     RequestConfig requestConfig;
+    //@TODO add to deployment script. this is our backend account able to claim for players / resolve attacks.
+    //@notice this does not represent an attack vector, since the actions dont mint/generate anything for msg.sender, they only cost gas.
+    address chainRunner;
 }
 
 library LibAppStorage {
@@ -111,6 +114,16 @@ contract Modifiers {
     modifier onlyPlanetOwner(uint256 _planetId) {
         require(
             msg.sender == IERC721(s.planets).ownerOf(_planetId),
+            "AppStorage: Not owner"
+        );
+        _;
+    }
+
+    modifier onlyPlanetOwnerOrChainRunner(uint256 _planetId) {
+        require(
+            msg.sender == IERC721(s.planets).ownerOf(_planetId) ||
+                //@TODO @notice @Marco , How can I reference the address variable from above? This way?
+                msg.sender == s.chainRunner,
             "AppStorage: Not owner"
         );
         _;
