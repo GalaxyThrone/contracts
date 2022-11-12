@@ -173,7 +173,7 @@ contract FleetsFacet is Modifiers {
         //check if ships are assigned to the planet
         for (uint256 i = 0; i < _shipIds.length; i++) {
             require(
-                IShips(s.ships).checkAssignedPlanet([_shipIds[i]]) ==
+                IShips(s.ships).checkAssignedPlanet(_shipIds[i]) ==
                     _fromPlanetId,
                 "ship is not assigned to this planet!"
             );
@@ -186,7 +186,6 @@ contract FleetsFacet is Modifiers {
             //mapping @TODO remove / refactor
 
             uint256[] memory placeholderdelete;
-            placeholderdelete.push(0);
 
             IPlanets(s.planets).assignDefensePlanet(
                 _fromPlanetId,
@@ -233,16 +232,15 @@ contract FleetsFacet is Modifiers {
     {}
 
     function resolveAttack(uint256 _attackInstanceId) external {
-        attackStatus memory attackToResolve = IPlanets(s.planets).getAttack(
-            _attackInstanceId
-        );
+        attackStatus memory attackToResolve = IPlanets(s.planets)
+            .getAttackStatus(_attackInstanceId);
 
         require(
             block.timestamp >= attackToResolve.timeToBeResolved,
             "attack fleet hasnt arrived yet!"
         );
 
-        uint256[] memory attackerShips = attackToResolve.attackerShipsId;
+        uint256[] memory attackerShips = attackToResolve.attackerShipsIds;
         uint256[] memory defenderShips = IPlanets(s.planets).getDefensePlanet(
             attackToResolve.toPlanet
         );
@@ -253,22 +251,22 @@ contract FleetsFacet is Modifiers {
         int256 defenseStrength;
         int256 defenseHealth;
         for (uint256 i = 0; i < attackerShips.length; i++) {
-            attackStrength += IShips(s.ships)
-                .getShipStats(attackerShips[i])
-                .attack;
-            attackHealth += IShips(s.ships)
-                .getShipStats(attackerShips[i])
-                .health;
+            attackStrength += int256(
+                IShips(s.ships).getShipStats(attackerShips[i]).attack
+            );
+            attackHealth += int256(
+                IShips(s.ships).getShipStats(attackerShips[i]).health
+            );
         }
 
         for (uint256 i = 0; i < defenderShips.length; i++) {
-            defenseStrength += IShips(s.ships)
-                .getShipStats(defenderShips[i])
-                .attack;
+            defenseStrength += int256(
+                IShips(s.ships).getShipStats(defenderShips[i]).attack
+            );
 
-            defenseHealth += IShips(s.ships)
-                .getShipStats(defenderShips[i])
-                .health;
+            defenseHealth += int256(
+                IShips(s.ships).getShipStats(defenderShips[i]).health
+            );
         }
 
         //to be improved later, very rudimentary resolvement
@@ -323,17 +321,15 @@ contract FleetsFacet is Modifiers {
             else {
                 //burn nfts and unassign ship from planets, also reduce defenderShip Array
                 for (uint256 i = 0; i < defenderShips.length; i++) {
-                    uint256 defenderShipHealth = IShips(s.ships)
-                        .getShipStats(defenderShips[i])
-                        .health;
+                    int256 defenderShipHealth = int256(
+                        IShips(s.ships).getShipStats(defenderShips[i]).health
+                    );
 
                     if (battleResult > defenderShipHealth) {
                         battleResult -= defenderShipHealth;
 
                         IShips(s.ships).burnShip(defenderShips[i]);
-                        IShips(s.ships).deleteShipFromPlanet(
-                            [defenderShips[i]]
-                        );
+                        IShips(s.ships).deleteShipFromPlanet(defenderShips[i]);
                         delete defenderShips[i];
                     }
                 }
@@ -367,15 +363,15 @@ contract FleetsFacet is Modifiers {
         if (battleResult < 0) {
             //burn attacker nfts that lost
             for (uint256 i = 0; i < attackerShips.length; i++) {
-                uint256 attackerShipHealth = IShips(s.ships)
-                    .getShipStats(attackerShips[i])
-                    .health;
+                int256 attackerShipHealth = int256(
+                    IShips(s.ships).getShipStats(attackerShips[i]).health
+                );
 
                 if (battleResult > attackerShipHealth) {
                     battleResult -= attackerShipHealth;
 
                     IShips(s.ships).burnShip(attackerShips[i]);
-                    IShips(s.ships).deleteShipFromPlanet([attackerShips[i]]);
+                    IShips(s.ships).deleteShipFromPlanet(attackerShips[i]);
                     delete attackerShips[i];
                 }
             }

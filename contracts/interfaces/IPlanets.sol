@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
+import {attackStatus} from "../libraries/AppStorage.sol";
 
 interface IPlanets {
     struct Planet {
@@ -59,7 +60,9 @@ interface IPlanets {
         uint256 _attackIdResolved
     ) external;
 
-    function getDefensePlanet(uint256 planetId) external;
+    function getDefensePlanet(uint256 planetId)
+        external
+        returns (uint256[] memory);
 
     function assignDefensePlanet(
         uint256 _planetId,
@@ -67,4 +70,11 @@ interface IPlanets {
     ) external;
 
     function resolveLostAttack(uint256 attackIdResolved) external;
+
+    function addAttack(attackStatus memory _attackToBeInitated) external;
+
+    function getAttackStatus(uint256 _instanceId)
+        external
+        view
+        returns (attackStatus memory);
 }
