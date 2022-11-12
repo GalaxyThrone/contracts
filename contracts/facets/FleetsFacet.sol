@@ -15,7 +15,7 @@ contract FleetsFacet is Modifiers {
         external
         onlyPlanetOwner(_planetId)
     {
-        IFleets fleetsContract = IShips(s.ships);
+        IShips fleetsContract = IShips(s.ships);
         uint256[3] memory price = fleetsContract.getPrice(_fleetId);
         uint256 craftTime = fleetsContract.getCraftTime(_fleetId);
         uint256 craftedFrom = fleetsContract.getCraftedFrom(_fleetId);
