@@ -76,6 +76,11 @@ struct AppStorage {
     mapping(uint256 => SendCargo) sendCargo;
     // sendTerraformId => SendTerraform
     mapping(uint256 => SendTerraform) sendTerraform;
+    //alliance Mappings
+    mapping(address => bool) isInvited;
+    mapping(bytes32 => address) allianceOwner;
+    mapping(address => bytes32) allianceOfPlayer;
+    mapping(bytes23 => uint256) allianceMemberCount;
     uint256 sendCargoId;
     uint256 sendTerraformId;
     // heroId => vrf/reg data
