@@ -32,6 +32,17 @@ struct RequestConfig {
     bytes32 keyHash;
 }
 
+struct attackStatus {
+    uint256 attackStarted;
+    uint256 distance;
+    uint256 timeToBeResolved;
+    uint256 fromPlanet;
+    uint256 toPlanet;
+    uint256[] attackerShipsIds;
+    address attacker;
+    uint256 attackInstanceId;
+}
+
 struct AppStorage {
     address crystal;
     address ethereus;
