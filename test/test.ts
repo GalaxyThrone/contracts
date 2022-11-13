@@ -6,7 +6,6 @@ import {
   AdminFacet,
   Buildings,
   Planets,
-  Fleets,
   BuildingsFacet,
   RegisterFacet,
 } from "../typechain-types";
@@ -27,6 +26,8 @@ describe("Game", function () {
 
   let vrfFacet: RegisterFacet;
   let buildingsFacet: BuildingsFacet;
+
+  let planetNfts: Planets;
 
   async function deployUsers() {
     const [
@@ -57,7 +58,7 @@ describe("Game", function () {
     console.log(
       "-------------------------------------------------------------------"
     );
-    console.log(g.diamondAddress);
+    console.log(g);
     console.log(
       "-------------------------------------------------------------------"
     );
@@ -69,6 +70,11 @@ describe("Game", function () {
       "RegisterFacet",
       diamond
     )) as RegisterFacet;
+
+    planetNfts = (await ethers.getContractAt(
+      "Planets",
+      g.planetsAddress
+    )) as Planets;
 
     buildingsFacet = (await ethers.getContractAt(
       "BuildingsFacet",
@@ -97,6 +103,13 @@ describe("Game", function () {
     const registration = await vrfFacet
       .connect(randomUser)
       .testRegister();
+
+    const checkOwnershipAmountPlayer = await planetNfts.balanceOf(
+      randomUser.address
+    );
+
+    console.log(checkOwnershipAmountPlayer);
+    //@TODO check if owner holds a planet NFT
   });
 
   it.skip("debug", async function () {
