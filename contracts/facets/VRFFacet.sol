@@ -23,6 +23,9 @@ contract RegisterFacet is Modifiers {
             "VRFFacet: already registering"
         );
         require(!s.registered[msg.sender], "VRFFacet: already registered");
+
+        //require payment to prevent sybil attacks. disabled for hackathon
+        IERC20(s.governanceToken).mintToUser(msg.sender, 1e18);
         drawRandomNumbers(msg.sender);
     }
 

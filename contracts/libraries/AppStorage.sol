@@ -39,6 +39,7 @@ struct AppStorage {
     address buildings;
     address fleets;
     address planets;
+    address governanceToken;
     mapping(address => bool) registered;
     mapping(uint256 => CraftItem) craftBuildings;
     mapping(uint256 => CraftItem) craftFleets;
