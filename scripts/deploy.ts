@@ -186,7 +186,9 @@ export async function deployDiamond() {
 
   //@TODO @notice create some planets to assign
   //@TODO currently gives a revert error for no apparent reason
-  const initPlanets = await adminFacet.initPlanets(20);
+  const initPlanets = await adminFacet
+    .connect(deployer)
+    .initPlanets(20);
   await initPlanets.wait();
 
   return {
