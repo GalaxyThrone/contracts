@@ -93,11 +93,10 @@ describe("Game", function () {
       AdminUser,
     } = await loadFixture(deployUsers);
 
+    //@actual register function for Tron Network
     const registration = await vrfFacet
       .connect(randomUser)
-      .register();
-
-    //@TODO MOCK VRF
+      .testRegister();
   });
 
   it.skip("debug", async function () {
