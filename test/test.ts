@@ -106,7 +106,7 @@ describe("Game", function () {
       AdminUser,
     } = await loadFixture(deployUsers);
 
-    //@actual register function for Tron Network
+    //@notice actual register function for Tron Network
     const registration = await vrfFacet
       .connect(randomUser)
       .testRegister();
