@@ -15,6 +15,7 @@ import {
 } from "../typechain-types";
 import { addBuildings } from "./addBuildings";
 import { addFleets } from "./addFleets";
+import { initPlanets } from "./initPlanets";
 
 const {
   getSelectors,
@@ -182,6 +183,11 @@ export async function deployDiamond() {
   await addBuildings(buildings.address);
   console.log("adding ships");
   await addFleets(ships.address);
+
+  //@TODO @notice create some planets to assign
+  //@TODO currently gives a revert error for no apparent reason
+  const initPlanets = await adminFacet.initPlanets(20);
+  await initPlanets.wait();
 
   return {
     diamondAddress: diamond.address,
