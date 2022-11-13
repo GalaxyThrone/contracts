@@ -174,14 +174,6 @@ contract Planets is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         return (planets[_planetId].coordinateX, planets[_planetId].coordinateY);
     }
 
-    function getDefensePlanet(uint256 _planetId)
-        external
-        view
-        returns (uint256[] memory)
-    {
-        return fleetShipIds[_planetId];
-    }
-
     function addAttack(attackStatus memory _attackToBeInitated)
         external
         onlyGameDiamond

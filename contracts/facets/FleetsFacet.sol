@@ -268,7 +268,7 @@ contract FleetsFacet is Modifiers {
 
         assignNewShipTypeAmount(_toPlanetId, _shipIds);
 
-        for (uint256 i = 0; i < attackerShips.length; i++) {
+        for (uint256 i = 0; i < _shipIds.length; i++) {
             IShips(s.ships).assignShipToPlanet(_shipIds[i], _toPlanetId);
         }
     }
@@ -492,7 +492,7 @@ contract FleetsFacet is Modifiers {
 
     //@notice alliance functions, saved in AppStorage
 
-    function createAlliance(bytes32 memory _allianceNameToCreate) external {
+    function createAlliance(bytes32 _allianceNameToCreate) external {
         require(
             s.allianceOwner[_allianceNameToCreate] == address(0),
             "alliance name is already taken!"
