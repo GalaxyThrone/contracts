@@ -56,15 +56,6 @@ describe("Game", function () {
     const diamond = g.diamondAddress; //"0xe296a5cf8c15d2a4192670fd12132fc7a2d5f426";
     //await upgrade();
 
-    //@why the fuck is this empty
-    console.log(
-      "-------------------------------------------------------------------"
-    );
-    console.log(g);
-    console.log(
-      "-------------------------------------------------------------------"
-    );
-
     await upgradeTestVersion(diamond);
     // await upgradeContract("0xA7902D5fd78e896A1071453D2e24DA41a7fA0004");
 
@@ -115,10 +106,122 @@ describe("Game", function () {
       randomUser.address
     );
 
+    expect(checkOwnershipAmountPlayer).to.equal(1);
+
+    /*
     console.log(checkOwnershipAmountPlayer);
-    //@notice user doesnt actually get an NFT upon registering..do we have to premint them?
+
+    console.log(checkOwnershipAmountPlayer);
+    const expr = await planetNfts.planets(1);
+    console.log("Planet1 Data:");
+    console.log(expr);
+
+    const expr2 = await planetNfts.planets(2);
+    console.log("Planet2 Data:");
+    console.log(expr2);
+
+    */
   });
 
+  it("registered user can mine every 24hours ", async function () {
+    const {
+      owner,
+      randomUser,
+      randomUserTwo,
+      randomUserThree,
+      AdminUser,
+    } = await loadFixture(deployUsers);
+  });
+
+  it("registered user can craft & claim buildings", async function () {
+    const {
+      owner,
+      randomUser,
+      randomUserTwo,
+      randomUserThree,
+      AdminUser,
+    } = await loadFixture(deployUsers);
+  });
+
+  it("registered user can craft & claim ships ", async function () {
+    const {
+      owner,
+      randomUser,
+      randomUserTwo,
+      randomUserThree,
+      AdminUser,
+    } = await loadFixture(deployUsers);
+  });
+
+  it("registered user attack other user and conquer his NFT ", async function () {
+    const {
+      owner,
+      randomUser,
+      randomUserTwo,
+      randomUserThree,
+      AdminUser,
+    } = await loadFixture(deployUsers);
+  });
+
+  it("registered user attack other user and lose ", async function () {
+    const {
+      owner,
+      randomUser,
+      randomUserTwo,
+      randomUserThree,
+      AdminUser,
+    } = await loadFixture(deployUsers);
+  });
+
+  it("registered user can send friendly ships to his owned planet ", async function () {
+    const {
+      owner,
+      randomUser,
+      randomUserTwo,
+      randomUserThree,
+      AdminUser,
+    } = await loadFixture(deployUsers);
+  });
+
+  it("registered user can send friendly ships to his alliance member ", async function () {
+    const {
+      owner,
+      randomUser,
+      randomUserTwo,
+      randomUserThree,
+      AdminUser,
+    } = await loadFixture(deployUsers);
+  });
+
+  it("registered user can create an alliance & invite members ", async function () {
+    const {
+      owner,
+      randomUser,
+      randomUserTwo,
+      randomUserThree,
+      AdminUser,
+    } = await loadFixture(deployUsers);
+  });
+
+  it("registered user can join  an alliance when invited", async function () {
+    const {
+      owner,
+      randomUser,
+      randomUserTwo,
+      randomUserThree,
+      AdminUser,
+    } = await loadFixture(deployUsers);
+  });
+
+  it.skip("chainRunner can mine every 24hours for the user ", async function () {
+    const {
+      owner,
+      randomUser,
+      randomUserTwo,
+      randomUserThree,
+      AdminUser,
+    } = await loadFixture(deployUsers);
+  });
   it.skip("debug", async function () {
     buildingsFacet = await impersonate(
       "0xf2381dD8B282669C139C2d227bAb5314B5E9EBC7",
