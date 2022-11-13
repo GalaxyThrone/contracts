@@ -15,6 +15,7 @@ import {
   upgrade,
   upgradeTestVersion,
 } from "../scripts/upgradeDiamond";
+import { initPlanets } from "../scripts/initPlanets";
 
 const {
   loadFixture,
@@ -25,6 +26,7 @@ describe("Game", function () {
   let g: any;
 
   let vrfFacet: RegisterFacet;
+  let adminFacet: AdminFacet;
   let buildingsFacet: BuildingsFacet;
 
   let planetNfts: Planets;
@@ -71,6 +73,11 @@ describe("Game", function () {
       diamond
     )) as RegisterFacet;
 
+    adminFacet = (await ethers.getContractAt(
+      "AdminFacet",
+      diamond
+    )) as AdminFacet;
+
     planetNfts = (await ethers.getContractAt(
       "Planets",
       g.planetsAddress
@@ -109,7 +116,7 @@ describe("Game", function () {
     );
 
     console.log(checkOwnershipAmountPlayer);
-    //@TODO check if owner holds a planet NFT
+    //@notice user doesnt actually get an NFT upon registering..do we have to premint them?
   });
 
   it.skip("debug", async function () {
