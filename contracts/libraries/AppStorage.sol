@@ -77,7 +77,7 @@ struct AppStorage {
     // sendTerraformId => SendTerraform
     mapping(uint256 => SendTerraform) sendTerraform;
     //alliance Mappings
-    mapping(address => bool) isInvited;
+    mapping(address => bool) isInvitedToAlliance;
     mapping(bytes32 => address) allianceOwner;
     mapping(address => bytes32) allianceOfPlayer;
     mapping(bytes23 => uint256) allianceMemberCount;
