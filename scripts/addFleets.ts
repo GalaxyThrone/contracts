@@ -1,5 +1,7 @@
 import { ethers } from "hardhat";
 import { Ships } from "../typechain-types";
+import { ship } from "../types";
+
 
 export async function addFleets(fleetsAddress: string) {
   // const gasPrice = 35000000000;
@@ -8,7 +10,7 @@ export async function addFleets(fleetsAddress: string) {
     fleetsAddress
   )) as Ships;
 
-  const fleet1: Ships = {
+  const fleet1: ship = {
     shipType: 0,
     price: [
       ethers.utils.parseEther("300"),
@@ -26,7 +28,7 @@ export async function addFleets(fleetsAddress: string) {
     equippedShipModule: {attackBoostStat: 0, healthBoostStat: 0},
   };
 
-  const fleet2: Ships = {
+  const fleet2: ship = {
     shipType: 1,
     price: [
       ethers.utils.parseEther("2000"),
@@ -43,7 +45,7 @@ export async function addFleets(fleetsAddress: string) {
     equippedShipModule: {attackBoostStat: 0, healthBoostStat: 0},
   };
 
-  const fleet3: Ships = {
+  const fleet3: ship = {
     shipType: 2,
     price: [
       ethers.utils.parseEther("5000"),
@@ -60,7 +62,7 @@ export async function addFleets(fleetsAddress: string) {
     equippedShipModule: {attackBoostStat: 0, healthBoostStat: 0},
   };
 
-  const fleet4: Ships = {
+  const fleet4: ship = {
     shipType: 3,
     price: [
       ethers.utils.parseEther("600"),
@@ -77,7 +79,7 @@ export async function addFleets(fleetsAddress: string) {
     equippedShipModule: {attackBoostStat: 0, healthBoostStat: 0},
   };
 
-  const fleet5: Ships = {
+  const fleet5: ship = {
     shipType: 4,
     price: [
       ethers.utils.parseEther("3000"),
@@ -94,7 +96,7 @@ export async function addFleets(fleetsAddress: string) {
     equippedShipModule: {attackBoostStat: 0, healthBoostStat: 0},
   };
 
-  const fleet6: Ships = {
+  const fleet6: ship = {
     shipType: 5,
     price: [
       ethers.utils.parseEther("2000"),
@@ -111,7 +113,7 @@ export async function addFleets(fleetsAddress: string) {
     equippedShipModule: {attackBoostStat: 0, healthBoostStat: 0},
   };
 
-  const fleet7: Ships = {
+  const fleet7: ship = {
     shipType: 6,
     price: [
       ethers.utils.parseEther("500"),
@@ -128,7 +130,7 @@ export async function addFleets(fleetsAddress: string) {
     equippedShipModule: {attackBoostStat: 0, healthBoostStat: 0},
   };
 
-  const fleet8: Ships = {
+  const fleet8: ship = {
     shipType: 7,
     price: [
       ethers.utils.parseEther("200"),
@@ -145,7 +147,7 @@ export async function addFleets(fleetsAddress: string) {
     equippedShipModule: {attackBoostStat: 0, healthBoostStat: 0},
   };
 
-  const fleet9: Ships = {
+  const fleet9: ship = {
     shipType: 8,
     price: [
       ethers.utils.parseEther("20000"),
@@ -162,30 +164,30 @@ export async function addFleets(fleetsAddress: string) {
     equippedShipModule: {attackBoostStat: 0, healthBoostStat: 0},
   };
 
-  const addFleet1Tx = await fleetsContract.addFleet(1, fleet1);
+  const addFleet1Tx = await fleetsContract.addShipType(1, fleet1);
   await addFleet1Tx.wait();
 
-  const addFleet2Tx = await fleetsContract.addFleet(2, fleet2);
+  const addFleet2Tx = await fleetsContract.addShipType(2, fleet2);
   await addFleet2Tx.wait();
 
-  const addFleet3Tx = await fleetsContract.addFleet(3, fleet3);
+  const addFleet3Tx = await fleetsContract.addShipType(3, fleet3);
   await addFleet3Tx.wait();
 
-  const addFleet4Tx = await fleetsContract.addFleet(4, fleet4);
+  const addFleet4Tx = await fleetsContract.addShipType(4, fleet4);
   await addFleet4Tx.wait();
 
-  const addFleet5Tx = await fleetsContract.addFleet(5, fleet5);
+  const addFleet5Tx = await fleetsContract.addShipType(5, fleet5);
   await addFleet5Tx.wait();
 
-  const addFleet6Tx = await fleetsContract.addFleet(6, fleet6);
+  const addFleet6Tx = await fleetsContract.addShipType(6, fleet6);
   await addFleet6Tx.wait();
 
-  const addFleet7Tx = await fleetsContract.addFleet(7, fleet7);
+  const addFleet7Tx = await fleetsContract.addShipType(7, fleet7);
   await addFleet7Tx.wait();
 
-  const addFleet8Tx = await fleetsContract.addFleet(8, fleet8);
+  const addFleet8Tx = await fleetsContract.addShipType(8, fleet8);
   await addFleet8Tx.wait();
 
-  const addFleet9Tx = await fleetsContract.addFleet(9, fleet9);
+  const addFleet9Tx = await fleetsContract.addShipType(9, fleet9);
   await addFleet9Tx.wait();
 }
