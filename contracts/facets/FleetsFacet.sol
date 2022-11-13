@@ -180,7 +180,7 @@ contract FleetsFacet is Modifiers {
         require(
             checkAlliance(IERC721(s.planets).ownerOf(_toPlanetId)) !=
                 checkAlliance(msg.sender) ||
-                checkAlliance(msg.sender) == address(0),
+                checkAlliance(msg.sender) == bytes32(0),
             "friendly target!"
         );
 
@@ -270,19 +270,6 @@ contract FleetsFacet is Modifiers {
 
         for (uint256 i = 0; i < _shipIds.length; i++) {
             IShips(s.ships).assignShipToPlanet(_shipIds[i], _toPlanetId);
-        }
-    }
-
-    function assignNewShipTypeAmount(
-        uint256 _toPlanetId,
-        uint256[] memory _shipsTokenIds
-    ) internal {
-        for (uint256 i = 0; i < _shipsTokenIds.length; i++) {
-            IPlanets(s.planets).addFleet(
-                _toPlanetId,
-                IShips(s.ships).getShipStats(_shipsTokenIds[i]).shipType,
-                1
-            );
         }
     }
 

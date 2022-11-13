@@ -149,7 +149,8 @@ contract Ships is ERC721EnumerableUpgradeable, OwnableUpgradeable {
 
         for (uint256 i = 0; i < totalSupply() + 1; i++) {
             if (assignedPlanet[i] == _planetId) {
-                defenseFleetToReturn = i;
+                defenseFleetToReturn[totalFleetSize - 1] = i;
+                totalFleetSize--;
             }
         }
 
