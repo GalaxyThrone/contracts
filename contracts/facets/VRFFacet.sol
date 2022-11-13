@@ -12,9 +12,9 @@ import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 contract RegisterFacet is Modifiers {
     event Register(uint256 indexed _heroId, uint256 _landId);
 
-    function testRegister(uint256 fakeRandom) external {
+    function testRegister() external {
         require(!s.registered[msg.sender], "VRFFacet: already registered");
-        _testRegister(msg.sender, fakeRandom);
+        _testRegister(msg.sender, random());
     }
 
     function register() external {
@@ -142,9 +142,27 @@ contract RegisterFacet is Modifiers {
         IERC20(s.metal).mint(msg.sender, 120000 ether);
         IERC20(s.crystal).mint(msg.sender, 80000 ether);
         IERC20(s.ethereus).mint(msg.sender, 60000 ether);
+
+        if (!s.registered[msg.sender]) {
+            s.registrationStarted[_player] = false;
+        }
     }
 
     function getRegistered(address _account) external view returns (bool) {
         return s.registered[_account];
+    }
+
+    function random() private view returns (uint256) {
+        return
+            uint256(
+                keccak256(
+                    abi.encodePacked(
+                        block.difficulty,
+                        msg.sender,
+                        block.timestamp,
+                        block.difficulty
+                    )
+                )
+            );
     }
 }
