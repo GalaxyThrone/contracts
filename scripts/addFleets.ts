@@ -2,7 +2,6 @@ import { ethers } from "hardhat";
 import { Ships } from "../typechain-types";
 import { ship } from "../types";
 
-
 export async function addFleets(fleetsAddress: string) {
   // const gasPrice = 35000000000;
   let fleetsContract = (await ethers.getContractAt(
@@ -25,7 +24,7 @@ export async function addFleets(fleetsAddress: string) {
     name: "Fighter",
     moduleSlots: 1,
     //@TODO right syntax?
-    equippedShipModule: {attackBoostStat: 0, healthBoostStat: 0},
+    equippedShipModule: [{ attackBoostStat: 0, healthBoostStat: 0 }],
   };
 
   const fleet2: ship = {
@@ -42,7 +41,7 @@ export async function addFleets(fleetsAddress: string) {
     craftedFrom: 7,
     name: "Frigate",
     moduleSlots: 1,
-    equippedShipModule: {attackBoostStat: 0, healthBoostStat: 0},
+    equippedShipModule: [{ attackBoostStat: 0, healthBoostStat: 0 }],
   };
 
   const fleet3: ship = {
@@ -59,7 +58,7 @@ export async function addFleets(fleetsAddress: string) {
     craftedFrom: 7,
     name: "Cruiser",
     moduleSlots: 1,
-    equippedShipModule: {attackBoostStat: 0, healthBoostStat: 0},
+    equippedShipModule: [{ attackBoostStat: 0, healthBoostStat: 0 }],
   };
 
   const fleet4: ship = {
@@ -76,7 +75,7 @@ export async function addFleets(fleetsAddress: string) {
     craftedFrom: 7,
     name: "Raider",
     moduleSlots: 1,
-    equippedShipModule: {attackBoostStat: 0, healthBoostStat: 0},
+    equippedShipModule: [{ attackBoostStat: 0, healthBoostStat: 0 }],
   };
 
   const fleet5: ship = {
@@ -93,7 +92,7 @@ export async function addFleets(fleetsAddress: string) {
     craftedFrom: 7,
     name: "Warship",
     moduleSlots: 1,
-    equippedShipModule: {attackBoostStat: 0, healthBoostStat: 0},
+    equippedShipModule: [{ attackBoostStat: 0, healthBoostStat: 0 }],
   };
 
   const fleet6: ship = {
@@ -110,7 +109,7 @@ export async function addFleets(fleetsAddress: string) {
     craftedFrom: 7,
     name: "Bomber",
     moduleSlots: 1,
-    equippedShipModule: {attackBoostStat: 0, healthBoostStat: 0},
+    equippedShipModule: [{ attackBoostStat: 0, healthBoostStat: 0 }],
   };
 
   const fleet7: ship = {
@@ -127,7 +126,7 @@ export async function addFleets(fleetsAddress: string) {
     craftedFrom: 7,
     name: "Cargo Ship",
     moduleSlots: 1,
-    equippedShipModule: {attackBoostStat: 0, healthBoostStat: 0},
+    equippedShipModule: [{ attackBoostStat: 0, healthBoostStat: 0 }],
   };
 
   const fleet8: ship = {
@@ -144,7 +143,7 @@ export async function addFleets(fleetsAddress: string) {
     craftedFrom: 7,
     name: "Courier",
     moduleSlots: 1,
-    equippedShipModule: {attackBoostStat: 0, healthBoostStat: 0},
+    equippedShipModule: [{ attackBoostStat: 0, healthBoostStat: 0 }],
   };
 
   const fleet9: ship = {
@@ -161,7 +160,7 @@ export async function addFleets(fleetsAddress: string) {
     craftedFrom: 7,
     name: "Terraformer",
     moduleSlots: 1,
-    equippedShipModule: {attackBoostStat: 0, healthBoostStat: 0},
+    equippedShipModule: [{ attackBoostStat: 0, healthBoostStat: 0 }],
   };
 
   const addFleet1Tx = await fleetsContract.addShipType(1, fleet1);
