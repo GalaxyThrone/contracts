@@ -1,6 +1,5 @@
 import { ethers } from "hardhat";
 import { Ships } from "../typechain-types";
-import { Fleet } from "../types";
 
 export async function addFleets(fleetsAddress: string) {
   // const gasPrice = 35000000000;
