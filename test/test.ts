@@ -8,6 +8,7 @@ import {
   Planets,
   BuildingsFacet,
   RegisterFacet,
+  Metal,
 } from "../typechain-types";
 import { BigNumber } from "ethers";
 import { impersonate } from "../scripts/helperFunctions";
@@ -30,6 +31,7 @@ describe("Game", function () {
   let buildingsFacet: BuildingsFacet;
 
   let planetNfts: Planets;
+  let metalToken: Metal;
 
   async function deployUsers() {
     const [
@@ -73,6 +75,11 @@ describe("Game", function () {
       "Planets",
       g.planetsAddress
     )) as Planets;
+
+    metalToken = (await ethers.getContractAt(
+      "Metal",
+      g.metalAddress
+    )) as Metal;
 
     buildingsFacet = (await ethers.getContractAt(
       "BuildingsFacet",
@@ -131,6 +138,34 @@ describe("Game", function () {
       randomUserThree,
       AdminUser,
     } = await loadFixture(deployUsers);
+
+    //@notice actual register function for Tron Network
+    const registration = await vrfFacet
+      .connect(randomUser)
+      .testRegister();
+
+    const checkOwnershipAmountPlayer = await planetNfts.balanceOf(
+      randomUser.address
+    );
+
+    const planetId = await planetNfts.tokenOfOwnerByIndex(
+      randomUser.address,
+      0
+    );
+
+    const beforeMining = await metalToken
+      .connect(randomUser)
+      .balanceOf(randomUser.address);
+
+    buildingsFacet.connect(randomUser).mineMetal(planetId);
+
+    const balanceAfterMining = await metalToken
+      .connect(randomUser)
+      .balanceOf(randomUser.address);
+
+    expect(balanceAfterMining).to.be.above(beforeMining);
+
+    //@TODO edge case double mine should revert if too early.
   });
 
   it("registered user can craft & claim buildings", async function () {
