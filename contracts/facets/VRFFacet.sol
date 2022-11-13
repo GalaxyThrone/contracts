@@ -23,9 +23,12 @@ contract RegisterFacet is Modifiers {
             "VRFFacet: already registering"
         );
         require(!s.registered[msg.sender], "VRFFacet: already registered");
+
+        //@TODO replace with fake VRF for Tron Network
         drawRandomNumbers(msg.sender);
     }
 
+    //@TODO replace with fake VRF for Tron Network
     function drawRandomNumbers(address _player) internal {
         // Will revert if subscription is not set and funded.
         uint256 requestId = VRFCoordinatorV2Interface(s.vrfCoordinator)
@@ -40,6 +43,7 @@ contract RegisterFacet is Modifiers {
         s.registrationStarted[_player] = true;
     }
 
+    //@TODO replace with fake VRF for Tron Network
     function rawFulfillRandomWords(
         uint256 requestId,
         uint256[] memory randomWords
@@ -66,6 +70,7 @@ contract RegisterFacet is Modifiers {
         );
     }
 
+    //@TODO replace with fake VRF for Tron Network
     function subscribe() external onlyOwner {
         address[] memory consumers = new address[](1);
         consumers[0] = address(this);
@@ -77,6 +82,7 @@ contract RegisterFacet is Modifiers {
         );
     }
 
+    //@TODO replace with fake VRF for Tron Network
     // Assumes this contract owns link
     function topUpSubscription(uint256 amount) external {
         LinkTokenInterface(s.linkAddress).transferAndCall(
@@ -86,6 +92,7 @@ contract RegisterFacet is Modifiers {
         );
     }
 
+    //@TODO replace with fake VRF for Tron Network
     function setVRFAddresses(address _vrfCoordinator, address _linkAddress)
         external
         onlyOwner

@@ -266,7 +266,7 @@ contract FleetsFacet is Modifiers {
 
         unAssignNewShipTypeAmount(_fromPlanetId, _shipIds);
 
-        AssignNewShipTypeAmount(_toPlanetId, _shipIds);
+        assignNewShipTypeAmount(_toPlanetId, _shipIds);
 
         for (uint256 i = 0; i < attackerShips.length; i++) {
             IShips(s.ships).assignShipToPlanet(_shipIds[i], _toPlanetId);
@@ -367,6 +367,7 @@ contract FleetsFacet is Modifiers {
                 for (uint256 i = 0; i < defenderShips.length; i++) {
                     IShips(s.ships).burnShip(defenderShips[i]);
                     IShips(s.ships).deleteShipFromPlanet(defenderShips[i]);
+                    //@TODO burn defense buildings / transfer buildings
                 }
 
                 //conquer planet
@@ -404,7 +405,7 @@ contract FleetsFacet is Modifiers {
             }
             //burn killed ships until there are no more left; then reassign attacking fleet to home-planet
             else {
-                //burn nfts and unassign ship from planets, also reduce defenderShip Array
+                //burn nfts and unassign ship from planets
                 for (uint256 i = 0; i < defenderShips.length; i++) {
                     int256 defenderShipHealth = int256(
                         IShips(s.ships).getShipStats(defenderShips[i]).health
