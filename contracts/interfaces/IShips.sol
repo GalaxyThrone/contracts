@@ -51,6 +51,8 @@ interface IShips {
         view
         returns (uint256);
 
-
-    function getDefensePlanet(uint256 _planetId) external view returns (uint256[] memory)
+    function getDefensePlanet(uint256 _planetId)
+        external
+        view
+        returns (uint256[] memory);
 }

@@ -10,7 +10,7 @@ import {
   Crystal,
   Ethereus,
   Planets,
-  Fleets,
+  Ships,
   Buildings,
 } from "../typechain-types";
 import { addBuildings } from "./addBuildings";
@@ -133,12 +133,14 @@ export async function deployDiamond() {
   ])) as Planets;
   await planets.deployed();
 
-  console.log("deploying Fleets");
-  const Fleets = await ethers.getContractFactory("Fleets");
-  const fleets = (await upgrades.deployProxy(Fleets, [
+
+  //@notice deploy ships contract instead of Fleets
+  console.log("deploying ships");
+  const Ships = await ethers.getContractFactory("Ships");
+  const ships = (await upgrades.deployProxy(Ships, [
     diamond.address,
-  ])) as Fleets;
-  await fleets.deployed();
+  ])) as Ships;
+  await ships.deployed();
 
   console.log("deploying Buildings");
   const Buildings = await ethers.getContractFactory("Buildings");
@@ -152,7 +154,7 @@ export async function deployDiamond() {
   console.log(`Ethereus deployed: ${ethereus.address}`);
   console.log(`Planets deployed: ${planets.address}`);
   console.log(`Buildings deployed: ${buildings.address}`);
-  console.log(`Fleets deployed: ${fleets.address}`);
+  console.log(`Ships deployed: ${ships.address}`);
 
   const adminFacet = (await ethers.getContractAt(
     "AdminFacet",
@@ -165,15 +167,15 @@ export async function deployDiamond() {
     ethereus.address,
     metal.address,
     buildings.address,
-    fleets.address,
+    ships.address,
     planets.address
   );
   await setAddresses.wait();
 
   console.log("adding buildings");
   await addBuildings(buildings.address);
-  console.log("adding fleets");
-  await addFleets(fleets.address);
+  console.log("adding ships");
+  await addFleets(ships.address);
 
   return {
     diamondAddress: diamond.address,
@@ -182,7 +184,7 @@ export async function deployDiamond() {
     ethereusAddress: ethereus.address,
     buildingsAddress: buildings.address,
     planetsAddress: planets.address,
-    fleetsAddress: fleets.address,
+    fleetsAddress: ships.address,
   };
 }
 

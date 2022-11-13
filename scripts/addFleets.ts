@@ -1,15 +1,16 @@
 import { ethers } from "hardhat";
-import { Fleets } from "../typechain-types";
+import { Ships } from "../typechain-types";
 import { Fleet } from "../types";
 
 export async function addFleets(fleetsAddress: string) {
   // const gasPrice = 35000000000;
   let fleetsContract = (await ethers.getContractAt(
-    "Fleets",
+    "Ships",
     fleetsAddress
-  )) as Fleets;
+  )) as Ships;
 
-  const fleet1: Fleet = {
+  const fleet1: Ships = {
+    shipType: 0,
     price: [
       ethers.utils.parseEther("300"),
       ethers.utils.parseEther("200"),
@@ -21,9 +22,13 @@ export async function addFleets(fleetsAddress: string) {
     craftTime: 18,
     craftedFrom: 7,
     name: "Fighter",
+    moduleSlots: 1,
+    //@TODO right syntax?
+    equippedShipModule: {attackBoostStat: 0, healthBoostStat: 0},
   };
 
-  const fleet2: Fleet = {
+  const fleet2: Ships = {
+    shipType: 1,
     price: [
       ethers.utils.parseEther("2000"),
       ethers.utils.parseEther("500"),
@@ -35,9 +40,12 @@ export async function addFleets(fleetsAddress: string) {
     craftTime: 72,
     craftedFrom: 7,
     name: "Frigate",
+    moduleSlots: 1,
+    equippedShipModule: {attackBoostStat: 0, healthBoostStat: 0},
   };
 
-  const fleet3: Fleet = {
+  const fleet3: Ships = {
+    shipType: 2,
     price: [
       ethers.utils.parseEther("5000"),
       ethers.utils.parseEther("3000"),
@@ -49,9 +57,12 @@ export async function addFleets(fleetsAddress: string) {
     craftTime: 144,
     craftedFrom: 7,
     name: "Cruiser",
+    moduleSlots: 1,
+    equippedShipModule: {attackBoostStat: 0, healthBoostStat: 0},
   };
 
-  const fleet4: Fleet = {
+  const fleet4: Ships = {
+    shipType: 3,
     price: [
       ethers.utils.parseEther("600"),
       ethers.utils.parseEther("300"),
@@ -63,9 +74,12 @@ export async function addFleets(fleetsAddress: string) {
     craftTime: 36,
     craftedFrom: 7,
     name: "Raider",
+    moduleSlots: 1,
+    equippedShipModule: {attackBoostStat: 0, healthBoostStat: 0},
   };
 
-  const fleet5: Fleet = {
+  const fleet5: Ships = {
+    shipType: 4,
     price: [
       ethers.utils.parseEther("3000"),
       ethers.utils.parseEther("1500"),
@@ -77,9 +91,12 @@ export async function addFleets(fleetsAddress: string) {
     craftTime: 72,
     craftedFrom: 7,
     name: "Warship",
+    moduleSlots: 1,
+    equippedShipModule: {attackBoostStat: 0, healthBoostStat: 0},
   };
 
-  const fleet6: Fleet = {
+  const fleet6: Ships = {
+    shipType: 5,
     price: [
       ethers.utils.parseEther("2000"),
       ethers.utils.parseEther("1500"),
@@ -91,9 +108,12 @@ export async function addFleets(fleetsAddress: string) {
     craftTime: 72,
     craftedFrom: 7,
     name: "Bomber",
+    moduleSlots: 1,
+    equippedShipModule: {attackBoostStat: 0, healthBoostStat: 0},
   };
 
-  const fleet7: Fleet = {
+  const fleet7: Ships = {
+    shipType: 6,
     price: [
       ethers.utils.parseEther("500"),
       ethers.utils.parseEther("300"),
@@ -105,9 +125,12 @@ export async function addFleets(fleetsAddress: string) {
     craftTime: 18,
     craftedFrom: 7,
     name: "Cargo Ship",
+    moduleSlots: 1,
+    equippedShipModule: {attackBoostStat: 0, healthBoostStat: 0},
   };
 
-  const fleet8: Fleet = {
+  const fleet8: Ships = {
+    shipType: 7,
     price: [
       ethers.utils.parseEther("200"),
       ethers.utils.parseEther("150"),
@@ -119,9 +142,12 @@ export async function addFleets(fleetsAddress: string) {
     craftTime: 9,
     craftedFrom: 7,
     name: "Courier",
+    moduleSlots: 1,
+    equippedShipModule: {attackBoostStat: 0, healthBoostStat: 0},
   };
 
-  const fleet9: Fleet = {
+  const fleet9: Ships = {
+    shipType: 8,
     price: [
       ethers.utils.parseEther("20000"),
       ethers.utils.parseEther("13000"),
@@ -133,6 +159,8 @@ export async function addFleets(fleetsAddress: string) {
     craftTime: 180,
     craftedFrom: 7,
     name: "Terraformer",
+    moduleSlots: 1,
+    equippedShipModule: {attackBoostStat: 0, healthBoostStat: 0},
   };
 
   const addFleet1Tx = await fleetsContract.addFleet(1, fleet1);
