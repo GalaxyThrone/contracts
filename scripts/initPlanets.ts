@@ -14,7 +14,7 @@ export async function initPlanets(diamondAddress: string) {
 }
 
 if (require.main === module) {
-  initPlanets("0xdB6FE0a407559B39A9FCEf60A08af19ccDfE62a6")
+  initPlanets("0x273640B69Dc1E94d1E2B8dE715bc127D39dD225f")
     .then(() => process.exit(0))
     .catch((error) => {
       console.error(error);
