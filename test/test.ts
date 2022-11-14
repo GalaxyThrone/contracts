@@ -9,6 +9,9 @@ import {
   BuildingsFacet,
   RegisterFacet,
   Metal,
+  Crystal,
+  Ethereus,
+  Ships,
 } from "../typechain-types";
 import { BigNumber } from "ethers";
 import { impersonate } from "../scripts/helperFunctions";
@@ -32,6 +35,10 @@ describe("Game", function () {
 
   let planetNfts: Planets;
   let metalToken: Metal;
+  let crystalToken: Crystal;
+  let ethereusToken: Ethereus;
+  let buildingNfts: Buildings;
+  let shipNfts: Ships;
 
   async function deployUsers() {
     const [
@@ -76,10 +83,30 @@ describe("Game", function () {
       g.planetsAddress
     )) as Planets;
 
+    buildingNfts = (await ethers.getContractAt(
+      "Buildings",
+      g.buildingsAddress
+    )) as Buildings;
+
+    shipNfts = (await ethers.getContractAt(
+      "Ships",
+      g.fleetsAddress
+    )) as Ships;
+
     metalToken = (await ethers.getContractAt(
       "Metal",
       g.metalAddress
     )) as Metal;
+
+    crystalToken = (await ethers.getContractAt(
+      "Crystal",
+      g.metalAddress
+    )) as Crystal;
+
+    ethereusToken = (await ethers.getContractAt(
+      "Ethereus",
+      g.ethereusAddress
+    )) as Ethereus;
 
     buildingsFacet = (await ethers.getContractAt(
       "BuildingsFacet",
@@ -130,7 +157,7 @@ describe("Game", function () {
     */
   });
 
-  it("registered user can mine every 24hours ", async function () {
+  it("registered user can mine metal every 24hours ", async function () {
     const {
       owner,
       randomUser,
@@ -176,6 +203,52 @@ describe("Game", function () {
       randomUserThree,
       AdminUser,
     } = await loadFixture(deployUsers);
+
+    //@notice actual register function for Tron Network
+    const registration = await vrfFacet
+      .connect(randomUser)
+      .testRegister();
+
+    const checkOwnershipAmountPlayer = await planetNfts.balanceOf(
+      randomUser.address
+    );
+
+    const planetId = await planetNfts.tokenOfOwnerByIndex(
+      randomUser.address,
+      0
+    );
+
+    await buildingsFacet
+      .connect(randomUser)
+      .craftBuilding(1, planetId);
+
+    const blockBefore = await ethers.provider.getBlock(
+      await ethers.provider.getBlockNumber()
+    );
+
+    const timestampBefore = blockBefore.timestamp;
+
+    await ethers.provider.send("evm_mine", [timestampBefore + 600]);
+
+    let checkOwnershipBuildings = await buildingNfts.balanceOf(
+      randomUser.address,
+      1
+    );
+
+    expect(checkOwnershipBuildings).to.equal(0);
+
+    const claimBuild = await buildingsFacet
+      .connect(randomUser)
+      .claimBuilding(planetId);
+
+    checkOwnershipBuildings = await buildingNfts.balanceOf(
+      randomUser.address,
+      1
+    );
+
+    expect(checkOwnershipBuildings).to.equal(1);
+
+    console.log("bananarama");
   });
 
   it("registered user can craft & claim ships ", async function () {
