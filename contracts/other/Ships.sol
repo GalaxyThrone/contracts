@@ -67,11 +67,10 @@ contract Ships is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         onlyGameDiamond
         returns (uint256)
     {
-        uint256 shipId = totalSupply() + 1;
+        uint256 shipId = totalSupply();
         SpaceShips[shipId] = shipType[_shipTypeId];
 
         _safeMint(_account, shipId);
-
         return (shipId);
     }
 

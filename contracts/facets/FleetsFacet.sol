@@ -44,10 +44,10 @@ contract FleetsFacet is Modifiers {
             msg.sender,
             s.craftFleets[_planetId].itemId
         );
-        uint256 fleetId = s.craftFleets[_planetId].itemId;
+        uint256 shipTypeId = s.craftFleets[_planetId].itemId;
         delete s.craftFleets[_planetId];
 
-        IPlanets(s.planets).addFleet(_planetId, fleetId, 1);
+        IPlanets(s.planets).addFleet(_planetId, shipTypeId, 1);
         IShips(s.ships).assignShipToPlanet(shipId, _planetId);
     }
 
@@ -195,9 +195,9 @@ contract FleetsFacet is Modifiers {
                 IERC721(s.ships).ownerOf(_shipIds[i]) == msg.sender,
                 "not your ship!"
             );
-            //unassign ships during attack
             IShips(s.ships).deleteShipFromPlanet(_shipIds[i]);
         }
+        //unassign ships during attack
         unAssignNewShipTypeAmount(_fromPlanetId, _shipIds);
 
         //refactor to  an internal func
