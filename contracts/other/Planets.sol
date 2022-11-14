@@ -71,7 +71,7 @@ contract Planets is ERC721EnumerableUpgradeable, OwnableUpgradeable {
             uint256[] memory expandedValues = new uint256[](5);
             for (uint256 j = 0; j < 5; j++) {
                 expandedValues[j] = uint256(
-                    keccak256(abi.encode(block.timestamp, i))
+                    keccak256(abi.encode(block.timestamp, j))
                 );
             }
 
