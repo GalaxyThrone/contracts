@@ -63,10 +63,13 @@ contract Planets is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         __ERC721_init("Planets", "PLN");
         __Ownable_init();
         gameDiamond = _gameDiamond;
-        genesisPlanets(_gameDiamond, 100);
+        genesisPlanets(_gameDiamond, 20);
     }
 
-    function genesisPlanets(address _gameDiamond, uint256 _amount) internal {
+    function genesisPlanets(address _gameDiamond, uint256 _amount)
+        public
+        onlyOwner
+    {
         for (uint256 i = 0; i < _amount; i++) {
             uint256[] memory expandedValues = new uint256[](5);
             for (uint256 j = 0; j < 5; j++) {
