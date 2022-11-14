@@ -12,9 +12,9 @@ import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 contract RegisterFacet is Modifiers {
     event Register(uint256 indexed _heroId, uint256 _landId);
 
-    function testRegister(uint256 fakeRandom) external {
+    function testRegister() external {
         require(!s.registered[msg.sender], "VRFFacet: already registered");
-        _testRegister(msg.sender, fakeRandom);
+        _testRegister(msg.sender, random());
     }
 
     function register() external {
@@ -24,11 +24,11 @@ contract RegisterFacet is Modifiers {
         );
         require(!s.registered[msg.sender], "VRFFacet: already registered");
 
-        //require payment to prevent sybil attacks. disabled for hackathon
-        IERC20(s.governanceToken).mintToUser(msg.sender, 1e18);
+        //@TODO replace with fake VRF for Tron Network
         drawRandomNumbers(msg.sender);
     }
 
+    //@TODO replace with fake VRF for Tron Network
     function drawRandomNumbers(address _player) internal {
         // Will revert if subscription is not set and funded.
         uint256 requestId = VRFCoordinatorV2Interface(s.vrfCoordinator)
@@ -43,6 +43,7 @@ contract RegisterFacet is Modifiers {
         s.registrationStarted[_player] = true;
     }
 
+    //@TODO replace with fake VRF for Tron Network
     function rawFulfillRandomWords(
         uint256 requestId,
         uint256[] memory randomWords
@@ -69,6 +70,7 @@ contract RegisterFacet is Modifiers {
         );
     }
 
+    //@TODO replace with fake VRF for Tron Network
     function subscribe() external onlyOwner {
         address[] memory consumers = new address[](1);
         consumers[0] = address(this);
@@ -80,6 +82,7 @@ contract RegisterFacet is Modifiers {
         );
     }
 
+    //@TODO replace with fake VRF for Tron Network
     // Assumes this contract owns link
     function topUpSubscription(uint256 amount) external {
         LinkTokenInterface(s.linkAddress).transferAndCall(
@@ -89,6 +92,7 @@ contract RegisterFacet is Modifiers {
         );
     }
 
+    //@TODO replace with fake VRF for Tron Network
     function setVRFAddresses(address _vrfCoordinator, address _linkAddress)
         external
         onlyOwner
@@ -138,9 +142,27 @@ contract RegisterFacet is Modifiers {
         IERC20(s.metal).mint(msg.sender, 120000 ether);
         IERC20(s.crystal).mint(msg.sender, 80000 ether);
         IERC20(s.ethereus).mint(msg.sender, 60000 ether);
+
+        if (!s.registered[msg.sender]) {
+            s.registrationStarted[_player] = false;
+        }
     }
 
     function getRegistered(address _account) external view returns (bool) {
         return s.registered[_account];
+    }
+
+    function random() private view returns (uint256) {
+        return
+            uint256(
+                keccak256(
+                    abi.encodePacked(
+                        block.difficulty,
+                        msg.sender,
+                        block.timestamp,
+                        block.difficulty
+                    )
+                )
+            );
     }
 }

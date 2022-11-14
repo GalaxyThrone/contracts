@@ -9,7 +9,8 @@ export interface Building {
   name: string;
 }
 
-export interface Fleet {
+export interface ship {
+  shipType: BigNumberish;
   price: [BigNumberish, BigNumberish, BigNumberish];
   attack: BigNumberish;
   health: BigNumberish;
@@ -17,4 +18,8 @@ export interface Fleet {
   craftTime: BigNumberish;
   craftedFrom: BigNumberish;
   name: string;
+  moduleSlots: BigNumberish;
+  equippedShipModule : any;
+
+
 }
