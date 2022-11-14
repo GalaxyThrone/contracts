@@ -10,7 +10,7 @@ export async function addFleets(fleetsAddress: string) {
   )) as Ships;
 
   const fleet1: ship = {
-    shipType: 0,
+    shipType: 1,
     price: [
       ethers.utils.parseEther("300"),
       ethers.utils.parseEther("200"),
@@ -28,7 +28,7 @@ export async function addFleets(fleetsAddress: string) {
   };
 
   const fleet2: ship = {
-    shipType: 1,
+    shipType: 2,
     price: [
       ethers.utils.parseEther("2000"),
       ethers.utils.parseEther("500"),
@@ -45,7 +45,7 @@ export async function addFleets(fleetsAddress: string) {
   };
 
   const fleet3: ship = {
-    shipType: 2,
+    shipType: 3,
     price: [
       ethers.utils.parseEther("5000"),
       ethers.utils.parseEther("3000"),
@@ -62,7 +62,7 @@ export async function addFleets(fleetsAddress: string) {
   };
 
   const fleet4: ship = {
-    shipType: 3,
+    shipType: 4,
     price: [
       ethers.utils.parseEther("600"),
       ethers.utils.parseEther("300"),
@@ -79,7 +79,7 @@ export async function addFleets(fleetsAddress: string) {
   };
 
   const fleet5: ship = {
-    shipType: 4,
+    shipType: 5,
     price: [
       ethers.utils.parseEther("3000"),
       ethers.utils.parseEther("1500"),
@@ -96,15 +96,15 @@ export async function addFleets(fleetsAddress: string) {
   };
 
   const fleet6: ship = {
-    shipType: 5,
+    shipType: 6,
     price: [
       ethers.utils.parseEther("2000"),
       ethers.utils.parseEther("1500"),
       ethers.utils.parseEther("1500"),
     ],
-    attack: 400,
-    health: 200,
-    cargo: 0,
+    attack: 600,
+    health: 100,
+    cargo: 50,
     craftTime: 72,
     craftedFrom: 7,
     name: "Bomber",
@@ -113,7 +113,7 @@ export async function addFleets(fleetsAddress: string) {
   };
 
   const fleet7: ship = {
-    shipType: 6,
+    shipType: 7,
     price: [
       ethers.utils.parseEther("500"),
       ethers.utils.parseEther("300"),
@@ -130,7 +130,7 @@ export async function addFleets(fleetsAddress: string) {
   };
 
   const fleet8: ship = {
-    shipType: 7,
+    shipType: 8,
     price: [
       ethers.utils.parseEther("200"),
       ethers.utils.parseEther("150"),
@@ -147,7 +147,7 @@ export async function addFleets(fleetsAddress: string) {
   };
 
   const fleet9: ship = {
-    shipType: 8,
+    shipType: 9,
     price: [
       ethers.utils.parseEther("20000"),
       ethers.utils.parseEther("13000"),
