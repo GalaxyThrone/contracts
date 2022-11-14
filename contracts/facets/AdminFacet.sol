@@ -10,15 +10,14 @@ contract AdminFacet is Modifiers {
         address _ethereus,
         address _metal,
         address _buildings,
-        address _fleets,
-        address _planets,
-        address _governanceToken
+        address _ships,
+        address _planets
     ) external onlyOwner {
         s.crystal = _crystal;
         s.ethereus = _ethereus;
         s.metal = _metal;
         s.buildings = _buildings;
-        s.fleets = _fleets;
+        s.ships = _ships;
         s.planets = _planets;
         s.governanceToken = _governanceToken;
     }

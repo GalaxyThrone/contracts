@@ -32,6 +32,35 @@ struct RequestConfig {
     bytes32 keyHash;
 }
 
+struct attackStatus {
+    uint256 attackStarted;
+    uint256 distance;
+    uint256 timeToBeResolved;
+    uint256 fromPlanet;
+    uint256 toPlanet;
+    uint256[] attackerShipsIds;
+    address attacker;
+    uint256 attackInstanceId;
+}
+
+struct ShipType {
+    uint256 shipType;
+    uint256[3] price; // [metal, crystal, ethereus]
+    uint256 attack;
+    uint256 health;
+    uint256 cargo;
+    uint256 craftTime;
+    uint256 craftedFrom;
+    string name;
+    uint256 moduleSlots;
+    ShipModule[] equippedShipModule;
+}
+
+struct ShipModule {
+    uint256 attackBoostStat;
+    uint256 healthBoostStat;
+}
+
 struct AppStorage {
     address crystal;
     address ethereus;
@@ -39,7 +68,7 @@ struct AppStorage {
     address buildings;
     address fleets;
     address planets;
-    address governanceToken;
+    address ships;
     mapping(address => bool) registered;
     mapping(uint256 => CraftItem) craftBuildings;
     mapping(uint256 => CraftItem) craftFleets;
@@ -47,6 +76,11 @@ struct AppStorage {
     mapping(uint256 => SendCargo) sendCargo;
     // sendTerraformId => SendTerraform
     mapping(uint256 => SendTerraform) sendTerraform;
+    //alliance Mappings
+    mapping(address => bool) isInvitedToAlliance;
+    mapping(bytes32 => address) allianceOwner;
+    mapping(address => bytes32) allianceOfPlayer;
+    mapping(bytes23 => uint256) allianceMemberCount;
     uint256 sendCargoId;
     uint256 sendTerraformId;
     // heroId => vrf/reg data

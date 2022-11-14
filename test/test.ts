@@ -6,35 +6,122 @@ import {
   AdminFacet,
   Buildings,
   Planets,
-  Fleets,
-  GameFacet,
   BuildingsFacet,
+  RegisterFacet,
+  Metal,
+  Crystal,
+  Ethereus,
+  Ships,
+  FleetsFacet,
 } from "../typechain-types";
 import { BigNumber } from "ethers";
 import { impersonate } from "../scripts/helperFunctions";
-import { upgrade } from "../scripts/upgradeDiamond";
+import {
+  upgrade,
+  upgradeTestVersion,
+} from "../scripts/upgradeDiamond";
+import { initPlanets } from "../scripts/initPlanets";
+import { Fleets } from "../typechain-types/contracts/other/Fleets";
+
+const {
+  loadFixture,
+} = require("@nomicfoundation/hardhat-network-helpers");
 // import { upgradeContract } from "../scripts/upgradeContract";
 
-let g: any;
-let gameFacet: GameFacet;
-let buildingsFacet: BuildingsFacet;
-
 describe("Game", function () {
-  before(async function () {
-    this.timeout(20000000);
-    // g = await deployDiamond();
+  let g: any;
 
-    await upgrade();
+  let vrfFacet: RegisterFacet;
+  let adminFacet: AdminFacet;
+  let buildingsFacet: BuildingsFacet;
+
+  let fleetsFacet: FleetsFacet;
+
+  let planetNfts: Planets;
+  let metalToken: Metal;
+  let crystalToken: Crystal;
+  let ethereusToken: Ethereus;
+  let buildingNfts: Buildings;
+  let shipNfts: Ships;
+
+  async function deployUsers() {
+    const [
+      owner,
+      randomUser,
+      randomUserTwo,
+      randomUserThree,
+      AdminUser,
+    ] = await ethers.getSigners();
+
+    return {
+      owner,
+      randomUser,
+      randomUserTwo,
+      randomUserThree,
+      AdminUser,
+    };
+  }
+
+  before(async function () {
+    // this.timeout(20000000);
+    g = await deployDiamond();
+
+    const diamond = g.diamondAddress; //"0xe296a5cf8c15d2a4192670fd12132fc7a2d5f426";
+    //await upgrade();
+
+    await upgradeTestVersion(diamond);
     // await upgradeContract("0xA7902D5fd78e896A1071453D2e24DA41a7fA0004");
 
-    const diamond = "0xe296a5cf8c15d2a4192670fd12132fc7a2d5f426";
+    vrfFacet = (await ethers.getContractAt(
+      "RegisterFacet",
+      diamond
+    )) as RegisterFacet;
 
-    // vrfFacet = (await ethers.getContractAt("VRFFacet", diamond)) as VRFFacet;
-    gameFacet = (await ethers.getContractAt("GameFacet", diamond)) as GameFacet;
+    adminFacet = (await ethers.getContractAt(
+      "AdminFacet",
+      diamond
+    )) as AdminFacet;
+
+    planetNfts = (await ethers.getContractAt(
+      "Planets",
+      g.planetsAddress
+    )) as Planets;
+
+    buildingNfts = (await ethers.getContractAt(
+      "Buildings",
+      g.buildingsAddress
+    )) as Buildings;
+
+    shipNfts = (await ethers.getContractAt(
+      "Ships",
+      g.fleetsAddress
+    )) as Ships;
+
+    metalToken = (await ethers.getContractAt(
+      "Metal",
+      g.metalAddress
+    )) as Metal;
+
+    crystalToken = (await ethers.getContractAt(
+      "Crystal",
+      g.metalAddress
+    )) as Crystal;
+
+    ethereusToken = (await ethers.getContractAt(
+      "Ethereus",
+      g.ethereusAddress
+    )) as Ethereus;
+
     buildingsFacet = (await ethers.getContractAt(
       "BuildingsFacet",
       diamond
     )) as BuildingsFacet;
+
+    fleetsFacet = (await ethers.getContractAt(
+      "FleetsFacet",
+      diamond
+    )) as FleetsFacet;
+
     // actionsFacet = (await ethers.getContractAt(
     //   "ActionsFacet",
     //   diamond
@@ -44,7 +131,410 @@ describe("Game", function () {
     //   "0x43D900698f716179794553B5BCaacb0e37080828"
     // )) as MagiaLands;
   });
-  it("debug", async function () {
+  it("register user and get planet NFT ", async function () {
+    const {
+      owner,
+      randomUser,
+      randomUserTwo,
+      randomUserThree,
+      AdminUser,
+    } = await loadFixture(deployUsers);
+
+    //@notice actual register function for Tron Network
+    const registration = await vrfFacet
+      .connect(randomUser)
+      .testRegister();
+
+    const checkOwnershipAmountPlayer = await planetNfts.balanceOf(
+      randomUser.address
+    );
+
+    expect(checkOwnershipAmountPlayer).to.equal(1);
+
+    /*
+    console.log(checkOwnershipAmountPlayer);
+
+    console.log(checkOwnershipAmountPlayer);
+    const expr = await planetNfts.planets(1);
+    console.log("Planet1 Data:");
+    console.log(expr);
+
+    const expr2 = await planetNfts.planets(2);
+    console.log("Planet2 Data:");
+    console.log(expr2);
+
+    */
+  });
+
+  it("registered user can mine metal every 24hours ", async function () {
+    const {
+      owner,
+      randomUser,
+      randomUserTwo,
+      randomUserThree,
+      AdminUser,
+    } = await loadFixture(deployUsers);
+
+    //@notice actual register function for Tron Network
+    const registration = await vrfFacet
+      .connect(randomUser)
+      .testRegister();
+
+    const checkOwnershipAmountPlayer = await planetNfts.balanceOf(
+      randomUser.address
+    );
+
+    const planetId = await planetNfts.tokenOfOwnerByIndex(
+      randomUser.address,
+      0
+    );
+
+    const beforeMining = await metalToken
+      .connect(randomUser)
+      .balanceOf(randomUser.address);
+
+    buildingsFacet.connect(randomUser).mineMetal(planetId);
+
+    const balanceAfterMining = await metalToken
+      .connect(randomUser)
+      .balanceOf(randomUser.address);
+
+    expect(balanceAfterMining).to.be.above(beforeMining);
+
+    //@TODO edge case double mine should revert if too early.
+  });
+
+  it("registered user can craft & claim buildings", async function () {
+    const {
+      owner,
+      randomUser,
+      randomUserTwo,
+      randomUserThree,
+      AdminUser,
+    } = await loadFixture(deployUsers);
+
+    //@notice actual register function for Tron Network
+    const registration = await vrfFacet
+      .connect(randomUser)
+      .testRegister();
+
+    const checkOwnershipAmountPlayer = await planetNfts.balanceOf(
+      randomUser.address
+    );
+
+    const planetId = await planetNfts.tokenOfOwnerByIndex(
+      randomUser.address,
+      0
+    );
+
+    await buildingsFacet
+      .connect(randomUser)
+      .craftBuilding(1, planetId);
+
+    const blockBefore = await ethers.provider.getBlock(
+      await ethers.provider.getBlockNumber()
+    );
+
+    const timestampBefore = blockBefore.timestamp;
+
+    await ethers.provider.send("evm_mine", [timestampBefore + 600]);
+
+    let checkOwnershipBuildings = await buildingNfts.balanceOf(
+      randomUser.address,
+      1
+    );
+
+    expect(checkOwnershipBuildings).to.equal(0);
+
+    const claimBuild = await buildingsFacet
+      .connect(randomUser)
+      .claimBuilding(planetId);
+
+    checkOwnershipBuildings = await buildingNfts.balanceOf(
+      randomUser.address,
+      1
+    );
+
+    expect(checkOwnershipBuildings).to.equal(1);
+
+    //@edge case to test, too early claim
+    //@edge case to test, double claim
+  });
+
+  it("registered user can craft & claim ships ", async function () {
+    const {
+      owner,
+      randomUser,
+      randomUserTwo,
+      randomUserThree,
+      AdminUser,
+    } = await loadFixture(deployUsers);
+
+    //@notice actual register function for Tron Network
+    const registration = await vrfFacet
+      .connect(randomUser)
+      .testRegister();
+
+    const checkOwnershipAmountPlayer = await planetNfts.balanceOf(
+      randomUser.address
+    );
+
+    const planetId = await planetNfts.tokenOfOwnerByIndex(
+      randomUser.address,
+      0
+    );
+
+    await buildingsFacet
+      .connect(randomUser)
+      .craftBuilding(7, planetId);
+
+    const blockBefore = await ethers.provider.getBlock(
+      await ethers.provider.getBlockNumber()
+    );
+
+    const timestampBefore = blockBefore.timestamp;
+
+    await ethers.provider.send("evm_mine", [timestampBefore + 1200]);
+
+    const claimBuild = await buildingsFacet
+      .connect(randomUser)
+      .claimBuilding(planetId);
+
+    await fleetsFacet.connect(randomUser).craftFleet(1, planetId);
+
+    let checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+      randomUser.address
+    );
+
+    expect(checkOwnershipShipsPlayer).to.equal(0);
+
+    await ethers.provider.send("evm_mine", [
+      timestampBefore + 1200 + 1200,
+    ]);
+
+    await fleetsFacet.connect(randomUser).claimFleet(planetId);
+
+    checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+      randomUser.address
+    );
+
+    expect(checkOwnershipShipsPlayer).to.equal(1);
+  });
+
+  it("registered user attack other user and conquer his NFT ", async function () {
+    const {
+      owner,
+      randomUser,
+      randomUserTwo,
+      randomUserThree,
+      AdminUser,
+    } = await loadFixture(deployUsers);
+
+    //create two opponents
+
+    await vrfFacet.connect(randomUser).testRegister();
+    await vrfFacet.connect(randomUserTwo).testRegister();
+
+    const planetIdPlayer1 = await planetNfts.tokenOfOwnerByIndex(
+      randomUser.address,
+      0
+    );
+
+    const planetIdPlayer2 = await planetNfts.tokenOfOwnerByIndex(
+      randomUserTwo.address,
+      0
+    );
+
+    await buildingsFacet
+      .connect(randomUser)
+      .craftBuilding(7, planetIdPlayer1);
+
+    let blockBefore = await ethers.provider.getBlock(
+      await ethers.provider.getBlockNumber()
+    );
+
+    let timestampBefore = blockBefore.timestamp;
+
+    await ethers.provider.send("evm_mine", [timestampBefore + 1200]);
+
+    let claimBuild = await buildingsFacet
+      .connect(randomUser)
+      .claimBuilding(planetIdPlayer1);
+
+    await fleetsFacet
+      .connect(randomUser)
+      .craftFleet(6, planetIdPlayer1);
+
+    let checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+      randomUser.address
+    );
+
+    expect(checkOwnershipShipsPlayer).to.equal(0);
+
+    await ethers.provider.send("evm_mine", [
+      timestampBefore + 1200 + 1200,
+    ]);
+
+    await fleetsFacet.connect(randomUser).claimFleet(planetIdPlayer1);
+
+    checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+      randomUser.address
+    );
+
+    expect(checkOwnershipShipsPlayer).to.equal(1);
+
+    //@notice player two
+    await buildingsFacet
+      .connect(randomUserTwo)
+      .craftBuilding(7, planetIdPlayer2);
+
+    blockBefore = await ethers.provider.getBlock(
+      await ethers.provider.getBlockNumber()
+    );
+
+    timestampBefore = blockBefore.timestamp;
+
+    await ethers.provider.send("evm_mine", [timestampBefore + 1200]);
+
+    claimBuild = await buildingsFacet
+      .connect(randomUserTwo)
+      .claimBuilding(planetIdPlayer2);
+
+    await fleetsFacet
+      .connect(randomUserTwo)
+      .craftFleet(1, planetIdPlayer2);
+
+    checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+      randomUserTwo.address
+    );
+
+    expect(checkOwnershipShipsPlayer).to.equal(0);
+
+    await ethers.provider.send("evm_mine", [
+      timestampBefore + 1200 + 1200,
+    ]);
+
+    await fleetsFacet
+      .connect(randomUserTwo)
+      .claimFleet(planetIdPlayer2);
+
+    checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+      randomUserTwo.address
+    );
+
+    expect(checkOwnershipShipsPlayer).to.equal(1);
+
+    const player1Fleet = await shipNfts.getDefensePlanet(
+      planetIdPlayer1
+    );
+
+    const player2Fleet = await shipNfts.getDefensePlanet(
+      planetIdPlayer2
+    );
+
+    //@user1 attacks user2
+
+    let shipIdPlayer1 = await shipNfts.tokenOfOwnerByIndex(
+      randomUser.address,
+      0
+    );
+
+    await fleetsFacet
+      .connect(randomUser)
+      .sendAttack(planetIdPlayer1, planetIdPlayer2, [shipIdPlayer1]);
+
+    await ethers.provider.send("evm_mine", [timestampBefore + 48000]);
+
+    //@notice we get the instance Id from the event on the planet contract (attackInitated);
+    const attackResolveReceipt = await fleetsFacet
+      .connect(randomUser)
+      .resolveAttack(0);
+    const result = attackResolveReceipt.wait();
+    //console.log(await (await result).events);
+    //const checkAtkship = await shipNfts.getShipStats(0);
+
+    //@notice user2 defense ships should be burned
+
+    checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+      randomUser.address
+    );
+
+    expect(checkOwnershipShipsPlayer).to.equal(1);
+
+    checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+      randomUserTwo.address
+    );
+
+    expect(checkOwnershipShipsPlayer).to.equal(0);
+
+    //@planet should be owned by player 1 now
+    const planetsOwnedPlayer1 = await planetNfts.balanceOf(
+      randomUser.address
+    );
+
+    expect(planetsOwnedPlayer1).to.equal(2);
+  });
+
+  it("registered user attack other user and lose ", async function () {
+    const {
+      owner,
+      randomUser,
+      randomUserTwo,
+      randomUserThree,
+      AdminUser,
+    } = await loadFixture(deployUsers);
+  });
+
+  it("registered user can send friendly ships to his owned planet ", async function () {
+    const {
+      owner,
+      randomUser,
+      randomUserTwo,
+      randomUserThree,
+      AdminUser,
+    } = await loadFixture(deployUsers);
+  });
+
+  it("registered user can send friendly ships to his alliance member ", async function () {
+    const {
+      owner,
+      randomUser,
+      randomUserTwo,
+      randomUserThree,
+      AdminUser,
+    } = await loadFixture(deployUsers);
+  });
+
+  it("registered user can create an alliance & invite members ", async function () {
+    const {
+      owner,
+      randomUser,
+      randomUserTwo,
+      randomUserThree,
+      AdminUser,
+    } = await loadFixture(deployUsers);
+  });
+
+  it("registered user can join  an alliance when invited", async function () {
+    const {
+      owner,
+      randomUser,
+      randomUserTwo,
+      randomUserThree,
+      AdminUser,
+    } = await loadFixture(deployUsers);
+  });
+
+  it.skip("chainRunner can mine every 24hours for the user ", async function () {
+    const {
+      owner,
+      randomUser,
+      randomUserTwo,
+      randomUserThree,
+      AdminUser,
+    } = await loadFixture(deployUsers);
+  });
+  it.skip("debug", async function () {
     buildingsFacet = await impersonate(
       "0xf2381dD8B282669C139C2d227bAb5314B5E9EBC7",
       buildingsFacet,

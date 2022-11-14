@@ -10,14 +10,18 @@ import {
   Crystal,
   Ethereus,
   Planets,
-  Fleets,
+  Ships,
   Buildings,
   GovernanceToken
 } from "../typechain-types";
 import { addBuildings } from "./addBuildings";
 import { addFleets } from "./addFleets";
+import { initPlanets } from "./initPlanets";
 
-const { getSelectors, FacetCutAction } = require("./libraries/diamond");
+const {
+  getSelectors,
+  FacetCutAction,
+} = require("./libraries/diamond");
 
 // const gasPrice = 35000000000;
 
@@ -26,9 +30,10 @@ export async function deployDiamond() {
   const deployer = accounts[0];
   const deployerAddress = await deployer.getAddress();
   console.log("Deployer:", deployerAddress);
-
   // deploy DiamondCutFacet
-  const DiamondCutFacet = await ethers.getContractFactory("DiamondCutFacet");
+  const DiamondCutFacet = await ethers.getContractFactory(
+    "DiamondCutFacet"
+  );
   const diamondCutFacet = await DiamondCutFacet.deploy();
   await diamondCutFacet.deployed();
   console.log("DiamondCutFacet deployed:", diamondCutFacet.address);
@@ -61,7 +66,7 @@ export async function deployDiamond() {
     "AdminFacet",
     "BuildingsFacet",
     "FleetsFacet",
-    "VRFFacet",
+    "RegisterFacet",
   ];
   const cut = [];
   for (const FacetName of FacetNames) {
@@ -82,7 +87,8 @@ export async function deployDiamond() {
   )) as DiamondCutFacet;
 
   // call to init function
-  const functionCall = diamondInit.interface.encodeFunctionData("init");
+  const functionCall =
+    diamondInit.interface.encodeFunctionData("init");
   const tx = await diamondCut.diamondCut(
     cut,
     diamondInit.address,
@@ -110,7 +116,9 @@ export async function deployDiamond() {
 
   console.log("deploying Metal");
   const Metal = await ethers.getContractFactory("Metal");
-  const metal = (await upgrades.deployProxy(Metal, [diamond.address])) as Metal;
+  const metal = (await upgrades.deployProxy(Metal, [
+    diamond.address,
+  ])) as Metal;
   await metal.deployed();
 
   console.log("deploying Crystal");
@@ -134,12 +142,13 @@ export async function deployDiamond() {
   ])) as Planets;
   await planets.deployed();
 
-  console.log("deploying Fleets");
-  const Fleets = await ethers.getContractFactory("Fleets");
-  const fleets = (await upgrades.deployProxy(Fleets, [
+  //@notice deploy ships contract instead of Fleets
+  console.log("deploying ships");
+  const Ships = await ethers.getContractFactory("Ships");
+  const ships = (await upgrades.deployProxy(Ships, [
     diamond.address,
-  ])) as Fleets;
-  await fleets.deployed();
+  ])) as Ships;
+  await ships.deployed();
 
   console.log("deploying Buildings");
   const Buildings = await ethers.getContractFactory("Buildings");
@@ -153,7 +162,7 @@ export async function deployDiamond() {
   console.log(`Ethereus deployed: ${ethereus.address}`);
   console.log(`Planets deployed: ${planets.address}`);
   console.log(`Buildings deployed: ${buildings.address}`);
-  console.log(`Fleets deployed: ${fleets.address}`);
+  console.log(`Ships deployed: ${ships.address}`);
 
   const adminFacet = (await ethers.getContractAt(
     "AdminFacet",
@@ -175,17 +184,26 @@ export async function deployDiamond() {
     ethereus.address,
     metal.address,
     buildings.address,
-    fleets.address,
-    planets.address,
-    deployedGovernanceToken.address,
+    ships.address,
+    planets.address
   );
   await setAddresses.wait();
 
   console.log("adding buildings");
   await addBuildings(buildings.address);
-  console.log("adding fleets");
-  await addFleets(fleets.address);
+  console.log("adding ships");
+  await addFleets(ships.address);
 
+  //@TODO @notice create some planets to assign
+  //@TODO currently gives a revert error for no apparent reason
+  //@notice added a genesis nft mint to the planet contract instead..
+
+  /*
+  const initPlanets = await adminFacet
+    .connect(deployer)
+    .initPlanets(20);
+  await initPlanets.wait();
+  */
   return {
     diamondAddress: diamond.address,
     metalAddress: metal.address,
@@ -193,7 +211,7 @@ export async function deployDiamond() {
     ethereusAddress: ethereus.address,
     buildingsAddress: buildings.address,
     planetsAddress: planets.address,
-    fleetsAddress: fleets.address,
+    fleetsAddress: ships.address,
   };
 }
 
