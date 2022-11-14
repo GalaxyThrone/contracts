@@ -6,20 +6,6 @@ dotenv.config();
 
 require("./tasks/diamondABI.js");
 
-//@notice just for testing
-module.exports = {
-  solidity: {
-    version: "0.8.17",
-    settings: {
-      optimizer: {
-        enabled: true,
-        runs: 1,
-      },
-    },
-  },
-};
-
-/* disabled for unit-tests local
 const config: HardhatUserConfig = {
   solidity: "0.8.17",
   networks: {
@@ -40,7 +26,4 @@ const config: HardhatUserConfig = {
   },
 };
 
-
-
 export default config;
-*/
