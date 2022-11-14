@@ -19,6 +19,7 @@ contract AdminFacet is Modifiers {
         s.buildings = _buildings;
         s.ships = _ships;
         s.planets = _planets;
+        s.governanceToken = _governanceToken;
     }
 
     function initPlanets(uint256 _amount) external onlyOwner {

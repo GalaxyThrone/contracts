@@ -12,6 +12,7 @@ import {
   Planets,
   Ships,
   Buildings,
+  GovernanceToken
 } from "../typechain-types";
 import { addBuildings } from "./addBuildings";
 import { addFleets } from "./addFleets";
@@ -167,6 +168,15 @@ export async function deployDiamond() {
     "AdminFacet",
     diamond.address
   )) as AdminFacet;
+
+
+
+  console.log("deploying GovernanceToken");
+  const GovernanceToken = await ethers.getContractFactory("GovernanceToken");
+  //founders governance tokens go to multisig addr
+  const deployedGovernanceToken = GovernanceToken.deploy("0xbc1FF4455b21245Df6ca01354d65Aaf9e5334aD8",diamond.address) as GovernanceToken;
+  await deployedGovernanceToken.deployed();
+  
 
   console.log("setting diamond addresses");
   const setAddresses = await adminFacet.setAddresses(
