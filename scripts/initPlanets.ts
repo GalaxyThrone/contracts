@@ -8,13 +8,17 @@ export async function initPlanets(diamondAddress: string) {
     diamondAddress
   )) as AdminFacet;
 
+  // console.log("FIXING");
+  // const fixTx = await adminFacet.removeFix();
+  // await fixTx.wait();
+
   console.log("init planets");
-  const initPlanets = await adminFacet.initPlanets(20);
+  const initPlanets = await adminFacet.startInit();
   await initPlanets.wait();
 }
 
 if (require.main === module) {
-  initPlanets("0x273640B69Dc1E94d1E2B8dE715bc127D39dD225f")
+  initPlanets("0xB701E11C49802D07FA200A8b61b18CfF8b574a66")
     .then(() => process.exit(0))
     .catch((error) => {
       console.error(error);

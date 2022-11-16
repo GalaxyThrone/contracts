@@ -6,22 +6,14 @@ import {
 } from "../tasks/deployUpgrade";
 
 export async function upgrade() {
-  const diamondUpgrader =
-    "0x296903b6049161bebEc75F6f391a930bdDBDbbFc";
-  const diamondAddress = "0xe296a5cf8c15D2A4192670fD12132Fc7a2D5F426";
+  const diamondUpgrader = "0x296903b6049161bebEc75F6f391a930bdDBDbbFc";
+  const diamondAddress = "0xB701E11C49802D07FA200A8b61b18CfF8b574a66";
 
   const facets: FacetsAndAddSelectors[] = [
     {
-      facetName: "BuildingsFacet",
-      addSelectors: [
-        // "function getRegistered(address _account) external view returns (bool)",
-        // "function getCraftBuildings(uint256 _planetId) external view returns (uint256, uint256)",
-      ],
-      removeSelectors: [
-        // "function getBatchUnitShieldEndTimestamp(uint256[] calldata _unitTokenIds) external view returns (uint256[200] memory batch_)",
-        // "function setAddresses(address _goldAddress, address _lumberAddress, address _manaAddress, address _buildingsAddress, address _landsAddress, address _unitsAddress, address _heroesAddress) external",
-        // "function startShield(uint256 _heroId, uint256[] calldata _unitTokenIds, uint256 _hours) external",
-      ],
+      facetName: "RegisterFacet",
+      addSelectors: [],
+      removeSelectors: [],
     },
     // {
     //   facetName: "SpellsFacet3",
@@ -81,8 +73,7 @@ export async function upgrade() {
   await run("deployUpgrade", args);
 }
 export async function upgradeTestVersion(diamondAddr: any) {
-  const diamondUpgrader =
-    "0x296903b6049161bebEc75F6f391a930bdDBDbbFc";
+  const diamondUpgrader = "0x296903b6049161bebEc75F6f391a930bdDBDbbFc";
   const diamondAddress = diamondAddr;
 
   const facets: FacetsAndAddSelectors[] = [

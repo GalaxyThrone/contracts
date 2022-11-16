@@ -3,6 +3,9 @@ pragma solidity 0.8.17;
 
 import {AppStorage, Modifiers} from "../libraries/AppStorage.sol";
 import "../interfaces/IPlanets.sol";
+import "@chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol";
+import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
+import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 
 contract AdminFacet is Modifiers {
     function setAddresses(
@@ -21,30 +24,54 @@ contract AdminFacet is Modifiers {
         s.planets = _planets;
     }
 
-    function initPlanets(uint256 _amount) external onlyOwner {
+    function drawRandomNumbers() internal {
+        // Will revert if subscription is not set and funded.
+        uint256 requestId = VRFCoordinatorV2Interface(s.vrfCoordinator)
+            .requestRandomWords(
+                s.requestConfig.keyHash,
+                s.requestConfig.subId,
+                s.requestConfig.requestConfirmations,
+                s.requestConfig.callbackGasLimit,
+                5
+            );
+        s.vrfRequest[requestId].kind = 0;
+    }
+
+    function startInit() external {
+        require(!s.init, "AdminFacet: already running init");
+        s.init = true;
+
+        drawRandomNumbers();
+    }
+
+    function finalizeInit(uint256 _amount, uint256[] calldata _randomness)
+        external
+        onlySelf
+    {
         for (uint256 i = 0; i < _amount; i++) {
-            uint256[] memory expandedValues = new uint256[](5);
-            for (uint256 j = 0; j < 5; j++) {
-                expandedValues[j] = uint256(
-                    keccak256(abi.encode(block.timestamp, j))
-                );
-            }
-            uint256 coordinateX = expandedValues[0] % 10000;
-            uint256 coordinateY = expandedValues[1] % 10000;
-            uint256 ethereus = (expandedValues[2] % 100000) * 1e18;
-            uint256 metal = (expandedValues[3] % 100000) * 1e18;
-            uint256 crystal = (expandedValues[4] % 100000) * 1e18;
+            uint256 coordinateX = _randomness[0] % 10000;
+            uint256 coordinateY = _randomness[1] % 10000;
+            uint256 ethereus = (_randomness[2] % 100000) * 1e18;
+            uint256 metal = (_randomness[3] % 100000) * 1e18;
+            uint256 crystal = (_randomness[4] % 100000) * 1e18;
             IPlanets(s.planets).mint(
                 IPlanets.Planet({
                     coordinateX: coordinateX,
                     coordinateY: coordinateY,
                     ethereus: ethereus,
                     metal: metal,
-                    crystal: crystal
+                    crystal: crystal,
+                    pvpEnabled: false,
+                    owner: address(this)
                 })
             );
         }
+        s.init = false;
     }
+
+    // function removeFix() external {
+    //     s.init = false;
+    // }
 
     function onERC721Received(
         address,

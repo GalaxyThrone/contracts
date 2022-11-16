@@ -9,6 +9,8 @@ interface IPlanets {
         uint256 ethereus;
         uint256 metal;
         uint256 crystal;
+        bool pvpEnabled;
+        address owner;
     }
 
     function mint(Planet calldata _planet) external;

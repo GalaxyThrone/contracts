@@ -12,7 +12,8 @@ import {
   Planets,
   Ships,
   Buildings,
-  GovernanceToken,
+  VRFFacet,
+  RegisterFacet,
 } from "../typechain-types";
 import { addBuildings } from "./addBuildings";
 import { addFleets } from "./addFleets";
@@ -62,6 +63,7 @@ export async function deployDiamond() {
     "BuildingsFacet",
     "FleetsFacet",
     "RegisterFacet",
+    "VRFFacet",
   ];
   const cut = [];
   for (const FacetName of FacetNames) {

@@ -61,6 +61,11 @@ struct ShipModule {
     uint256 healthBoostStat;
 }
 
+struct VrfRequest {
+    address owner;
+    uint8 kind; // 0 init planet, 1 register, 2 attack
+}
+
 struct AppStorage {
     address crystal;
     address ethereus;
@@ -84,12 +89,13 @@ struct AppStorage {
     uint256 sendCargoId;
     uint256 sendTerraformId;
     // heroId => vrf/reg data
-    mapping(uint256 => address) vrfRequestIdToAddress;
+    mapping(uint256 => VrfRequest) vrfRequest;
     mapping(address => bool) registrationStarted;
     //VRF
     address vrfCoordinator;
     address linkAddress;
     RequestConfig requestConfig;
+    bool init;
 }
 
 library LibAppStorage {
@@ -105,6 +111,11 @@ contract Modifiers {
 
     modifier onlyOwner() {
         LibDiamond.enforceIsContractOwner();
+        _;
+    }
+
+    modifier onlySelf() {
+        require(msg.sender == address(this), "RegisterFacet: not self");
         _;
     }
 
