@@ -125,7 +125,7 @@ contract Ships is ERC721EnumerableUpgradeable, OwnableUpgradeable {
     }
 
     function getShipStats(uint256 _shipId)
-        external
+        public
         view
         returns (ShipType memory)
     {
@@ -154,5 +154,37 @@ contract Ships is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         }
 
         return defenseFleetToReturn;
+    }
+
+    function getDefensePlanetDetailed(uint256 _planetId)
+        external
+        view
+        returns (uint256[] memory, ShipType[] memory)
+    {
+        //@TODO to be refactored / removed / fixed / solved differently
+        uint256 totalFleetSize;
+        for (uint256 i = 0; i < totalSupply() + 1; i++) {
+            if (assignedPlanet[i] == _planetId) {
+                totalFleetSize += 1;
+            }
+        }
+        uint256[] memory defenseFleetToReturn = new uint256[](totalFleetSize);
+        ShipType[] memory defenseFleetShipTypesToReturn = new ShipType[](
+            totalFleetSize
+        );
+        for (uint256 i = 0; i < totalSupply() + 1; i++) {
+            if (assignedPlanet[i] == _planetId) {
+                defenseFleetToReturn[totalFleetSize - 1] = i;
+                totalFleetSize--;
+            }
+        }
+
+        for (uint256 j = 0; j < defenseFleetToReturn.length; j++) {
+            defenseFleetShipTypesToReturn[j] = getShipStats(
+                defenseFleetToReturn[j]
+            );
+        }
+
+        return (defenseFleetToReturn, defenseFleetShipTypesToReturn);
     }
 }
