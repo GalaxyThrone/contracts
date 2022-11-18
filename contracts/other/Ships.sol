@@ -187,4 +187,6 @@ contract Ships is ERC721EnumerableUpgradeable, OwnableUpgradeable {
 
         return (defenseFleetToReturn, defenseFleetShipTypesToReturn);
     }
+
+    //@notice on-chain tokenURI once ships get more customizable
 }

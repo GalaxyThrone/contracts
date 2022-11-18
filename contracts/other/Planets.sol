@@ -25,6 +25,7 @@ contract Planets is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         uint256[] attackerShipsIds;
         address attacker;
         uint256 attackInstanceId;
+        uint256[] attackSeed;
     }
 
     address public gameDiamond;
@@ -51,10 +52,10 @@ contract Planets is ERC721EnumerableUpgradeable, OwnableUpgradeable {
     );
 
     event attackInitated(
-        uint256 indexed attackedPlanet,
+        uint256 attackedPlanet,
         address indexed Attacker,
         uint256 indexed timeToArrive,
-        uint256 arrayIndex
+        uint256 indexed arrayIndex
     );
 
     event attackLost(uint256 indexed attackedPlanet, address indexed Attacker);
@@ -167,6 +168,21 @@ contract Planets is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         return buildings[_planetId][_buildingId];
     }
 
+    function getAllBuildings(uint256 _planetId, uint256 _totalBuildingTypeCount)
+        external
+        view
+        returns (uint256[] memory)
+    {
+        uint256[] memory buildingsCount = new uint256[](
+            _totalBuildingTypeCount
+        );
+
+        for (uint256 i = 0; i < _totalBuildingTypeCount; i++) {
+            buildingsCount[i] = buildings[_planetId][i];
+        }
+        return buildingsCount;
+    }
+
     function getAttackStatus(uint256 _instanceId)
         external
         view
@@ -202,6 +218,7 @@ contract Planets is ERC721EnumerableUpgradeable, OwnableUpgradeable {
     function addAttack(attackStatus memory _attackToBeInitated)
         external
         onlyGameDiamond
+        returns (uint256)
     {
         _attackToBeInitated.attackInstanceId = runningAttacks.length;
         runningAttacks.push(_attackToBeInitated);
@@ -212,6 +229,8 @@ contract Planets is ERC721EnumerableUpgradeable, OwnableUpgradeable {
             _attackToBeInitated.timeToBeResolved,
             runningAttacks.length - 1
         );
+
+        return (runningAttacks.length - 1);
     }
 
     function planetConquestTransfer(
@@ -235,5 +254,24 @@ contract Planets is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         );
 
         delete runningAttacks[_attackIdResolved];
+    }
+
+    function getPVPStatus(uint256 _planetId) external view returns (bool) {
+        return planets[_planetId].pvpEnabled;
+    }
+
+    function enablePVP(uint256 _planetId) external onlyGameDiamond {
+        planets[_planetId].pvpEnabled = true;
+    }
+
+    function addAttackSeed(uint256 _attackId, uint256[] calldata _randomness)
+        external
+        onlyGameDiamond
+    {
+        runningAttacks[_attackId].attackSeed = _randomness;
+    }
+
+    function getTotalPlanetCount() external view returns (uint256) {
+        return totalSupply();
     }
 }

@@ -10,8 +10,6 @@ import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 
 contract RegisterFacet is Modifiers {
-    event Register(uint256 indexed _heroId, uint256 _landId);
-
     function startRegister() external {
         require(
             !s.registrationStarted[msg.sender],

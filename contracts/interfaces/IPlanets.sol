@@ -34,6 +34,11 @@ interface IPlanets {
         view
         returns (uint256);
 
+    function getAllBuildings(uint256 _planetId, uint256 _totalBuildingCount)
+        external
+        view
+        returns (uint256[] memory);
+
     function addBoost(
         uint256 _planetId,
         uint256 _resourceId,
@@ -74,10 +79,21 @@ interface IPlanets {
 
     function resolveLostAttack(uint256 attackIdResolved) external;
 
-    function addAttack(attackStatus memory _attackToBeInitated) external;
+    function addAttack(attackStatus memory _attackToBeInitated)
+        external
+        returns (uint256);
 
     function getAttackStatus(uint256 _instanceId)
         external
         view
         returns (attackStatus memory);
+
+    function getPVPStatus(uint256 _planetId) external view returns (bool);
+
+    function enablePVP(uint256 _planetId) external;
+
+    function addAttackSeed(uint256 _attackId, uint256[] calldata _randomness)
+        external;
+
+    function getTotalPlanetCount() external view returns (uint256);
 }

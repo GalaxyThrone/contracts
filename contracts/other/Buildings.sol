@@ -19,8 +19,13 @@ contract Buildings is ERC1155Upgradeable, OwnableUpgradeable {
 
     // tokenId => Building
     mapping(uint256 => Building) public buildings;
-
+    uint256 public totalBuildingTypes;
     string private _uri;
+
+    modifier onlyGameDiamond() {
+        require(msg.sender == gameDiamond, "Planets: restricted");
+        _;
+    }
 
     function initialize(address _gameDiamond) public initializer {
         __ERC1155_init("");
@@ -36,8 +41,10 @@ contract Buildings is ERC1155Upgradeable, OwnableUpgradeable {
         _uri = __uri;
     }
 
-    function mint(address _account, uint256 _buildingId) external {
-        require(msg.sender == gameDiamond, "Buildings: restricted");
+    function mint(address _account, uint256 _buildingId)
+        external
+        onlyGameDiamond
+    {
         _mint(_account, _buildingId, 1, "");
     }
 
@@ -46,6 +53,7 @@ contract Buildings is ERC1155Upgradeable, OwnableUpgradeable {
         onlyOwner
     {
         buildings[_id] = _building;
+        totalBuildingTypes += 1;
     }
 
     function setAddresses(address _gameDiamond) external onlyOwner {
@@ -79,4 +87,54 @@ contract Buildings is ERC1155Upgradeable, OwnableUpgradeable {
     // ) public override {
     //     revert("Buildings: restricted");
     // }
+
+    function getTotalBuildingTypes() external view returns (uint256) {
+        return totalBuildingTypes;
+    }
+
+    function getBuildingType(uint256 _buildingId)
+        external
+        view
+        returns (Building memory)
+    {
+        return buildings[_buildingId];
+    }
+
+    function getBuildingTypes(uint256[] memory _buildingId)
+        external
+        view
+        returns (Building[] memory)
+    {
+        Building[] memory buildingTypesArray = new Building[](
+            _buildingId.length
+        );
+
+        for (uint256 i = 0; i < _buildingId.length; i++) {
+            buildingTypesArray[i] = buildings[i];
+        }
+
+        return buildingTypesArray;
+    }
+
+    function transferBuildingsToConquerer(
+        uint256[] memory buildingIdsAmounts,
+        address _prevOwner,
+        address _newOwner
+    ) external onlyGameDiamond {
+        //@To be able to use safeBatchTransferFrom, we need an array of tokenIds to transfer
+        uint256[] memory buildingTypeIds = new uint256[](
+            buildingIdsAmounts.length
+        );
+        for (uint256 i = 0; i < buildingIdsAmounts.length; i++) {
+            buildingTypeIds[i] = i;
+        }
+
+        _safeBatchTransferFrom(
+            _prevOwner,
+            _newOwner,
+            buildingTypeIds,
+            buildingIdsAmounts,
+            ""
+        );
+    }
 }

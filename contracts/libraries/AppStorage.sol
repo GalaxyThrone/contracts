@@ -41,6 +41,7 @@ struct attackStatus {
     uint256[] attackerShipsIds;
     address attacker;
     uint256 attackInstanceId;
+    uint256[] attackSeed;
 }
 
 struct ShipType {
@@ -56,6 +57,15 @@ struct ShipType {
     ShipModule[] equippedShipModule;
 }
 
+struct Building {
+    uint256[3] price; // [metal, crystal, ethereus]
+    uint256[3] boosts; // [metal, crystal, ethereus]
+    uint256 attack;
+    uint256 health;
+    uint256 craftTime;
+    string name;
+}
+
 struct ShipModule {
     uint256 attackBoostStat;
     uint256 healthBoostStat;
@@ -64,6 +74,7 @@ struct ShipModule {
 struct VrfRequest {
     address owner;
     uint8 kind; // 0 init planet, 1 register, 2 attack
+    uint256 attackId;
 }
 
 struct AppStorage {
@@ -96,6 +107,7 @@ struct AppStorage {
     address linkAddress;
     RequestConfig requestConfig;
     bool init;
+    address chainRunner;
 }
 
 library LibAppStorage {
@@ -122,6 +134,16 @@ contract Modifiers {
     modifier onlyPlanetOwner(uint256 _planetId) {
         require(
             msg.sender == IERC721(s.planets).ownerOf(_planetId),
+            "AppStorage: Not owner"
+        );
+        _;
+    }
+
+    modifier onlyPlanetOwnerOrChainRunner(uint256 _planetId) {
+        require(
+            msg.sender == IERC721(s.planets).ownerOf(_planetId) ||
+                //@TODO @notice @Marco , How can I reference the address variable from above? This way?
+                msg.sender == s.chainRunner,
             "AppStorage: Not owner"
         );
         _;
