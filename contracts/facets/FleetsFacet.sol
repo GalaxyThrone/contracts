@@ -1,12 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-import {AppStorage, Modifiers, CraftItem, SendCargo, SendTerraform, attackStatus, ShipType} from "../libraries/AppStorage.sol";
+import {AppStorage, Modifiers, CraftItem, SendCargo, SendTerraform, attackStatus, ShipType, Building} from "../libraries/AppStorage.sol";
 import "../interfaces/IPlanets.sol";
 import "../interfaces/IShips.sol";
 import "../interfaces/IERC20.sol";
 import "../interfaces/IERC721.sol";
 import "../interfaces/IResource.sol";
+import "../interfaces/IBuildings.sol";
 
 contract FleetsFacet is Modifiers {
     function craftFleet(uint256 _fleetId, uint256 _planetId)
@@ -122,7 +123,7 @@ contract FleetsFacet is Modifiers {
 
         attackToBeAdded.distance = distance;
 
-        attackToBeAdded.timeToBeResolved = block.timestamp + distance + 120; // minimum 2min test
+        attackToBeAdded.timeToBeResolved = block.timestamp + 120; // minimum 2min test
 
         attackToBeAdded.fromPlanet = _fromPlanetId;
 
@@ -240,6 +241,25 @@ contract FleetsFacet is Modifiers {
             );
         }
 
+        //add buildings defense strength
+
+        // Array of BuildingAmounts per BuildingId (ArrayIndex == BuildingTypeId)
+        uint256[] memory buildingsPlanetCount = IPlanets(s.planets)
+            .getAllBuildings(
+                attackToResolve.toPlanet,
+                IBuildings(s.buildings).getTotalBuildingTypes()
+            );
+
+        //Building Metadata array
+        Building[] memory buildingTypesArray = IBuildings(s.buildings)
+            .getBuildingTypes(buildingsPlanetCount);
+
+        for (uint256 i = 0; i < buildingsPlanetCount.length; i++) {
+            defenseStrength += int256(
+                buildingsPlanetCount[i] * buildingTypesArray[i].attack
+            );
+        }
+
         //to be improved later, very rudimentary resolvement
         // 100 - 50 = 50 dmg
         int256 battleResult = attackStrength - defenseStrength;
@@ -292,6 +312,12 @@ contract FleetsFacet is Modifiers {
                         attackToResolve.toPlanet
                     );
                 }
+
+                IBuildings(s.buildings).transferBuildingsToConquerer(
+                    buildingsPlanetCount,
+                    loserAddr,
+                    attackToResolve.attacker
+                );
             }
             //burn killed ships until there are no more left; then reassign attacking fleet to home-planet
             else {
@@ -413,7 +439,7 @@ contract FleetsFacet is Modifiers {
         delete s.isInvitedToAlliance[msg.sender];
     }
 
-    function leaveAlliance(bytes32 _allianceToJoin) external {
+    function leaveAlliance() external {
         delete s.allianceOfPlayer[msg.sender];
     }
 

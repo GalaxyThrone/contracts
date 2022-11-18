@@ -56,6 +56,15 @@ struct ShipType {
     ShipModule[] equippedShipModule;
 }
 
+struct Building {
+    uint256[3] price; // [metal, crystal, ethereus]
+    uint256[3] boosts; // [metal, crystal, ethereus]
+    uint256 attack;
+    uint256 health;
+    uint256 craftTime;
+    string name;
+}
+
 struct ShipModule {
     uint256 attackBoostStat;
     uint256 healthBoostStat;

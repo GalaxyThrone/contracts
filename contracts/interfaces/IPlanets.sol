@@ -34,6 +34,11 @@ interface IPlanets {
         view
         returns (uint256);
 
+    function getAllBuildings(uint256 _planetId, uint256 _totalBuildingCount)
+        external
+        view
+        returns (uint256[] memory);
+
     function addBoost(
         uint256 _planetId,
         uint256 _resourceId,

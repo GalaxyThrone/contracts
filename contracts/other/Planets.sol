@@ -167,6 +167,21 @@ contract Planets is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         return buildings[_planetId][_buildingId];
     }
 
+    function getAllBuildings(uint256 _planetId, uint256 _totalBuildingTypeCount)
+        external
+        view
+        returns (uint256[] memory)
+    {
+        uint256[] memory buildingsCount = new uint256[](
+            _totalBuildingTypeCount
+        );
+
+        for (uint256 i = 0; i < _totalBuildingTypeCount; i++) {
+            buildingsCount[i] = buildings[_planetId][i];
+        }
+        return buildingsCount;
+    }
+
     function getAttackStatus(uint256 _instanceId)
         external
         view
