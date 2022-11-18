@@ -94,4 +94,6 @@ interface IPlanets {
 
     function addAttackSeed(uint256 _attackId, uint256[] calldata _randomness)
         external;
+
+    function getTotalPlanetCount() external view returns (uint256);
 }

@@ -145,8 +145,9 @@ contract BuildingsFacet is Modifiers, AutomationCompatibleInterface {
         bytes memory miningPathEthereus = abi.encode(ethereusId);
         bytes memory craftingPathBuildings = abi.encode(craftBuildingPath);
 
+        uint256 totalPlanetAmount = IPlanets(s.planets).getTotalPlanetCount();
+
         if (keccak256(checkData) == keccak256(craftingPathBuildings)) {
-            uint256 totalPlanetAmount = 1000;
             for (uint256 i = 0; i < totalPlanetAmount; i++) {
                 if (block.timestamp >= s.craftBuildings[i].readyTimestamp) {
                     return (true, abi.encode(i));
@@ -155,7 +156,6 @@ contract BuildingsFacet is Modifiers, AutomationCompatibleInterface {
         }
 
         if (keccak256(checkData) == keccak256(miningPathMetal)) {
-            uint256 totalPlanetAmount = 1000;
             for (uint256 i = 0; i < totalPlanetAmount; i++) {
                 uint256 lastClaimed = IPlanets(s.planets).getLastClaimed(
                     i,
@@ -168,7 +168,6 @@ contract BuildingsFacet is Modifiers, AutomationCompatibleInterface {
         }
 
         if (keccak256(checkData) == keccak256(miningPathCrystal)) {
-            uint256 totalPlanetAmount = 1000;
             for (uint256 i = 0; i < totalPlanetAmount; i++) {
                 uint256 lastClaimed = IPlanets(s.planets).getLastClaimed(
                     i,
@@ -181,7 +180,6 @@ contract BuildingsFacet is Modifiers, AutomationCompatibleInterface {
         }
 
         if (keccak256(checkData) == keccak256(miningPathEthereus)) {
-            uint256 totalPlanetAmount = 1000;
             for (uint256 i = 0; i < totalPlanetAmount; i++) {
                 uint256 lastClaimed = IPlanets(s.planets).getLastClaimed(
                     i,

@@ -270,4 +270,8 @@ contract Planets is ERC721EnumerableUpgradeable, OwnableUpgradeable {
     {
         runningAttacks[_attackId].attackSeed = _randomness;
     }
+
+    function getTotalPlanetCount() external view returns (uint256) {
+        return totalSupply();
+    }
 }
