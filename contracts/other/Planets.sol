@@ -52,10 +52,10 @@ contract Planets is ERC721EnumerableUpgradeable, OwnableUpgradeable {
     );
 
     event attackInitated(
-        uint256 indexed attackedPlanet,
+        uint256 attackedPlanet,
         address indexed Attacker,
         uint256 indexed timeToArrive,
-        uint256 arrayIndex
+        uint256 indexed arrayIndex
     );
 
     event attackLost(uint256 indexed attackedPlanet, address indexed Attacker);
