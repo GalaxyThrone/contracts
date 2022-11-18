@@ -12,8 +12,6 @@ import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 
 contract VRFFacet is Modifiers {
-    event Register(uint256 indexed _heroId, uint256 _landId);
-
     function rawFulfillRandomWords(
         uint256 requestId,
         uint256[] memory randomWords
