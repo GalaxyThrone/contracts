@@ -19,7 +19,10 @@ import { addBuildings } from "./addBuildings";
 import { addFleets } from "./addFleets";
 import { initPlanets } from "./initPlanets";
 
-const { getSelectors, FacetCutAction } = require("./libraries/diamond");
+const {
+  getSelectors,
+  FacetCutAction,
+} = require("./libraries/diamond");
 
 // const gasPrice = 35000000000;
 
@@ -29,7 +32,9 @@ export async function deployDiamond() {
   const deployerAddress = await deployer.getAddress();
   console.log("Deployer:", deployerAddress);
   // deploy DiamondCutFacet
-  const DiamondCutFacet = await ethers.getContractFactory("DiamondCutFacet");
+  const DiamondCutFacet = await ethers.getContractFactory(
+    "DiamondCutFacet"
+  );
   const diamondCutFacet = await DiamondCutFacet.deploy();
   await diamondCutFacet.deployed();
   console.log("DiamondCutFacet deployed:", diamondCutFacet.address);
@@ -84,7 +89,8 @@ export async function deployDiamond() {
   )) as DiamondCutFacet;
 
   // call to init function
-  const functionCall = diamondInit.interface.encodeFunctionData("init");
+  const functionCall =
+    diamondInit.interface.encodeFunctionData("init");
   const tx = await diamondCut.diamondCut(
     cut,
     diamondInit.address,
@@ -112,7 +118,9 @@ export async function deployDiamond() {
 
   console.log("deploying Metal");
   const Metal = await ethers.getContractFactory("Metal");
-  const metal = (await upgrades.deployProxy(Metal, [diamond.address])) as Metal;
+  const metal = (await upgrades.deployProxy(Metal, [
+    diamond.address,
+  ])) as Metal;
   await metal.deployed();
 
   console.log("deploying Crystal");
@@ -139,7 +147,9 @@ export async function deployDiamond() {
   //@notice deploy ships contract instead of Fleets
   console.log("deploying ships");
   const Ships = await ethers.getContractFactory("Ships");
-  const ships = (await upgrades.deployProxy(Ships, [diamond.address])) as Ships;
+  const ships = (await upgrades.deployProxy(Ships, [
+    diamond.address,
+  ])) as Ships;
   await ships.deployed();
 
   console.log("deploying Buildings");
@@ -167,6 +177,10 @@ export async function deployDiamond() {
   // const deployedGovernanceToken = GovernanceToken.deploy("0xbc1FF4455b21245Df6ca01354d65Aaf9e5334aD8",diamond.address) as GovernanceToken;
   // await deployedGovernanceToken.deployed();
 
+  //@TODO this should be dynamically set on the adminFacet.
+
+  //@notice Chainlink Automation Address
+  const chainRunner = "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045";
   console.log("setting diamond addresses");
   const setAddresses = await adminFacet.setAddresses(
     crystal.address,
@@ -174,7 +188,8 @@ export async function deployDiamond() {
     metal.address,
     buildings.address,
     ships.address,
-    planets.address
+    planets.address,
+    chainRunner
   );
   await setAddresses.wait();
 

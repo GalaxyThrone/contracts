@@ -14,7 +14,8 @@ contract AdminFacet is Modifiers {
         address _metal,
         address _buildings,
         address _ships,
-        address _planets
+        address _planets,
+        address _chainRunner
     ) external onlyOwner {
         s.crystal = _crystal;
         s.ethereus = _ethereus;
@@ -22,6 +23,7 @@ contract AdminFacet is Modifiers {
         s.buildings = _buildings;
         s.ships = _ships;
         s.planets = _planets;
+        s.chainRunner = _chainRunner;
     }
 
     function drawRandomNumbers() internal {
@@ -100,5 +102,9 @@ contract AdminFacet is Modifiers {
         bytes memory
     ) public virtual returns (bytes4) {
         return this.onERC1155BatchReceived.selector;
+    }
+
+    function changeChainRunner(address _newChainRunner) external onlyOwner {
+        s.chainRunner = _newChainRunner;
     }
 }

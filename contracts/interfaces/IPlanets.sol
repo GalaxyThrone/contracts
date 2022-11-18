@@ -80,4 +80,8 @@ interface IPlanets {
         external
         view
         returns (attackStatus memory);
+
+    function getPVPStatus(uint256 _planetId) external view returns (bool);
+
+    function enablePVP(uint256 _planetId) external;
 }

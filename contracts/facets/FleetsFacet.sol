@@ -49,113 +49,11 @@ contract FleetsFacet is Modifiers {
 
         IPlanets(s.planets).addFleet(_planetId, shipTypeId, 1);
         IShips(s.ships).assignShipToPlanet(shipId, _planetId);
+
+        //@notice for the alpha, you are PVP enabled once you are claiming your first spaceship
+        IPlanets(s.planets).enablePVP(_planetId);
     }
 
-    //@notice Disabled for V0.01
-    /*
-    function sendCargo(
-        uint256 _fromPlanetId,
-        uint256 _toPlanetId,
-        uint256 _fleetId,
-        uint256 _resourceId
-    ) external onlyPlanetOwner(_fromPlanetId) {
-        //todo: require only cargo ships
-        SendCargo memory newSendCargo = SendCargo(
-            _fromPlanetId,
-            _toPlanetId,
-            _fleetId,
-            _resourceId,
-            block.timestamp
-        );
-        s.sendCargoId++;
-        s.sendCargo[s.sendCargoId] = newSendCargo;
-        // emit event
-    }
-    */
-    //@notice Disabled for V0.01
-    /*
-    function returnCargo(uint256 _sendCargoId) external {
-        require(
-            msg.sender ==
-                IERC721(s.planets).ownerOf(
-                    s.sendCargo[_sendCargoId].fromPlanetId
-                ),
-            "AppStorage: Not owner"
-        );
-        (uint256 fromX, uint256 fromY) = IPlanets(s.planets).getCoordinates(
-            s.sendCargo[_sendCargoId].fromPlanetId
-        );
-        (uint256 toX, uint256 toY) = IPlanets(s.planets).getCoordinates(
-            s.sendCargo[_sendCargoId].toPlanetId
-        );
-        uint256 xDist = fromX > toX ? fromX - toX : toX - fromX;
-        uint256 yDist = fromY > toY ? fromY - toY : toY - fromY;
-        uint256 distance = xDist + yDist;
-        require(
-            block.timestamp >=
-                s.sendCargo[_sendCargoId].timestamp + (distance * 2),
-            "FleetsFacet: not ready yet"
-        );
-        uint256 cargo = IFleets(s.fleets).getCargo(
-            s.sendCargo[_sendCargoId].fleetId
-        );
-        IPlanets(s.planets).mineResource(
-            s.sendCargo[_sendCargoId].toPlanetId,
-            s.sendCargo[_sendCargoId].resourceId,
-            cargo
-        );
-        IResource(s.ethereus).mint(msg.sender, cargo);
-        delete s.sendCargo[_sendCargoId];
-    }
-    */
-    //@notice Disabled for V0.01
-
-    /*
-    function sendTerraform(
-        uint256 _fromPlanetId,
-        uint256 _toPlanetId,
-        uint256 _fleetId
-    ) external onlyPlanetOwner(_fromPlanetId) {
-        //todo: require only to empty planet
-        //todo: only terraform ship
-        SendTerraform memory newSendTerraform = SendTerraform(
-            _fromPlanetId,
-            _toPlanetId,
-            _fleetId,
-            block.timestamp
-        );
-        s.sendTerraformId++;
-        s.sendTerraform[s.sendTerraformId] = newSendTerraform;
-        // emit event
-    }
-    */
-    //@notice Disabled for V0.01
-    /*
-    function endTerraform(uint256 _sendTerraformId) external {
-        require(
-            msg.sender ==
-                IERC721(s.planets).ownerOf(
-                    s.sendTerraform[_sendTerraformId].fromPlanetId
-                ),
-            "AppStorage: Not owner"
-        );
-        (uint256 fromX, uint256 fromY) = IPlanets(s.planets).getCoordinates(
-            s.sendTerraform[_sendTerraformId].fromPlanetId
-        );
-        (uint256 toX, uint256 toY) = IPlanets(s.planets).getCoordinates(
-            s.sendTerraform[_sendTerraformId].toPlanetId
-        );
-        uint256 xDist = fromX > toX ? fromX - toX : toX - fromX;
-        uint256 yDist = fromY > toY ? fromY - toY : toY - fromY;
-        uint256 distance = xDist + yDist;
-        require(
-            block.timestamp >=
-                s.sendTerraform[_sendTerraformId].timestamp + distance,
-            "FleetsFacet: not ready yet"
-        );
-        //todo: conquer planet
-    }
-    */
     function getCraftFleets(uint256 _planetId)
         external
         view
@@ -182,6 +80,11 @@ contract FleetsFacet is Modifiers {
                 checkAlliance(msg.sender) ||
                 checkAlliance(msg.sender) == bytes32(0),
             "friendly target!"
+        );
+
+        require(
+            IPlanets(s.planets).getPVPStatus(_toPlanetId),
+            "Planet is invulnerable!"
         );
 
         //check if ships are assigned to the planet
@@ -522,3 +425,109 @@ contract FleetsFacet is Modifiers {
         return s.allianceOfPlayer[_playerToCheck];
     }
 }
+
+//@notice Disabled for V0.01
+/*
+    function sendCargo(
+        uint256 _fromPlanetId,
+        uint256 _toPlanetId,
+        uint256 _fleetId,
+        uint256 _resourceId
+    ) external onlyPlanetOwner(_fromPlanetId) {
+        //todo: require only cargo ships
+        SendCargo memory newSendCargo = SendCargo(
+            _fromPlanetId,
+            _toPlanetId,
+            _fleetId,
+            _resourceId,
+            block.timestamp
+        );
+        s.sendCargoId++;
+        s.sendCargo[s.sendCargoId] = newSendCargo;
+        // emit event
+    }
+    */
+//@notice Disabled for V0.01
+/*
+    function returnCargo(uint256 _sendCargoId) external {
+        require(
+            msg.sender ==
+                IERC721(s.planets).ownerOf(
+                    s.sendCargo[_sendCargoId].fromPlanetId
+                ),
+            "AppStorage: Not owner"
+        );
+        (uint256 fromX, uint256 fromY) = IPlanets(s.planets).getCoordinates(
+            s.sendCargo[_sendCargoId].fromPlanetId
+        );
+        (uint256 toX, uint256 toY) = IPlanets(s.planets).getCoordinates(
+            s.sendCargo[_sendCargoId].toPlanetId
+        );
+        uint256 xDist = fromX > toX ? fromX - toX : toX - fromX;
+        uint256 yDist = fromY > toY ? fromY - toY : toY - fromY;
+        uint256 distance = xDist + yDist;
+        require(
+            block.timestamp >=
+                s.sendCargo[_sendCargoId].timestamp + (distance * 2),
+            "FleetsFacet: not ready yet"
+        );
+        uint256 cargo = IFleets(s.fleets).getCargo(
+            s.sendCargo[_sendCargoId].fleetId
+        );
+        IPlanets(s.planets).mineResource(
+            s.sendCargo[_sendCargoId].toPlanetId,
+            s.sendCargo[_sendCargoId].resourceId,
+            cargo
+        );
+        IResource(s.ethereus).mint(msg.sender, cargo);
+        delete s.sendCargo[_sendCargoId];
+    }
+    */
+//@notice Disabled for V0.01
+
+/*
+    function sendTerraform(
+        uint256 _fromPlanetId,
+        uint256 _toPlanetId,
+        uint256 _fleetId
+    ) external onlyPlanetOwner(_fromPlanetId) {
+        //todo: require only to empty planet
+        //todo: only terraform ship
+        SendTerraform memory newSendTerraform = SendTerraform(
+            _fromPlanetId,
+            _toPlanetId,
+            _fleetId,
+            block.timestamp
+        );
+        s.sendTerraformId++;
+        s.sendTerraform[s.sendTerraformId] = newSendTerraform;
+        // emit event
+    }
+    */
+//@notice Disabled for V0.01
+/*
+    function endTerraform(uint256 _sendTerraformId) external {
+        require(
+            msg.sender ==
+                IERC721(s.planets).ownerOf(
+                    s.sendTerraform[_sendTerraformId].fromPlanetId
+                ),
+            "AppStorage: Not owner"
+        );
+        (uint256 fromX, uint256 fromY) = IPlanets(s.planets).getCoordinates(
+            s.sendTerraform[_sendTerraformId].fromPlanetId
+        );
+        (uint256 toX, uint256 toY) = IPlanets(s.planets).getCoordinates(
+            s.sendTerraform[_sendTerraformId].toPlanetId
+        );
+        uint256 xDist = fromX > toX ? fromX - toX : toX - fromX;
+        uint256 yDist = fromY > toY ? fromY - toY : toY - fromY;
+        uint256 distance = xDist + yDist;
+        require(
+            block.timestamp >=
+                s.sendTerraform[_sendTerraformId].timestamp + distance,
+            "FleetsFacet: not ready yet"
+        );
+        //todo: conquer planet
+    }
+    */

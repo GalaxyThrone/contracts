@@ -236,4 +236,12 @@ contract Planets is ERC721EnumerableUpgradeable, OwnableUpgradeable {
 
         delete runningAttacks[_attackIdResolved];
     }
+
+    function getPVPStatus(uint256 _planetId) external view returns (bool) {
+        return planets[_planetId].pvpEnabled;
+    }
+
+    function enablePVP(uint256 _planetId) external onlyGameDiamond {
+        planets[_planetId].pvpEnabled = true;
+    }
 }

@@ -96,6 +96,7 @@ struct AppStorage {
     address linkAddress;
     RequestConfig requestConfig;
     bool init;
+    address chainRunner;
 }
 
 library LibAppStorage {
@@ -122,6 +123,16 @@ contract Modifiers {
     modifier onlyPlanetOwner(uint256 _planetId) {
         require(
             msg.sender == IERC721(s.planets).ownerOf(_planetId),
+            "AppStorage: Not owner"
+        );
+        _;
+    }
+
+    modifier onlyPlanetOwnerOrChainRunner(uint256 _planetId) {
+        require(
+            msg.sender == IERC721(s.planets).ownerOf(_planetId) ||
+                //@TODO @notice @Marco , How can I reference the address variable from above? This way?
+                msg.sender == s.chainRunner,
             "AppStorage: Not owner"
         );
         _;
