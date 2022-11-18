@@ -29,6 +29,11 @@ contract VRFFacet is Modifiers {
             );
         } else if (s.vrfRequest[requestId].kind == 0) {
             AdminFacet(address(this)).finalizeInit(5, randomWords);
+        } else if (s.vrfRequest[requestId].kind == 2) {
+            AdminFacet(address(this)).finalizeAttackSeed(
+                s.vrfRequest[requestId].attackId,
+                randomWords
+            );
         }
     }
 

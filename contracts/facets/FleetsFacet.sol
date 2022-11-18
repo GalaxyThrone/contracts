@@ -8,6 +8,7 @@ import "../interfaces/IERC20.sol";
 import "../interfaces/IERC721.sol";
 import "../interfaces/IResource.sol";
 import "../interfaces/IBuildings.sol";
+import "./AdminFacet.sol";
 
 contract FleetsFacet is Modifiers {
     function craftFleet(uint256 _fleetId, uint256 _planetId)
@@ -123,7 +124,7 @@ contract FleetsFacet is Modifiers {
 
         attackToBeAdded.distance = distance;
 
-        attackToBeAdded.timeToBeResolved = block.timestamp + 120; // minimum 2min test
+        attackToBeAdded.timeToBeResolved = block.timestamp + 180; // minimum 3mins test ( to ensure VRF called back in time)
 
         attackToBeAdded.fromPlanet = _fromPlanetId;
 
@@ -133,7 +134,11 @@ contract FleetsFacet is Modifiers {
 
         attackToBeAdded.attacker = msg.sender;
 
-        IPlanets(s.planets).addAttack(attackToBeAdded);
+        uint256 _attackInstanceId = IPlanets(s.planets).addAttack(
+            attackToBeAdded
+        );
+
+        AdminFacet(address(this)).drawRandomAttackSeed(_attackInstanceId);
     }
 
     //@TODO currently instantenous for hackathon.
@@ -250,7 +255,7 @@ contract FleetsFacet is Modifiers {
                 IBuildings(s.buildings).getTotalBuildingTypes()
             );
 
-        //Building Metadata array
+        //Building metadata type array
         Building[] memory buildingTypesArray = IBuildings(s.buildings)
             .getBuildingTypes(buildingsPlanetCount);
 
@@ -260,8 +265,44 @@ contract FleetsFacet is Modifiers {
             );
         }
 
-        //to be improved later, very rudimentary resolvement
-        // 100 - 50 = 50 dmg
+        //every planet has a minimum defense strength, even if its only the spaceship debris of their destroyed fleet blocking the way
+        if (defenseStrength == 0) {
+            defenseStrength += 10;
+        }
+
+        //even a ship without weapons still has its warpdrive ( as demonstrated in the extremely plot-holey star wars movie)
+        if (attackStrength == 0) {
+            attackStrength += 10;
+        }
+
+        //attack strength bonus/malus
+
+        attackStrength +=
+            attackStrength *
+            int256((attackToResolve.attackSeed[0] % 25));
+        attackStrength -=
+            attackStrength *
+            int256((attackToResolve.attackSeed[1] % 25));
+
+        //defense strength bonus/malus
+
+        //everyone loves an underdog
+        if (defenseStrength * 5 < attackStrength) {
+            defenseStrength +=
+                defenseStrength *
+                int256((attackToResolve.attackSeed[2] % 100));
+            defenseStrength -=
+                defenseStrength *
+                int256((attackToResolve.attackSeed[3] % 5));
+        } else {
+            defenseStrength +=
+                defenseStrength *
+                int256((attackToResolve.attackSeed[2] % 25));
+            defenseStrength -=
+                defenseStrength *
+                int256((attackToResolve.attackSeed[3] % 25));
+        }
+
         int256 battleResult = attackStrength - defenseStrength;
 
         //attacker has higher atk than defender

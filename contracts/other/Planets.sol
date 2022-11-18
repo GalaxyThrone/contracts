@@ -25,6 +25,7 @@ contract Planets is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         uint256[] attackerShipsIds;
         address attacker;
         uint256 attackInstanceId;
+        uint256[] attackSeed;
     }
 
     address public gameDiamond;
@@ -217,6 +218,7 @@ contract Planets is ERC721EnumerableUpgradeable, OwnableUpgradeable {
     function addAttack(attackStatus memory _attackToBeInitated)
         external
         onlyGameDiamond
+        returns (uint256)
     {
         _attackToBeInitated.attackInstanceId = runningAttacks.length;
         runningAttacks.push(_attackToBeInitated);
@@ -227,6 +229,8 @@ contract Planets is ERC721EnumerableUpgradeable, OwnableUpgradeable {
             _attackToBeInitated.timeToBeResolved,
             runningAttacks.length - 1
         );
+
+        return (runningAttacks.length - 1);
     }
 
     function planetConquestTransfer(
@@ -258,5 +262,12 @@ contract Planets is ERC721EnumerableUpgradeable, OwnableUpgradeable {
 
     function enablePVP(uint256 _planetId) external onlyGameDiamond {
         planets[_planetId].pvpEnabled = true;
+    }
+
+    function addAttackSeed(uint256 _attackId, uint256[] calldata _randomness)
+        external
+        onlyGameDiamond
+    {
+        runningAttacks[_attackId].attackSeed = _randomness;
     }
 }

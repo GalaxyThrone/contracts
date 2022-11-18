@@ -79,7 +79,9 @@ interface IPlanets {
 
     function resolveLostAttack(uint256 attackIdResolved) external;
 
-    function addAttack(attackStatus memory _attackToBeInitated) external;
+    function addAttack(attackStatus memory _attackToBeInitated)
+        external
+        returns (uint256);
 
     function getAttackStatus(uint256 _instanceId)
         external
@@ -89,4 +91,7 @@ interface IPlanets {
     function getPVPStatus(uint256 _planetId) external view returns (bool);
 
     function enablePVP(uint256 _planetId) external;
+
+    function addAttackSeed(uint256 _attackId, uint256[] calldata _randomness)
+        external;
 }

@@ -41,6 +41,7 @@ struct attackStatus {
     uint256[] attackerShipsIds;
     address attacker;
     uint256 attackInstanceId;
+    uint256[] attackSeed;
 }
 
 struct ShipType {
@@ -73,6 +74,7 @@ struct ShipModule {
 struct VrfRequest {
     address owner;
     uint8 kind; // 0 init planet, 1 register, 2 attack
+    uint256 attackId;
 }
 
 struct AppStorage {

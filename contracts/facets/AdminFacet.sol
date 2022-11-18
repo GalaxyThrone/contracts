@@ -39,6 +39,20 @@ contract AdminFacet is Modifiers {
         s.vrfRequest[requestId].kind = 0;
     }
 
+    function drawRandomAttackSeed(uint256 _attackId) external onlySelf {
+        // Will revert if subscription is not set and funded.
+        uint256 requestId = VRFCoordinatorV2Interface(s.vrfCoordinator)
+            .requestRandomWords(
+                s.requestConfig.keyHash,
+                s.requestConfig.subId,
+                s.requestConfig.requestConfirmations,
+                s.requestConfig.callbackGasLimit,
+                5
+            );
+        s.vrfRequest[requestId].kind = 2;
+        s.vrfRequest[requestId].attackId = _attackId;
+    }
+
     function startInit() external {
         require(!s.init, "AdminFacet: already running init");
         s.init = true;
@@ -69,6 +83,13 @@ contract AdminFacet is Modifiers {
             );
         }
         s.init = false;
+    }
+
+    function finalizeAttackSeed(
+        uint256 _attackId,
+        uint256[] calldata _randomness
+    ) external onlySelf {
+        IPlanets(s.planets).addAttackSeed(_attackId, _randomness);
     }
 
     // function removeFix() external {
