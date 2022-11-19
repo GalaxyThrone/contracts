@@ -9,7 +9,7 @@ a fully on-chain SciFi strategy game inspired from games like tribal wars.
 
 We wanted to create a SciFi Strategy Building Game where your owned planets & ships are actually yours, not just existing on a centralized backend and dictated by one company.
 
-So every Asset in our game has been created using **ERC721** for planets and ships and **ERC1155** for buildings/research/technologies, while the resources of the game itself are **ERC20** tokens. 
+Every Asset in our game has been created using **ERC721** for planets and ships and **ERC1155** for buildings/research/technologies, while the resources of the game itself are **ERC20** tokens. 
 
 A **governance DAO** exists via snapshot.org and the ownership of 1 planet NFT
 
