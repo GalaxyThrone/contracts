@@ -1,13 +1,17 @@
-# Sample Hardhat Project
+Galaxy Throne 
+a fully on-chain SciFi strategy game inspired from games like tribal wars.
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
 
-Try running some of the following tasks:
+We wanted to create a SciFi Strategy Building Game where your owned planets & ships are actually yours, not just existing on a centralized backend and dictated by one company.
 
-```shell
-npx hardhat help
-npx hardhat test
-GAS_REPORT=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.ts
-```
+So every Asset in our game has been created using **ERC721** for planets and ships and **ERC1155** for buildings/research/technologies, while the resources of the game itself are **ERC20** tokens. 
+
+A **governance DAO** exists via snapshot.org and the ownership of 1 planet NFT
+
+We are utilizing Chainlinks Verifiable Random Function to randomize planet generation & the assignment of the home planet as well as for dynamic fights.
+
+In order to avoid frequent transactions & user gas-fees we leveraged Chainlink-Automation triggering those transactions instead of the player, for a gasless & seamless user experience.
+
+
+We are utilizing the EIP-2535 Diamond Standard: https://eips.ethereum.org/EIPS/eip-2535 to offer upgradable, limitless contracts
+
