@@ -188,7 +188,13 @@ contract Planets is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         view
         returns (attackStatus memory)
     {
-        return runningAttacks[_instanceId];
+        //out of bounds access
+        if (_instanceId > runningAttacks.length - 1) {
+            attackStatus memory emptyResponse;
+            return emptyResponse;
+        } else {
+            return runningAttacks[_instanceId];
+        }
     }
 
     function getLastClaimed(uint256 _planetId, uint256 _resourceId)
@@ -273,5 +279,42 @@ contract Planets is ERC721EnumerableUpgradeable, OwnableUpgradeable {
 
     function getTotalPlanetCount() external view returns (uint256) {
         return totalSupply();
+    }
+
+    //view function to check if attack can be resolved
+    //returns the ids & timestamps
+    function checkIfPlayerHasAttackRunning(address _player)
+        external
+        view
+        returns (uint256[] memory, uint256[] memory)
+    {
+        uint256 attackIdsAmount;
+        for (uint256 i = 0; i < runningAttacks.length; i++) {
+            if (runningAttacks[i].attacker == _player) {
+                attackIdsAmount += 1;
+            }
+        }
+
+        uint256[] memory attackIds = new uint256[](attackIdsAmount);
+
+        uint256[] memory attackResolvementTime = new uint256[](attackIdsAmount);
+        uint256 j = 0;
+        for (uint256 i = 0; i < runningAttacks.length; i++) {
+            if (runningAttacks[i].attacker == _player) {
+                attackIds[j] = i;
+                attackResolvementTime[j] = runningAttacks[i].timeToBeResolved;
+                j++;
+            }
+        }
+
+        return (attackIds, attackResolvementTime);
+    }
+
+    function getAllRunningAttacks()
+        external
+        view
+        returns (attackStatus[] memory)
+    {
+        return runningAttacks;
     }
 }

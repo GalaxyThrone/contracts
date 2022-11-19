@@ -26,6 +26,7 @@ contract AdminFacet is Modifiers {
         s.chainRunner = _chainRunner;
     }
 
+    //@notice generates new planets randomly
     function drawRandomNumbers() internal {
         // Will revert if subscription is not set and funded.
         uint256 requestId = VRFCoordinatorV2Interface(s.vrfCoordinator)

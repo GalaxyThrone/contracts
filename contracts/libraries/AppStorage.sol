@@ -142,8 +142,9 @@ contract Modifiers {
     modifier onlyPlanetOwnerOrChainRunner(uint256 _planetId) {
         require(
             msg.sender == IERC721(s.planets).ownerOf(_planetId) ||
-                //@TODO @notice @Marco , How can I reference the address variable from above? This way?
-                msg.sender == s.chainRunner,
+                //@TODO offload to chainlink automation facet instead of s.buildings
+                msg.sender == s.chainRunner ||
+                msg.sender == s.buildings,
             "AppStorage: Not owner"
         );
         _;

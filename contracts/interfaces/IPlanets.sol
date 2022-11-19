@@ -96,4 +96,14 @@ interface IPlanets {
         external;
 
     function getTotalPlanetCount() external view returns (uint256);
+
+    function checkIfPlayerHasAttackRunning(address _player)
+        external
+        view
+        returns (uint256[] memory, uint256[] memory);
+
+    function getAllRunningAttacks()
+        external
+        view
+        returns (attackStatus[] memory);
 }
