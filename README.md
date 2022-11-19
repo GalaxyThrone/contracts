@@ -1,10 +1,10 @@
-
-<img width="167" alt="medium_ (1)" src="https://user-images.githubusercontent.com/117198798/202849713-e766a836-91fc-4895-9833-204f2f8173b2.png">
+<img width="167" alt="medium_" src="https://user-images.githubusercontent.com/117198798/202849745-e7d7a8a1-413a-4e87-8d3f-9dbea3377aef.png">
 
 
 **Galaxy Throne**
 
 a fully on-chain SciFi strategy game inspired from games like tribal wars.
+
 
 
 We wanted to create a SciFi Strategy Building Game where your owned planets & ships are actually yours, not just existing on a centralized backend and dictated by one company.
