@@ -1,3 +1,7 @@
+
+<img width="167" alt="medium_ (1)" src="https://user-images.githubusercontent.com/117198798/202849713-e766a836-91fc-4895-9833-204f2f8173b2.png">
+
+
 **Galaxy Throne**
 
 a fully on-chain SciFi strategy game inspired from games like tribal wars.
