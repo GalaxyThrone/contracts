@@ -1,4 +1,5 @@
-Galaxy Throne 
+**Galaxy Throne**
+
 a fully on-chain SciFi strategy game inspired from games like tribal wars.
 
 
@@ -13,5 +14,5 @@ We are utilizing Chainlinks Verifiable Random Function to randomize planet gener
 In order to avoid frequent transactions & user gas-fees we leveraged Chainlink-Automation triggering those transactions instead of the player, for a gasless & seamless user experience.
 
 
-We are utilizing the EIP-2535 Diamond Standard: https://eips.ethereum.org/EIPS/eip-2535 to offer upgradable, limitless contracts
+We are utilizing the **EIP-2535 Diamond Standard**: https://eips.ethereum.org/EIPS/eip-2535 to offer upgradable, limitless contracts
 
