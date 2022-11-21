@@ -22,6 +22,7 @@ struct SendTerraform {
     uint256 toPlanetId;
     uint256 fleetId;
     uint256 timestamp;
+    uint256 arrivalTime;
 }
 
 struct RequestConfig {

@@ -51,6 +51,7 @@ contract Planets is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         address indexed newOwner
     );
 
+    event planetTerraformed(uint256 indexed tokenId, address indexed newOwner);
     event attackInitated(
         uint256 attackedPlanet,
         address indexed Attacker,
@@ -248,6 +249,14 @@ contract Planets is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         delete runningAttacks[_attackIdResolved];
         _safeTransfer(_oldOwner, _newOwner, _tokenId, "");
         emit planetConquered(_tokenId, _oldOwner, _newOwner);
+    }
+
+    function planetTerraform(uint256 _tokenId, address _newOwner)
+        external
+        onlyGameDiamond
+    {
+        _safeTransfer(gameDiamond, _newOwner, _tokenId, "");
+        emit planetTerraformed(_tokenId, _newOwner);
     }
 
     function resolveLostAttack(uint256 _attackIdResolved)

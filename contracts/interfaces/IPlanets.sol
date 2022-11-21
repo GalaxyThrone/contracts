@@ -106,4 +106,6 @@ interface IPlanets {
         external
         view
         returns (attackStatus[] memory);
+
+    function planetTerraform(uint256 _tokenId, address _newOwner) external;
 }

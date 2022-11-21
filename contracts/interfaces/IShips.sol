@@ -55,4 +55,6 @@ interface IShips {
         external
         view
         returns (uint256[] memory);
+
+    function ownerOf(uint256 _tokenId) external view returns (address);
 }

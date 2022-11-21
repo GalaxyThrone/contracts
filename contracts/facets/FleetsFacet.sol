@@ -11,6 +11,12 @@ import "../interfaces/IBuildings.sol";
 import "./AdminFacet.sol";
 
 contract FleetsFacet is Modifiers {
+    event sendTerraformer(
+        uint256 indexed _toPlanet,
+        uint256 indexed _arrivalTime,
+        address indexed sender
+    );
+
     function craftFleet(uint256 _fleetId, uint256 _planetId)
         external
         onlyPlanetOwner(_planetId)
@@ -211,6 +217,17 @@ contract FleetsFacet is Modifiers {
                 1
             );
         }
+    }
+
+    function unAssignNewShipTypeIdAmount(
+        uint256 _toPlanetId,
+        uint256 _shipsTokenIds
+    ) internal {
+        IPlanets(s.planets).removeFleet(
+            _toPlanetId,
+            IShips(s.ships).getShipStats(_shipsTokenIds).shipType,
+            1
+        );
     }
 
     function resolveAttack(uint256 _attackInstanceId) external {
@@ -496,8 +513,88 @@ contract FleetsFacet is Modifiers {
     {
         return s.allianceOfPlayer[_playerToCheck];
     }
-}
 
+    function sendTerraform(
+        uint256 _fromPlanetId,
+        uint256 _toPlanetId,
+        uint256 _shipId
+    ) external onlyPlanetOwner(_fromPlanetId) {
+        //todo: only terraform ship
+
+        require(
+            IShips(s.ships).ownerOf(_shipId) == msg.sender,
+            "not your ship!"
+        );
+
+        require(
+            compareStrings(
+                IShips(s.ships).getShipStats(_shipId).name,
+                "Terraformer"
+            ),
+            "only terraform-capital ships can transform uninhabitated planets!"
+        );
+
+        //todo: require only to empty planet
+        require(
+            IERC721(s.planets).ownerOf(_toPlanetId) == address(this),
+            "planet already terraformed!"
+        );
+
+        (uint256 fromX, uint256 fromY) = IPlanets(s.planets).getCoordinates(
+            _fromPlanetId
+        );
+        (uint256 toX, uint256 toY) = IPlanets(s.planets).getCoordinates(
+            _toPlanetId
+        );
+        uint256 xDist = fromX > toX ? fromX - toX : toX - fromX;
+        uint256 yDist = fromY > toY ? fromY - toY : toY - fromY;
+        uint256 arrivalTime = xDist + yDist + block.timestamp;
+
+        SendTerraform memory newSendTerraform = SendTerraform(
+            _fromPlanetId,
+            _toPlanetId,
+            _shipId,
+            block.timestamp,
+            arrivalTime
+        );
+        s.sendTerraformId++;
+        s.sendTerraform[s.sendTerraformId] = newSendTerraform;
+
+        //unassign ship from home planet & substract amount
+        IShips(s.ships).deleteShipFromPlanet(_shipId);
+        unAssignNewShipTypeIdAmount(_fromPlanetId, _shipId);
+        emit sendTerraformer(_toPlanetId, arrivalTime, msg.sender);
+    }
+
+    //@notice resolve arrival of terraformer
+    function endTerraform(uint256 _sendTerraformId) external {
+        require(
+            block.timestamp >= s.sendTerraform[_sendTerraformId].arrivalTime,
+            "FleetsFacet: not ready yet"
+        );
+
+        //@notice transferring planet to terraformer owner. Event on Planet contract
+        IPlanets(s.planets).planetTerraform(
+            s.sendTerraform[_sendTerraformId].toPlanetId,
+            IShips(s.ships).ownerOf(s.sendTerraform[_sendTerraformId].fleetId)
+        );
+
+        //@notice burn terraformer ship from owner
+
+        IShips(s.ships).burnShip(s.sendTerraform[_sendTerraformId].fleetId);
+
+        delete s.sendTerraform[_sendTerraformId];
+    }
+
+    function compareStrings(string memory a, string memory b)
+        internal
+        view
+        returns (bool)
+    {
+        return (keccak256(abi.encodePacked((a))) ==
+            keccak256(abi.encodePacked((b))));
+    }
+}
 //@notice Disabled for V0.01
 /*
     function sendCargo(
@@ -553,53 +650,5 @@ contract FleetsFacet is Modifiers {
         );
         IResource(s.ethereus).mint(msg.sender, cargo);
         delete s.sendCargo[_sendCargoId];
-    }
-    */
-//@notice Disabled for V0.01
-
-/*
-    function sendTerraform(
-        uint256 _fromPlanetId,
-        uint256 _toPlanetId,
-        uint256 _fleetId
-    ) external onlyPlanetOwner(_fromPlanetId) {
-        //todo: require only to empty planet
-        //todo: only terraform ship
-        SendTerraform memory newSendTerraform = SendTerraform(
-            _fromPlanetId,
-            _toPlanetId,
-            _fleetId,
-            block.timestamp
-        );
-        s.sendTerraformId++;
-        s.sendTerraform[s.sendTerraformId] = newSendTerraform;
-        // emit event
-    }
-    */
-//@notice Disabled for V0.01
-/*
-    function endTerraform(uint256 _sendTerraformId) external {
-        require(
-            msg.sender ==
-                IERC721(s.planets).ownerOf(
-                    s.sendTerraform[_sendTerraformId].fromPlanetId
-                ),
-            "AppStorage: Not owner"
-        );
-        (uint256 fromX, uint256 fromY) = IPlanets(s.planets).getCoordinates(
-            s.sendTerraform[_sendTerraformId].fromPlanetId
-        );
-        (uint256 toX, uint256 toY) = IPlanets(s.planets).getCoordinates(
-            s.sendTerraform[_sendTerraformId].toPlanetId
-        );
-        uint256 xDist = fromX > toX ? fromX - toX : toX - fromX;
-        uint256 yDist = fromY > toY ? fromY - toY : toY - fromY;
-        uint256 distance = xDist + yDist;
-        require(
-            block.timestamp >=
-                s.sendTerraform[_sendTerraformId].timestamp + distance,
-            "FleetsFacet: not ready yet"
-        );
-        //todo: conquer planet
     }
     */
