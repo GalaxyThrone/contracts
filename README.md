@@ -1,7 +1,8 @@
-<img width="167" alt="medium_" src="https://user-images.githubusercontent.com/117198798/202849745-e7d7a8a1-413a-4e87-8d3f-9dbea3377aef.png">
+![upscaler-medium_ (1)-2x](https://user-images.githubusercontent.com/117198798/203138171-990e45cf-89b7-400e-830f-3817f70583ee.jpg)
 
 
 **Galaxy Throne**
+
 
 a fully on-chain SciFi strategy game inspired from games like tribal wars.
 
@@ -19,4 +20,7 @@ In order to avoid frequent transactions & user gas-fees we leveraged Chainlink-A
 
 
 We are utilizing the **EIP-2535 Diamond Standard**: https://eips.ethereum.org/EIPS/eip-2535 to offer upgradable, limitless contracts
+
+
+Current deployed Demo: https://galaxy-throne-chainlink-dapp.vercel.app/
 
