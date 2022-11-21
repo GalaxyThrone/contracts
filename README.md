@@ -20,3 +20,6 @@ In order to avoid frequent transactions & user gas-fees we leveraged Chainlink-A
 
 We are utilizing the **EIP-2535 Diamond Standard**: https://eips.ethereum.org/EIPS/eip-2535 to offer upgradable, limitless contracts
 
+
+Current deployed Demo: https://galaxy-throne-chainlink-dapp.vercel.app/
+
