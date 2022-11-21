@@ -1,5 +1,4 @@
-<img width="167" alt="medium_" src="https://user-images.githubusercontent.com/117198798/202849745-e7d7a8a1-413a-4e87-8d3f-9dbea3377aef.png">
-
+![upscaler-medium_ (1)-2x](https://user-images.githubusercontent.com/117198798/203137863-207b130a-714d-4c9f-bfb7-46b28aab05e2.jpg)
 
 **Galaxy Throne**
 
