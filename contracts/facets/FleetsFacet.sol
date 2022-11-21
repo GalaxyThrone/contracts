@@ -519,8 +519,6 @@ contract FleetsFacet is Modifiers {
         uint256 _toPlanetId,
         uint256 _shipId
     ) external onlyPlanetOwner(_fromPlanetId) {
-        //todo: only terraform ship
-
         require(
             IShips(s.ships).ownerOf(_shipId) == msg.sender,
             "not your ship!"
@@ -534,7 +532,7 @@ contract FleetsFacet is Modifiers {
             "only terraform-capital ships can transform uninhabitated planets!"
         );
 
-        //todo: require only to empty planet
+        //@notice: require an unowned planet
         require(
             IERC721(s.planets).ownerOf(_toPlanetId) == address(this),
             "planet already terraformed!"
