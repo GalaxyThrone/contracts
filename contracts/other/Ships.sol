@@ -4,6 +4,8 @@ pragma solidity 0.8.17;
 import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {IERC20} from "../interfaces/IERC20.sol";
+import "@openzeppelin/contracts/utils/Base64.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 
 contract Ships is ERC721EnumerableUpgradeable, OwnableUpgradeable {
     address public gameDiamond;
@@ -188,5 +190,50 @@ contract Ships is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         return (defenseFleetToReturn, defenseFleetShipTypesToReturn);
     }
 
-    //@notice on-chain tokenURI once ships get more customizable
+    function tokenURI(uint256 _tokenId)
+        public
+        view
+        override
+        returns (string memory)
+    {
+        ShipType memory shipAttributes = SpaceShips[_tokenId];
+
+        string memory maxHP = Strings.toString(shipAttributes.health);
+        string memory cargoSpace = Strings.toString(shipAttributes.cargo);
+        string memory attackDamage = Strings.toString(shipAttributes.attack);
+        string memory shipTypeName = shipAttributes.name;
+
+        string memory json = Base64.encode(
+            bytes(
+                string(
+                    abi.encodePacked(
+                        '{ "description": "Spaceship ",',
+                        '"attributes": [ ',
+                        '{"trait_type": "tokenId", "value":',
+                        _tokenId,
+                        "}, ",
+                        '{"trait_type": "ship_class", "value":',
+                        shipTypeName,
+                        "}, ",
+                        '{"trait_type": "health", "value":',
+                        maxHP,
+                        "}, ",
+                        '{"trait_type": "attack_strength", "value":',
+                        attackDamage,
+                        "}, ",
+                        '{"trait_type": "cargo_space", "value":',
+                        cargoSpace,
+                        "}",
+                        "]}"
+                    )
+                )
+            )
+        );
+
+        string memory output = string(
+            abi.encodePacked("data:application/json;base64,", json)
+        );
+
+        return output;
+    }
 }
