@@ -143,9 +143,7 @@ contract Modifiers {
     modifier onlyPlanetOwnerOrChainRunner(uint256 _planetId) {
         require(
             msg.sender == IERC721(s.planets).ownerOf(_planetId) ||
-                //@TODO offload to chainlink automation facet instead of s.buildings
-                msg.sender == s.chainRunner ||
-                msg.sender == s.buildings,
+                msg.sender == s.chainRunner 
             "AppStorage: Not owner"
         );
         _;
