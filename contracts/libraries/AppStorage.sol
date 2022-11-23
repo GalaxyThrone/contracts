@@ -143,7 +143,7 @@ contract Modifiers {
     modifier onlyPlanetOwnerOrChainRunner(uint256 _planetId) {
         require(
             msg.sender == IERC721(s.planets).ownerOf(_planetId) ||
-                msg.sender == s.chainRunner 
+                msg.sender == s.chainRunner,
             "AppStorage: Not owner"
         );
         _;
