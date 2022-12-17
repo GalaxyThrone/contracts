@@ -16,11 +16,11 @@ A **governance DAO** exists via snapshot.org and the ownership of 1 planet NFT
 
 We are utilizing Chainlinks Verifiable Random Function to randomize planet generation & the assignment of the home planet as well as for dynamic fights.
 
-In order to avoid frequent transactions & user gas-fees we leveraged Chainlink-Automation triggering those transactions instead of the player, for a gasless & seamless user experience.
+In order to avoid frequent transactions & user gas-fees we leveraged the Chainlink-Automation-Framework triggering those transactions instead of the player, for a gasless & seamless user experience.
 
 
 We are utilizing the **EIP-2535 Diamond Standard**: https://eips.ethereum.org/EIPS/eip-2535 to offer upgradable, limitless contracts
 
 
-Current deployed Demo: https://galaxy-throne-chainlink-dapp.vercel.app/
+Current deployed Demo: https://galaxythrone-dapp.vercel.app/
 
