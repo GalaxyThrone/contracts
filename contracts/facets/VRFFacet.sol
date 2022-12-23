@@ -12,28 +12,28 @@ import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 
 contract VRFFacet is Modifiers {
-    function rawFulfillRandomWords(
-        uint256 requestId,
-        uint256[] memory randomWords
-    ) external {
-        require(
-            LibMeta.msgSender() == s.vrfCoordinator,
-            "Only VRFCoordinator can fulfill"
-        );
-        if (s.vrfRequest[requestId].kind == 1) {
-            RegisterFacet(address(this)).finalizeRegister(
-                s.vrfRequest[requestId].owner,
-                randomWords
-            );
-        } else if (s.vrfRequest[requestId].kind == 0) {
-            AdminFacet(address(this)).finalizeInit(5, randomWords);
-        } else if (s.vrfRequest[requestId].kind == 2) {
-            AdminFacet(address(this)).finalizeAttackSeed(
-                s.vrfRequest[requestId].attackId,
-                randomWords
-            );
-        }
-    }
+    // function rawFulfillRandomWords(
+    //     uint256 requestId,
+    //     uint256[] memory randomWords
+    // ) external {
+    //     require(
+    //         LibMeta.msgSender() == s.vrfCoordinator,
+    //         "Only VRFCoordinator can fulfill"
+    //     );
+    //     if (s.vrfRequest[requestId].kind == 1) {
+    //         RegisterFacet(address(this)).finalizeRegister(
+    //             s.vrfRequest[requestId].owner,
+    //             randomWords
+    //         );
+    //     } else if (s.vrfRequest[requestId].kind == 0) {
+    //         AdminFacet(address(this)).finalizeInit(5, randomWords);
+    //     } else if (s.vrfRequest[requestId].kind == 2) {
+    //         AdminFacet(address(this)).finalizeAttackSeed(
+    //             s.vrfRequest[requestId].attackId,
+    //             randomWords
+    //         );
+    //     }
+    // }
 
     function setConfig(RequestConfig calldata _requestConfig)
         external
