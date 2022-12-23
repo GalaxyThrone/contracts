@@ -185,7 +185,7 @@ contract FleetsFacet is Modifiers {
 
     function compareStrings(string memory a, string memory b)
         internal
-        view
+        pure
         returns (bool)
     {
         return (keccak256(abi.encodePacked((a))) ==

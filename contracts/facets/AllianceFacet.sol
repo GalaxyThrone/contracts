@@ -47,12 +47,4 @@ contract AllianceFacet is Modifiers {
     function leaveAlliance() external {
         delete s.allianceOfPlayer[msg.sender];
     }
-
-    function checkAlliance(address _playerToCheck)
-        public
-        view
-        returns (bytes32)
-    {
-        return s.allianceOfPlayer[_playerToCheck];
-    }
 }

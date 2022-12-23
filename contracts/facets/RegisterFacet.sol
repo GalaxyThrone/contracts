@@ -17,7 +17,21 @@ contract RegisterFacet is Modifiers {
         );
         require(!s.registered[msg.sender], "VRFFacet: already registered");
 
-        drawRandomNumbers(msg.sender);
+        // drawRandomNumbers(msg.sender);
+        uint256[] memory _randomness = new uint256[](1);
+        // generate 5 pseudo random numbers using blockhash, timestamp
+        for (uint256 i = 0; i < 1; i++) {
+            _randomness[i] = uint256(
+                keccak256(
+                    abi.encodePacked(
+                        blockhash(block.number - i),
+                        block.timestamp,
+                        i
+                    )
+                )
+            );
+        }
+        finalizeRegister(msg.sender, _randomness);
     }
 
     function drawRandomNumbers(address _player) internal {
@@ -36,8 +50,7 @@ contract RegisterFacet is Modifiers {
     }
 
     function finalizeRegister(address _player, uint256[] memory _randomness)
-        external
-        onlySelf
+        internal
     {
         uint256 totalSupply = IERC721(s.planets).totalSupply();
         for (uint256 i; i < totalSupply; i++) {
