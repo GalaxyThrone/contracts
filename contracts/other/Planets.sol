@@ -326,4 +326,88 @@ contract Planets is ERC721EnumerableUpgradeable, OwnableUpgradeable {
     {
         return runningAttacks;
     }
+
+    //@notice get all incoming attacks of a specific player address
+    function getAllIncomingAttacksPlayer(address _player)
+        external
+        view
+        returns (attackStatus[] memory)
+    {
+        uint256 totalAttackCount;
+        for (uint256 i = 0; i < runningAttacks.length; i++) {
+            if (ownerOf(runningAttacks[i].toPlanet) == _player) {
+                totalAttackCount += 1;
+            }
+        }
+
+        attackStatus[] memory incomingAttacksPlayer = new attackStatus[](
+            totalAttackCount
+        );
+
+        uint256 step = 0;
+        for (uint256 i = 0; i < runningAttacks.length; i++) {
+            if (ownerOf(runningAttacks[i].toPlanet) == _player) {
+                incomingAttacksPlayer[step] = runningAttacks[i];
+                step++;
+            }
+        }
+
+        return incomingAttacksPlayer;
+    }
+
+    //@notice get all outgoing attacks of a players address
+    function getAllOutgoingAttacks(address _player)
+        external
+        view
+        returns (attackStatus[] memory)
+    {
+        uint256 totalAttackCount;
+        for (uint256 i = 0; i < runningAttacks.length; i++) {
+            if (runningAttacks[i].attacker == _player) {
+                totalAttackCount += 1;
+            }
+        }
+
+        attackStatus[] memory outgoingAttacks = new attackStatus[](
+            totalAttackCount
+        );
+
+        uint256 step = 0;
+        for (uint256 i = 0; i < runningAttacks.length; i++) {
+            if (runningAttacks[i].attacker == _player) {
+                outgoingAttacks[step] = runningAttacks[i];
+                step++;
+            }
+        }
+
+        return outgoingAttacks;
+    }
+
+    //@notice get all incoming attacks of a planet NFT id
+    function getAllIncomingAttacksPlanet(uint256 _planetId)
+        external
+        view
+        returns (attackStatus[] memory)
+    {
+        uint256 totalAttackCount;
+        for (uint256 i = 0; i < runningAttacks.length; i++) {
+            if (runningAttacks[i].toPlanet == _planetId) {
+                totalAttackCount += 1;
+            }
+        }
+
+        attackStatus[] memory planetIncomingAttacks = new attackStatus[](
+            totalAttackCount
+        );
+
+        uint256 step = 0;
+        for (uint256 i = 0; i < runningAttacks.length; i++) {
+            if (runningAttacks[i].toPlanet == _planetId) {
+                planetIncomingAttacks[step] = runningAttacks[i];
+                step++;
+            }
+        }
+
+        return planetIncomingAttacks;
+    }
 }
