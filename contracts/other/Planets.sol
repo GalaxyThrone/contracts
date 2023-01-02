@@ -327,6 +327,7 @@ contract Planets is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         return runningAttacks;
     }
 
+    //@notice get all incoming attacks of a specific player address
     function getAllIncomingAttacksPlayer(address _player)
         external
         view
@@ -354,6 +355,7 @@ contract Planets is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         return incomingAttacksPlayer;
     }
 
+    //@notice get all outgoing attacks of a players address
     function getAllOutgoingAttacks(address _player)
         external
         view
@@ -381,6 +383,7 @@ contract Planets is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         return outgoingAttacks;
     }
 
+    //@notice get all incoming attacks of a planet NFT id
     function getAllIncomingAttacksPlanet(uint256 _planetId)
         external
         view
