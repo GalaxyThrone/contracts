@@ -97,7 +97,9 @@ struct AppStorage {
     mapping(address => bool) isInvitedToAlliance;
     mapping(bytes32 => address) allianceOwner;
     mapping(address => bytes32) allianceOfPlayer;
-    mapping(bytes23 => uint256) allianceMemberCount;
+    mapping(bytes32 => uint256) allianceMemberCount;
+    mapping(uint256 => bytes32) registeredAlliances;
+    uint256 totalAllianceCount;
     uint256 sendCargoId;
     uint256 sendTerraformId;
     // heroId => vrf/reg data
