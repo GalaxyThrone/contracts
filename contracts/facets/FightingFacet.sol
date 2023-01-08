@@ -228,29 +228,33 @@ contract FightingFacet is Modifiers {
         //attack strength bonus/malus
 
         attackStrength +=
-            attackStrength *
-            int256((attackToResolve.attackSeed[0] % 25));
+            (attackStrength * int256((attackToResolve.attackSeed[0] % 25))) /
+            100;
         attackStrength -=
-            attackStrength *
-            int256((attackToResolve.attackSeed[1] % 25));
+            (attackStrength * int256((attackToResolve.attackSeed[1] % 25))) /
+            100;
 
         //defense strength bonus/malus
 
         //everyone loves an underdog
         if (defenseStrength * 5 < attackStrength) {
             defenseStrength +=
-                defenseStrength *
-                int256((attackToResolve.attackSeed[2] % 100));
+                (defenseStrength *
+                    int256((attackToResolve.attackSeed[2] % 100))) /
+                100;
             defenseStrength -=
-                defenseStrength *
-                int256((attackToResolve.attackSeed[3] % 5));
+                (defenseStrength *
+                    int256((attackToResolve.attackSeed[3] % 5))) /
+                100;
         } else {
             defenseStrength +=
-                defenseStrength *
-                int256((attackToResolve.attackSeed[2] % 25));
+                (defenseStrength *
+                    int256((attackToResolve.attackSeed[2] % 25))) /
+                100;
             defenseStrength -=
-                defenseStrength *
-                int256((attackToResolve.attackSeed[3] % 25));
+                (defenseStrength *
+                    int256((attackToResolve.attackSeed[3] % 25))) /
+                100;
         }
 
         int256 battleResult = attackStrength - defenseStrength;
