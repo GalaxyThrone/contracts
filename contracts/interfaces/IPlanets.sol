@@ -15,51 +15,11 @@ interface IPlanets {
 
     function mint(Planet calldata _planet) external;
 
-    function addBuilding(uint256 _planetId, uint256 _buildingId) external;
-
-    function addFleet(
-        uint256 _planetId,
-        uint256 _shipType,
-        uint256 amount
-    ) external;
-
-    function removeFleet(
-        uint256 _planetId,
-        uint256 _shipType,
-        uint256 amount
-    ) external;
-
-    function getBuildings(uint256 _planetId, uint256 _buildingId)
-        external
-        view
-        returns (uint256);
-
-    function getAllBuildings(uint256 _planetId, uint256 _totalBuildingCount)
-        external
-        view
-        returns (uint256[] memory);
-
-    function addBoost(
-        uint256 _planetId,
-        uint256 _resourceId,
-        uint256 _boost
-    ) external;
-
-    function getLastClaimed(uint256 _planetId, uint256 _resourceId)
-        external
-        view
-        returns (uint256);
-
     function mineResource(
         uint256 _planetId,
         uint256 _resourceId,
         uint256 _amount
     ) external;
-
-    function getBoost(uint256 _planetId, uint256 _resourceId)
-        external
-        view
-        returns (uint256);
 
     function getCoordinates(uint256 _planetId)
         external

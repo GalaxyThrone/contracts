@@ -31,15 +31,6 @@ contract Planets is ERC721EnumerableUpgradeable, OwnableUpgradeable {
     address public gameDiamond;
     // planetId => Planet
     mapping(uint256 => Planet) public planets;
-    // planetId => fleetId => amount
-    mapping(uint256 => mapping(uint256 => uint256)) public fleets;
-
-    // planetId => buildingId => amount
-    mapping(uint256 => mapping(uint256 => uint256)) public buildings;
-    // planetId => resource => boost
-    mapping(uint256 => mapping(uint256 => uint256)) public boosts;
-    // planetId => resource => lastClaimed
-    mapping(uint256 => mapping(uint256 => uint256)) public lastClaimed;
 
     string private _uri;
 
@@ -67,31 +58,6 @@ contract Planets is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         gameDiamond = _gameDiamond;
     }
 
-    // function genesisPlanets(address _gameDiamond, uint256 _amount)
-    //     public
-    //     onlyOwner
-    // {
-    //     for (uint256 i = 0; i < _amount; i++) {
-    //         uint256[] memory expandedValues = new uint256[](5);
-    //         for (uint256 j = 0; j < 5; j++) {
-    //             expandedValues[j] = uint256(
-    //                 keccak256(abi.encode(block.timestamp, j))
-    //             );
-    //         }
-
-    //         Planet memory genesisPlanet;
-    //         genesisPlanet.coordinateX = expandedValues[0] % 10000;
-    //         genesisPlanet.coordinateY = expandedValues[1] % 10000;
-    //         genesisPlanet.ethereus = (expandedValues[2] % 100000) * 1e18;
-    //         genesisPlanet.metal = (expandedValues[3] % 100000) * 1e18;
-    //         genesisPlanet.crystal = (expandedValues[4] % 100000) * 1e18;
-
-    //         uint256 planetId = totalSupply() + 1;
-    //         planets[planetId] = genesisPlanet;
-    //         _mint(_gameDiamond, planetId);
-    //     }
-    // }
-
     function setUri(string calldata __uri) external onlyOwner {
         _uri = __uri;
     }
@@ -111,37 +77,6 @@ contract Planets is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         _safeMint(msg.sender, planetId);
     }
 
-    function addBuilding(uint256 _planetId, uint256 _buildingId)
-        external
-        onlyGameDiamond
-    {
-        buildings[_planetId][_buildingId] += 1;
-    }
-
-    function addFleet(
-        uint256 _planetId,
-        uint256 _shipType,
-        uint256 amount
-    ) external onlyGameDiamond {
-        fleets[_planetId][_shipType] += amount;
-    }
-
-    function removeFleet(
-        uint256 _planetId,
-        uint256 _shipType,
-        uint256 amount
-    ) external onlyGameDiamond {
-        fleets[_planetId][_shipType] -= amount;
-    }
-
-    function addBoost(
-        uint256 _planetId,
-        uint256 _resourceId,
-        uint256 _boost
-    ) external onlyGameDiamond {
-        boosts[_planetId][_resourceId] += _boost;
-    }
-
     function mineResource(
         uint256 _planetId,
         uint256 _resourceId,
@@ -154,34 +89,10 @@ contract Planets is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         } else if (_resourceId == 2) {
             planets[_planetId].ethereus -= _amount;
         }
-        lastClaimed[_planetId][_resourceId] = block.timestamp;
     }
 
     function setAddresses(address _gameDiamond) external onlyOwner {
         gameDiamond = _gameDiamond;
-    }
-
-    function getBuildings(uint256 _planetId, uint256 _buildingId)
-        external
-        view
-        returns (uint256)
-    {
-        return buildings[_planetId][_buildingId];
-    }
-
-    function getAllBuildings(uint256 _planetId, uint256 _totalBuildingTypeCount)
-        external
-        view
-        returns (uint256[] memory)
-    {
-        uint256[] memory buildingsCount = new uint256[](
-            _totalBuildingTypeCount
-        );
-
-        for (uint256 i = 0; i < _totalBuildingTypeCount; i++) {
-            buildingsCount[i] = buildings[_planetId][i];
-        }
-        return buildingsCount;
     }
 
     function getAttackStatus(uint256 _instanceId)
@@ -196,22 +107,6 @@ contract Planets is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         } else {
             return runningAttacks[_instanceId];
         }
-    }
-
-    function getLastClaimed(uint256 _planetId, uint256 _resourceId)
-        external
-        view
-        returns (uint256)
-    {
-        return lastClaimed[_planetId][_resourceId];
-    }
-
-    function getBoost(uint256 _planetId, uint256 _resourceId)
-        external
-        view
-        returns (uint256)
-    {
-        return boosts[_planetId][_resourceId];
     }
 
     function getCoordinates(uint256 _planetId)

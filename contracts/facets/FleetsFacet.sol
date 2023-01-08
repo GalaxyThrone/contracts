@@ -21,14 +21,11 @@ contract FleetsFacet is Modifiers {
         external
         onlyPlanetOwner(_planetId)
     {
-        IShips fleetsContract = IShips(s.ships);
+        IShips fleetsContract = IShips(s.shipsAddress);
         uint256[3] memory price = fleetsContract.getPrice(_fleetId);
         uint256 craftTime = fleetsContract.getCraftTime(_fleetId);
         uint256 craftedFrom = fleetsContract.getCraftedFrom(_fleetId);
-        uint256 buildings = IPlanets(s.planets).getBuildings(
-            _planetId,
-            craftedFrom
-        );
+        uint256 buildings = s.buildings[_planetId][craftedFrom];
         require(craftTime > 0, "FleetsFacet: not released yet");
         require(
             s.craftFleets[_planetId].itemId == 0,
@@ -38,9 +35,9 @@ contract FleetsFacet is Modifiers {
         uint256 readyTimestamp = block.timestamp + craftTime;
         CraftItem memory newFleet = CraftItem(_fleetId, readyTimestamp);
         s.craftFleets[_planetId] = newFleet;
-        IERC20(s.metal).burnFrom(msg.sender, price[0]);
-        IERC20(s.crystal).burnFrom(msg.sender, price[1]);
-        IERC20(s.ethereus).burnFrom(msg.sender, price[2]);
+        IERC20(s.metalAddress).burnFrom(msg.sender, price[0]);
+        IERC20(s.crystalAddress).burnFrom(msg.sender, price[1]);
+        IERC20(s.ethereusAddress).burnFrom(msg.sender, price[2]);
     }
 
     function claimFleet(uint256 _planetId)
@@ -51,18 +48,18 @@ contract FleetsFacet is Modifiers {
             block.timestamp >= s.craftFleets[_planetId].readyTimestamp,
             "FleetsFacet: not ready yet"
         );
-        uint256 shipId = IShips(s.ships).mint(
+        uint256 shipId = IShips(s.shipsAddress).mint(
             msg.sender,
             s.craftFleets[_planetId].itemId
         );
         uint256 shipTypeId = s.craftFleets[_planetId].itemId;
         delete s.craftFleets[_planetId];
 
-        IPlanets(s.planets).addFleet(_planetId, shipTypeId, 1);
-        IShips(s.ships).assignShipToPlanet(shipId, _planetId);
+        s.fleets[_planetId][shipTypeId] += 1;
+        IShips(s.shipsAddress).assignShipToPlanet(shipId, _planetId);
 
         //@notice for the alpha, you are PVP enabled once you are claiming your first spaceship
-        IPlanets(s.planets).enablePVP(_planetId);
+        IPlanets(s.planetsAddress).enablePVP(_planetId);
     }
 
     function getCraftFleets(uint256 _planetId)
@@ -81,11 +78,9 @@ contract FleetsFacet is Modifiers {
         uint256[] memory _shipsTokenIds
     ) internal {
         for (uint256 i = 0; i < _shipsTokenIds.length; i++) {
-            IPlanets(s.planets).addFleet(
-                _toPlanetId,
-                IShips(s.ships).getShipStats(_shipsTokenIds[i]).shipType,
-                1
-            );
+            s.fleets[_toPlanetId][
+                IShips(s.shipsAddress).getShipStats(_shipsTokenIds[i]).shipType
+            ] += 1;
         }
     }
 
@@ -94,11 +89,9 @@ contract FleetsFacet is Modifiers {
         uint256[] memory _shipsTokenIds
     ) internal {
         for (uint256 i = 0; i < _shipsTokenIds.length; i++) {
-            IPlanets(s.planets).removeFleet(
-                _toPlanetId,
-                IShips(s.ships).getShipStats(_shipsTokenIds[i]).shipType,
-                1
-            );
+            s.fleets[_toPlanetId][
+                IShips(s.shipsAddress).getShipStats(_shipsTokenIds[i]).shipType
+            ] -= 1;
         }
     }
 
@@ -106,11 +99,9 @@ contract FleetsFacet is Modifiers {
         uint256 _toPlanetId,
         uint256 _shipsTokenIds
     ) internal {
-        IPlanets(s.planets).removeFleet(
-            _toPlanetId,
-            IShips(s.ships).getShipStats(_shipsTokenIds).shipType,
-            1
-        );
+        s.fleets[_toPlanetId][
+            IShips(s.shipsAddress).getShipStats(_shipsTokenIds).shipType
+        ] -= 1;
     }
 
     function sendTerraform(
@@ -119,13 +110,13 @@ contract FleetsFacet is Modifiers {
         uint256 _shipId
     ) external onlyPlanetOwner(_fromPlanetId) {
         require(
-            IShips(s.ships).ownerOf(_shipId) == msg.sender,
+            IShips(s.shipsAddress).ownerOf(_shipId) == msg.sender,
             "not your ship!"
         );
 
         require(
             compareStrings(
-                IShips(s.ships).getShipStats(_shipId).name,
+                IShips(s.shipsAddress).getShipStats(_shipId).name,
                 "Terraformer"
             ),
             "only terraform-capital ships can transform uninhabitated planets!"
@@ -133,14 +124,13 @@ contract FleetsFacet is Modifiers {
 
         //@notice: require an unowned planet
         require(
-            IERC721(s.planets).ownerOf(_toPlanetId) == address(this),
+            IERC721(s.planetsAddress).ownerOf(_toPlanetId) == address(this),
             "planet already terraformed!"
         );
 
-        (uint256 fromX, uint256 fromY) = IPlanets(s.planets).getCoordinates(
-            _fromPlanetId
-        );
-        (uint256 toX, uint256 toY) = IPlanets(s.planets).getCoordinates(
+        (uint256 fromX, uint256 fromY) = IPlanets(s.planetsAddress)
+            .getCoordinates(_fromPlanetId);
+        (uint256 toX, uint256 toY) = IPlanets(s.planetsAddress).getCoordinates(
             _toPlanetId
         );
         uint256 xDist = fromX > toX ? fromX - toX : toX - fromX;
@@ -158,7 +148,7 @@ contract FleetsFacet is Modifiers {
         s.sendTerraform[s.sendTerraformId] = newSendTerraform;
 
         //unassign ship from home planet & substract amount
-        IShips(s.ships).deleteShipFromPlanet(_shipId);
+        IShips(s.shipsAddress).deleteShipFromPlanet(_shipId);
         unAssignNewShipTypeIdAmount(_fromPlanetId, _shipId);
         emit sendTerraformer(_toPlanetId, arrivalTime, msg.sender);
     }
@@ -171,14 +161,18 @@ contract FleetsFacet is Modifiers {
         );
 
         //@notice transferring planet to terraformer owner. Event on Planet contract
-        IPlanets(s.planets).planetTerraform(
+        IPlanets(s.planetsAddress).planetTerraform(
             s.sendTerraform[_sendTerraformId].toPlanetId,
-            IShips(s.ships).ownerOf(s.sendTerraform[_sendTerraformId].fleetId)
+            IShips(s.shipsAddress).ownerOf(
+                s.sendTerraform[_sendTerraformId].fleetId
+            )
         );
 
         //@notice burn terraformer ship from owner
 
-        IShips(s.ships).burnShip(s.sendTerraform[_sendTerraformId].fleetId);
+        IShips(s.shipsAddress).burnShip(
+            s.sendTerraform[_sendTerraformId].fleetId
+        );
 
         delete s.sendTerraform[_sendTerraformId];
     }

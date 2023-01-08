@@ -52,11 +52,11 @@ contract RegisterFacet is Modifiers {
     function finalizeRegister(address _player, uint256[] memory _randomness)
         internal
     {
-        uint256 totalSupply = IERC721(s.planets).totalSupply();
+        uint256 totalSupply = IERC721(s.planetsAddress).totalSupply();
         for (uint256 i; i < totalSupply; i++) {
             uint256 tokenId = _randomness[0] % totalSupply;
-            if (IERC721(s.planets).ownerOf(tokenId) == address(this)) {
-                IERC721(s.planets).safeTransferFrom(
+            if (IERC721(s.planetsAddress).ownerOf(tokenId) == address(this)) {
+                IERC721(s.planetsAddress).safeTransferFrom(
                     address(this),
                     _player,
                     tokenId
@@ -65,9 +65,9 @@ contract RegisterFacet is Modifiers {
                 break;
             }
         }
-        IERC20(s.metal).mint(_player, 120000 ether);
-        IERC20(s.crystal).mint(_player, 80000 ether);
-        IERC20(s.ethereus).mint(_player, 60000 ether);
+        IERC20(s.metalAddress).mint(_player, 120000 ether);
+        IERC20(s.crystalAddress).mint(_player, 80000 ether);
+        IERC20(s.ethereusAddress).mint(_player, 60000 ether);
 
         if (!s.registered[msg.sender]) {
             s.registrationStarted[_player] = false;

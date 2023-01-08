@@ -14,7 +14,7 @@ contract BuildingsFacet is Modifiers {
         external
         onlyPlanetOwner(_planetId)
     {
-        IBuildings buildingsContract = IBuildings(s.buildings);
+        IBuildings buildingsContract = IBuildings(s.buildingsAddress);
         uint256[3] memory price = buildingsContract.getPrice(_buildingId);
         uint256 craftTime = buildingsContract.getCraftTime(_buildingId);
         require(craftTime > 0, "BuildingsFacet: not released yet");
@@ -25,9 +25,9 @@ contract BuildingsFacet is Modifiers {
         uint256 readyTimestamp = block.timestamp + craftTime;
         CraftItem memory newBuilding = CraftItem(_buildingId, readyTimestamp);
         s.craftBuildings[_planetId] = newBuilding;
-        IERC20(s.metal).burnFrom(msg.sender, price[0]);
-        IERC20(s.crystal).burnFrom(msg.sender, price[1]);
-        IERC20(s.ethereus).burnFrom(msg.sender, price[2]);
+        IERC20(s.metalAddress).burnFrom(msg.sender, price[0]);
+        IERC20(s.crystalAddress).burnFrom(msg.sender, price[1]);
+        IERC20(s.ethereusAddress).burnFrom(msg.sender, price[2]);
     }
 
     function claimBuilding(uint256 _planetId)
@@ -38,24 +38,24 @@ contract BuildingsFacet is Modifiers {
             block.timestamp >= s.craftBuildings[_planetId].readyTimestamp,
             "BuildingsFacet: not ready yet"
         );
-        IBuildings(s.buildings).mint(
-            IERC721(s.planets).ownerOf(_planetId),
+        IBuildings(s.buildingsAddress).mint(
+            IERC721(s.planetsAddress).ownerOf(_planetId),
             s.craftBuildings[_planetId].itemId
         );
         uint256 buildingId = s.craftBuildings[_planetId].itemId;
         delete s.craftBuildings[_planetId];
-        IPlanets(s.planets).addBuilding(_planetId, buildingId);
-        uint256[3] memory boosts = IBuildings(s.buildings).getBoosts(
+        s.buildings[_planetId][buildingId] += 1;
+        uint256[3] memory boosts = IBuildings(s.buildingsAddress).getBoosts(
             buildingId
         );
         if (boosts[0] > 0) {
-            IPlanets(s.planets).addBoost(_planetId, 0, boosts[0]);
+            s.boosts[_planetId][0] += boosts[0];
         }
         if (boosts[1] > 0) {
-            IPlanets(s.planets).addBoost(_planetId, 1, boosts[1]);
+            s.boosts[_planetId][1] += boosts[1];
         }
         if (boosts[2] > 0) {
-            IPlanets(s.planets).addBoost(_planetId, 2, boosts[2]);
+            s.boosts[_planetId][2] += boosts[2];
         }
     }
 
@@ -63,16 +63,17 @@ contract BuildingsFacet is Modifiers {
         external
         onlyPlanetOwnerOrChainRunner(_planetId)
     {
-        uint256 lastClaimed = IPlanets(s.planets).getLastClaimed(_planetId, 0);
+        uint256 lastClaimed = s.lastClaimed[_planetId][0];
         require(
             block.timestamp > lastClaimed + 8 hours,
             "BuildingsFacet: 8 hour cooldown"
         );
-        uint256 boost = IPlanets(s.planets).getBoost(_planetId, 0);
+        uint256 boost = s.boosts[_planetId][0];
         uint256 amountMined = 500 ether + (boost * 1e18);
-        IPlanets(s.planets).mineResource(_planetId, 0, amountMined);
-        IResource(s.metal).mint(
-            IERC721(s.planets).ownerOf(_planetId),
+        IPlanets(s.planetsAddress).mineResource(_planetId, 0, amountMined);
+        s.lastClaimed[_planetId][0] = block.timestamp;
+        IResource(s.metalAddress).mint(
+            IERC721(s.planetsAddress).ownerOf(_planetId),
             amountMined
         );
     }
@@ -81,16 +82,17 @@ contract BuildingsFacet is Modifiers {
         external
         onlyPlanetOwnerOrChainRunner(_planetId)
     {
-        uint256 lastClaimed = IPlanets(s.planets).getLastClaimed(_planetId, 1);
+        uint256 lastClaimed = s.lastClaimed[_planetId][1];
         require(
             block.timestamp > lastClaimed + 8 hours,
             "BuildingsFacet: 8 hour cooldown"
         );
-        uint256 boost = IPlanets(s.planets).getBoost(_planetId, 1);
+        uint256 boost = s.boosts[_planetId][1];
         uint256 amountMined = 300 ether + (boost * 1e18);
-        IPlanets(s.planets).mineResource(_planetId, 1, amountMined);
-        IResource(s.crystal).mint(
-            IERC721(s.planets).ownerOf(_planetId),
+        IPlanets(s.planetsAddress).mineResource(_planetId, 1, amountMined);
+        s.lastClaimed[_planetId][1] = block.timestamp;
+        IResource(s.crystalAddress).mint(
+            IERC721(s.planetsAddress).ownerOf(_planetId),
             amountMined
         );
     }
@@ -99,16 +101,17 @@ contract BuildingsFacet is Modifiers {
         external
         onlyPlanetOwnerOrChainRunner(_planetId)
     {
-        uint256 lastClaimed = IPlanets(s.planets).getLastClaimed(_planetId, 2);
+        uint256 lastClaimed = s.lastClaimed[_planetId][2];
         require(
             block.timestamp > lastClaimed + 8 hours,
             "BuildingsFacet: 8 hour cooldown"
         );
-        uint256 boost = IPlanets(s.planets).getBoost(_planetId, 2);
+        uint256 boost = s.boosts[_planetId][2];
         uint256 amountMined = 200 ether + (boost * 1e18);
-        IPlanets(s.planets).mineResource(_planetId, 2, amountMined);
-        IResource(s.ethereus).mint(
-            IERC721(s.planets).ownerOf(_planetId),
+        IPlanets(s.planetsAddress).mineResource(_planetId, 2, amountMined);
+        s.lastClaimed[_planetId][2] = block.timestamp;
+        IResource(s.ethereusAddress).mint(
+            IERC721(s.planetsAddress).ownerOf(_planetId),
             amountMined
         );
     }
@@ -122,5 +125,44 @@ contract BuildingsFacet is Modifiers {
             s.craftBuildings[_planetId].itemId,
             s.craftBuildings[_planetId].readyTimestamp
         );
+    }
+
+    function getBuildings(uint256 _planetId, uint256 _buildingId)
+        external
+        view
+        returns (uint256)
+    {
+        return s.buildings[_planetId][_buildingId];
+    }
+
+    function getAllBuildings(uint256 _planetId, uint256 _totalBuildingTypeCount)
+        external
+        view
+        returns (uint256[] memory)
+    {
+        uint256[] memory buildingsCount = new uint256[](
+            _totalBuildingTypeCount
+        );
+
+        for (uint256 i = 0; i < _totalBuildingTypeCount; i++) {
+            buildingsCount[i] = s.buildings[_planetId][i];
+        }
+        return buildingsCount;
+    }
+
+    function getLastClaimed(uint256 _planetId, uint256 _resourceId)
+        external
+        view
+        returns (uint256)
+    {
+        return s.lastClaimed[_planetId][_resourceId];
+    }
+
+    function getBoost(uint256 _planetId, uint256 _resourceId)
+        external
+        view
+        returns (uint256)
+    {
+        return s.boosts[_planetId][_resourceId];
     }
 }
