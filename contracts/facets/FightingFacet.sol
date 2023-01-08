@@ -22,6 +22,11 @@ contract FightingFacet is Modifiers {
         );
 
         require(
+            IERC721(s.planets).ownerOf(_toPlanetId) != address(this),
+            "planet is uninhabited!"
+        );
+
+        require(
             checkAlliance(IERC721(s.planets).ownerOf(_toPlanetId)) !=
                 checkAlliance(msg.sender) ||
                 checkAlliance(msg.sender) == bytes32(0),
