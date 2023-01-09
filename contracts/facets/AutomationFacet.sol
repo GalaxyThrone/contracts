@@ -40,17 +40,15 @@ contract AutomationFacet is Modifiers, AutomationCompatibleInterface {
         uint256 craftBuildingId = 4;
         uint256 resolveAttacksPath = 5;
 
-        uint256 totalPlanetAmount = IPlanets(s.planets).getTotalPlanetCount();
+        uint256 totalPlanetAmount = IPlanets(s.planetsAddress)
+            .getTotalPlanetCount();
 
         //@TODO  to be refactored to return arrays to avoid starvation later on.
 
         //@notice check claim metal
         if (keccak256(checkData) == keccak256(abi.encode(metalId))) {
             for (uint256 i = 0; i < totalPlanetAmount; i++) {
-                uint256 lastClaimed = IPlanets(s.planets).getLastClaimed(
-                    i,
-                    metalId
-                );
+                uint256 lastClaimed = s.lastClaimed[i][metalId];
                 if (block.timestamp > lastClaimed + 8 hours) {
                     return (true, abi.encode(i));
                 }
@@ -59,10 +57,7 @@ contract AutomationFacet is Modifiers, AutomationCompatibleInterface {
         //@notice check  claim crystal
         if (keccak256(checkData) == keccak256(abi.encode(crystalId))) {
             for (uint256 i = 0; i < totalPlanetAmount; i++) {
-                uint256 lastClaimed = IPlanets(s.planets).getLastClaimed(
-                    i,
-                    crystalId
-                );
+                uint256 lastClaimed = s.lastClaimed[i][crystalId];
                 if (block.timestamp > lastClaimed + 8 hours) {
                     return (true, abi.encode(i));
                 }
@@ -71,10 +66,7 @@ contract AutomationFacet is Modifiers, AutomationCompatibleInterface {
         //@notice check  claim ethereus
         if (keccak256(checkData) == keccak256(abi.encode(ethereusId))) {
             for (uint256 i = 0; i < totalPlanetAmount; i++) {
-                uint256 lastClaimed = IPlanets(s.planets).getLastClaimed(
-                    i,
-                    ethereusId
-                );
+                uint256 lastClaimed = s.lastClaimed[i][ethereusId];
                 if (block.timestamp > lastClaimed + 8 hours) {
                     return (true, abi.encode(i));
                 }
@@ -98,8 +90,9 @@ contract AutomationFacet is Modifiers, AutomationCompatibleInterface {
         }
         //@notice check resolve attacks
         if (keccak256(checkData) == keccak256(abi.encode(resolveAttacksPath))) {
-            attackStatus[] memory currentlyRunningAttacks = IPlanets(s.planets)
-                .getAllRunningAttacks();
+            attackStatus[] memory currentlyRunningAttacks = IPlanets(
+                s.planetsAddress
+            ).getAllRunningAttacks();
 
             for (uint256 i = 0; i < currentlyRunningAttacks.length; i++) {
                 if (
@@ -125,19 +118,16 @@ contract AutomationFacet is Modifiers, AutomationCompatibleInterface {
         uint256 planetId = abi.decode(performData, (uint256));
 
         //@notice check all mining available on the planet;
-        uint256 lastClaimed = IPlanets(s.planets).getLastClaimed(
-            planetId,
-            metalId
-        );
+        uint256 lastClaimed = s.lastClaimed[planetId][metalId];
 
         if (block.timestamp > lastClaimed + 8 hours) {
             BuildingsFacet(address(this)).mineMetal(planetId);
         }
-        lastClaimed = IPlanets(s.planets).getLastClaimed(planetId, crystalId);
+        lastClaimed = lastClaimed = s.lastClaimed[planetId][crystalId];
         if (block.timestamp > lastClaimed + 8 hours) {
             BuildingsFacet(address(this)).mineCrystal(planetId);
         }
-        lastClaimed = IPlanets(s.planets).getLastClaimed(planetId, ethereusId);
+        lastClaimed = s.lastClaimed[planetId][ethereusId];
         if (block.timestamp > lastClaimed + 8 hours) {
             BuildingsFacet(address(this)).mineEthereus(planetId);
         }
@@ -161,7 +151,7 @@ contract AutomationFacet is Modifiers, AutomationCompatibleInterface {
 
         //@notice check if attack can be resolved
 
-        attackStatus memory attackInstance = IPlanets(s.planets)
+        attackStatus memory attackInstance = IPlanets(s.planetsAddress)
             .getAttackStatus(planetId);
 
         if (

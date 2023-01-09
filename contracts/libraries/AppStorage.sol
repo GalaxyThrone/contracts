@@ -79,13 +79,13 @@ struct VrfRequest {
 }
 
 struct AppStorage {
-    address crystal;
-    address ethereus;
-    address metal;
-    address buildings;
-    address fleets;
-    address planets;
-    address ships;
+    address crystalAddress;
+    address ethereusAddress;
+    address metalAddress;
+    address buildingsAddress;
+    address fleetsAddress;
+    address planetsAddress;
+    address shipsAddress;
     mapping(address => bool) registered;
     mapping(uint256 => CraftItem) craftBuildings;
     mapping(uint256 => CraftItem) craftFleets;
@@ -111,6 +111,14 @@ struct AppStorage {
     RequestConfig requestConfig;
     bool init;
     address chainRunner;
+    // planetId => fleetId => amount
+    mapping(uint256 => mapping(uint256 => uint256)) fleets;
+    // planetId => buildingId => amount
+    mapping(uint256 => mapping(uint256 => uint256)) buildings;
+    // planetId => resource => boost
+    mapping(uint256 => mapping(uint256 => uint256)) boosts;
+    // planetId => resource => lastClaimed
+    mapping(uint256 => mapping(uint256 => uint256)) lastClaimed;
 }
 
 library LibAppStorage {
@@ -136,7 +144,7 @@ contract Modifiers {
 
     modifier onlyPlanetOwner(uint256 _planetId) {
         require(
-            msg.sender == IERC721(s.planets).ownerOf(_planetId),
+            msg.sender == IERC721(s.planetsAddress).ownerOf(_planetId),
             "AppStorage: Not owner"
         );
         _;
@@ -144,7 +152,7 @@ contract Modifiers {
 
     modifier onlyPlanetOwnerOrChainRunner(uint256 _planetId) {
         require(
-            msg.sender == IERC721(s.planets).ownerOf(_planetId) ||
+            msg.sender == IERC721(s.planetsAddress).ownerOf(_planetId) ||
                 msg.sender == s.chainRunner,
             "AppStorage: Not owner"
         );

@@ -17,12 +17,12 @@ contract AdminFacet is Modifiers {
         address _planets,
         address _chainRunner
     ) external onlyOwner {
-        s.crystal = _crystal;
-        s.ethereus = _ethereus;
-        s.metal = _metal;
-        s.buildings = _buildings;
-        s.ships = _ships;
-        s.planets = _planets;
+        s.crystalAddress = _crystal;
+        s.ethereusAddress = _ethereus;
+        s.metalAddress = _metal;
+        s.buildingsAddress = _buildings;
+        s.shipsAddress = _ships;
+        s.planetsAddress = _planets;
         s.chainRunner = _chainRunner;
     }
 
@@ -67,7 +67,7 @@ contract AdminFacet is Modifiers {
             );
         }
 
-        IPlanets(s.planets).addAttackSeed(_attackId, _randomness);
+        IPlanets(s.planetsAddress).addAttackSeed(_attackId, _randomness);
     }
 
     function startInit(uint256 _amount) external onlyOwner {
@@ -105,7 +105,7 @@ contract AdminFacet is Modifiers {
             uint256 ethereus = (_randomness[2] % 100000) * 1e18;
             uint256 metal = (_randomness[3] % 100000) * 1e18;
             uint256 crystal = (_randomness[4] % 100000) * 1e18;
-            IPlanets(s.planets).mint(
+            IPlanets(s.planetsAddress).mint(
                 IPlanets.Planet({
                     coordinateX: coordinateX,
                     coordinateY: coordinateY,
@@ -124,7 +124,7 @@ contract AdminFacet is Modifiers {
         uint256 _attackId,
         uint256[] calldata _randomness
     ) external onlySelf {
-        IPlanets(s.planets).addAttackSeed(_attackId, _randomness);
+        IPlanets(s.planetsAddress).addAttackSeed(_attackId, _randomness);
     }
 
     function onERC721Received(

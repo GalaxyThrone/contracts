@@ -154,20 +154,18 @@ describe("Game", function () {
       randomUser.address
     );
 
+    expect(checkOwnershipAmountPlayer).to.equal(1);
+
     const planetId = await planetNfts.tokenOfOwnerByIndex(
       randomUser.address,
       0
     );
 
-    const beforeMining = await metalToken
-      .connect(randomUser)
-      .balanceOf(randomUser.address);
+    const beforeMining = await metalToken.balanceOf(randomUser.address);
 
-    buildingsFacet.connect(randomUser).mineMetal(planetId);
+    await buildingsFacet.connect(randomUser).mineMetal(planetId);
 
-    const balanceAfterMining = await metalToken
-      .connect(randomUser)
-      .balanceOf(randomUser.address);
+    const balanceAfterMining = await metalToken.balanceOf(randomUser.address);
 
     expect(balanceAfterMining).to.be.above(beforeMining);
 
