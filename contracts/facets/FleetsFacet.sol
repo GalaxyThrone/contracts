@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-import {AppStorage, Modifiers, CraftItem, SendCargo, SendTerraform, attackStatus, ShipType, Building} from "../libraries/AppStorage.sol";
+import {AppStorage, Modifiers, CraftItem, OutMining, SendTerraform, TransferResource, attackStatus, ShipType, Building} from "../libraries/AppStorage.sol";
 import "../interfaces/IPlanets.sol";
 import "../interfaces/IShips.sol";
 import "../interfaces/IERC20.sol";
@@ -11,10 +11,27 @@ import "../interfaces/IBuildings.sol";
 import "./AdminFacet.sol";
 
 contract FleetsFacet is Modifiers {
-    event sendTerraformer(
-        uint256 indexed _toPlanet,
-        uint256 indexed _arrivalTime,
+    event SendTerraformer(
+        uint256 indexed toPlanet,
+        uint256 indexed arrivalTime,
         address indexed sender
+    );
+    event StartOutMining(
+        uint256 indexed fromPlanetId,
+        uint256 indexed toPlanetId,
+        address indexed sender,
+        uint256 fleetId,
+        uint256 resourceId,
+        uint256 arrivalTime
+    );
+    event StartSendResources(
+        uint256 indexed fromPlanetId,
+        uint256 indexed toPlanetId,
+        address indexed sender,
+        uint256 fleetId,
+        uint256 resourceId,
+        uint256 amount,
+        uint256 arrivalTime
     );
 
     function craftFleet(uint256 _fleetId, uint256 _planetId)
@@ -35,9 +52,21 @@ contract FleetsFacet is Modifiers {
         uint256 readyTimestamp = block.timestamp + craftTime;
         CraftItem memory newFleet = CraftItem(_fleetId, readyTimestamp);
         s.craftFleets[_planetId] = newFleet;
-        IERC20(s.metalAddress).burnFrom(msg.sender, price[0]);
-        IERC20(s.crystalAddress).burnFrom(msg.sender, price[1]);
-        IERC20(s.ethereusAddress).burnFrom(msg.sender, price[2]);
+        require(
+            s.planetResources[_planetId][0] >= price[0],
+            "FleetsFacet: not enough metal"
+        );
+        require(
+            s.planetResources[_planetId][1] >= price[1],
+            "FleetsFacet: not enough crystal"
+        );
+        require(
+            s.planetResources[_planetId][2] >= price[2],
+            "FleetsFacet: not enough ethereus"
+        );
+        IERC20(s.metalAddress).burnFrom(address(this), price[0]);
+        IERC20(s.crystalAddress).burnFrom(address(this), price[1]);
+        IERC20(s.ethereusAddress).burnFrom(address(this), price[2]);
     }
 
     function claimFleet(uint256 _planetId)
@@ -150,7 +179,7 @@ contract FleetsFacet is Modifiers {
         //unassign ship from home planet & substract amount
         IShips(s.shipsAddress).deleteShipFromPlanet(_shipId);
         unAssignNewShipTypeIdAmount(_fromPlanetId, _shipId);
-        emit sendTerraformer(_toPlanetId, arrivalTime, msg.sender);
+        emit SendTerraformer(_toPlanetId, arrivalTime, msg.sender);
     }
 
     //@notice resolve arrival of terraformer
@@ -185,61 +214,176 @@ contract FleetsFacet is Modifiers {
         return (keccak256(abi.encodePacked((a))) ==
             keccak256(abi.encodePacked((b))));
     }
-}
-//@notice Disabled for V0.01
-/*
-    function sendCargo(
+
+    function startOutMining(
         uint256 _fromPlanetId,
         uint256 _toPlanetId,
         uint256 _fleetId,
         uint256 _resourceId
     ) external onlyPlanetOwner(_fromPlanetId) {
-        //todo: require only cargo ships
-        SendCargo memory newSendCargo = SendCargo(
+        require(
+            _fleetId == 7 || _fleetId == 8,
+            "FleetsFacet: only cargo/courier"
+        );
+        require(
+            s.fleets[_fromPlanetId][_fleetId] > 0,
+            "FleetsFacet: no fleet on planet"
+        );
+
+        (uint256 fromX, uint256 fromY) = IPlanets(s.planetsAddress)
+            .getCoordinates(_fromPlanetId);
+        (uint256 toX, uint256 toY) = IPlanets(s.planetsAddress).getCoordinates(
+            _toPlanetId
+        );
+        uint256 xDist = fromX > toX ? fromX - toX : toX - fromX;
+        uint256 yDist = fromY > toY ? fromY - toY : toY - fromY;
+        uint256 arrivalTime = xDist + yDist + block.timestamp;
+
+        OutMining memory newOutMining = OutMining(
             _fromPlanetId,
             _toPlanetId,
             _fleetId,
             _resourceId,
-            block.timestamp
+            block.timestamp,
+            arrivalTime
         );
-        s.sendCargoId++;
-        s.sendCargo[s.sendCargoId] = newSendCargo;
-        // emit event
+        s.outMiningId++;
+        s.outMining[s.outMiningId] = newOutMining;
+        emit StartOutMining(
+            _fromPlanetId,
+            _toPlanetId,
+            msg.sender,
+            _fleetId,
+            _resourceId,
+            arrivalTime
+        );
     }
-    */
-//@notice Disabled for V0.01
-/*
-    function returnCargo(uint256 _sendCargoId) external {
+
+    function resolveOutMining(uint256 _outMiningId) external {
         require(
             msg.sender ==
-                IERC721(s.planets).ownerOf(
-                    s.sendCargo[_sendCargoId].fromPlanetId
+                IERC721(s.planetsAddress).ownerOf(
+                    s.outMining[_outMiningId].fromPlanetId
                 ),
             "AppStorage: Not owner"
         );
-        (uint256 fromX, uint256 fromY) = IPlanets(s.planets).getCoordinates(
-            s.sendCargo[_sendCargoId].fromPlanetId
+
+        require(
+            block.timestamp >= s.outMining[_outMiningId].arrivalTime,
+            "FleetsFacet: not ready yet"
         );
-        (uint256 toX, uint256 toY) = IPlanets(s.planets).getCoordinates(
-            s.sendCargo[_sendCargoId].toPlanetId
+        uint256 cargo = IShips(s.fleetsAddress).getCargo(
+            s.outMining[_outMiningId].fleetId
+        );
+        IPlanets(s.planetsAddress).mineResource(
+            s.outMining[_outMiningId].toPlanetId,
+            s.outMining[_outMiningId].resourceId,
+            cargo
+        );
+        if (s.outMining[_outMiningId].resourceId == 0) {
+            IResource(s.metalAddress).mint(address(this), cargo);
+            s.planetResources[s.outMining[_outMiningId].fromPlanetId][
+                0
+            ] += cargo;
+        } else if (s.outMining[_outMiningId].resourceId == 1) {
+            IResource(s.crystalAddress).mint(address(this), cargo);
+            s.planetResources[s.outMining[_outMiningId].fromPlanetId][
+                1
+            ] += cargo;
+        } else if (s.outMining[_outMiningId].resourceId == 2) {
+            IResource(s.ethereusAddress).mint(address(this), cargo);
+            s.planetResources[s.outMining[_outMiningId].fromPlanetId][
+                2
+            ] += cargo;
+        }
+        delete s.outMining[_outMiningId];
+    }
+
+    function startSendResources(
+        uint256 _fromPlanetId,
+        uint256 _toPlanetId,
+        uint256 _fleetId,
+        uint256 _resourceId,
+        uint256 _amount
+    ) external onlyPlanetOwner(_fromPlanetId) onlyPlanetOwner(_toPlanetId) {
+        require(
+            _fleetId == 7 || _fleetId == 8,
+            "FleetsFacet: only cargo/courier"
+        );
+        require(
+            s.fleets[_fromPlanetId][_fleetId] > 0,
+            "FleetsFacet: no fleet on planet"
+        );
+        require(_amount > 0, "FleetsFacet: amount must be > 0");
+        require(
+            s.planetResources[_fromPlanetId][_resourceId] >= _amount,
+            "FleetsFacet: not enough resources"
+        );
+        (uint256 fromX, uint256 fromY) = IPlanets(s.planetsAddress)
+            .getCoordinates(_fromPlanetId);
+        (uint256 toX, uint256 toY) = IPlanets(s.planetsAddress).getCoordinates(
+            _toPlanetId
         );
         uint256 xDist = fromX > toX ? fromX - toX : toX - fromX;
         uint256 yDist = fromY > toY ? fromY - toY : toY - fromY;
-        uint256 distance = xDist + yDist;
+        uint256 arrivalTime = xDist + yDist + block.timestamp;
+        TransferResource memory newTransferResource = TransferResource(
+            _fromPlanetId,
+            _toPlanetId,
+            _fleetId,
+            _resourceId,
+            _amount,
+            block.timestamp,
+            arrivalTime
+        );
+        s.transferResource[s.transferResourceId] = newTransferResource;
+        s.transferResourceId++;
+        emit StartSendResources(
+            _fromPlanetId,
+            _toPlanetId,
+            msg.sender,
+            _fleetId,
+            _resourceId,
+            _amount,
+            arrivalTime
+        );
+    }
+
+    function resolveSendResources(uint256 _transferResourceId) external {
+        require(
+            msg.sender ==
+                IERC721(s.planetsAddress).ownerOf(
+                    s.transferResource[_transferResourceId].fromPlanetId
+                ),
+            "AppStorage: Not owner"
+        );
         require(
             block.timestamp >=
-                s.sendCargo[_sendCargoId].timestamp + (distance * 2),
+                s.transferResource[_transferResourceId].arrivalTime,
             "FleetsFacet: not ready yet"
         );
-        uint256 cargo = IFleets(s.fleets).getCargo(
-            s.sendCargo[_sendCargoId].fleetId
-        );
-        IPlanets(s.planets).mineResource(
-            s.sendCargo[_sendCargoId].toPlanetId,
-            s.sendCargo[_sendCargoId].resourceId,
-            cargo
-        );
-        IResource(s.ethereus).mint(msg.sender, cargo);
-        delete s.sendCargo[_sendCargoId];
+        if (s.transferResource[_transferResourceId].resourceId == 0) {
+            s.planetResources[
+                s.transferResource[_transferResourceId].fromPlanetId
+            ][0] -= s.transferResource[_transferResourceId].amount;
+            s.planetResources[
+                s.transferResource[_transferResourceId].toPlanetId
+            ][0] += s.transferResource[_transferResourceId].amount;
+        } else if (s.transferResource[_transferResourceId].resourceId == 1) {
+            s.planetResources[
+                s.transferResource[_transferResourceId].fromPlanetId
+            ][1] -= s.transferResource[_transferResourceId].amount;
+            s.planetResources[
+                s.transferResource[_transferResourceId].toPlanetId
+            ][1] += s.transferResource[_transferResourceId].amount;
+        } else if (s.transferResource[_transferResourceId].resourceId == 2) {
+            s.planetResources[
+                s.transferResource[_transferResourceId].fromPlanetId
+            ][2] -= s.transferResource[_transferResourceId].amount;
+            s.planetResources[
+                s.transferResource[_transferResourceId].toPlanetId
+            ][2] += s.transferResource[_transferResourceId].amount;
+        }
+        delete s.transferResource[_transferResourceId];
     }
-    */
+}
