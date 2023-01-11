@@ -267,7 +267,18 @@ contract FleetsFacet is Modifiers {
                 ),
             "AppStorage: Not owner"
         );
-
+        // require owner of toPlanetId == msg.sender || owner of toPlanetId == address(this)
+        require(
+            IERC721(s.planetsAddress).ownerOf(
+                s.outMining[_outMiningId].toPlanetId
+            ) ==
+                msg.sender ||
+                IERC721(s.planetsAddress).ownerOf(
+                    s.outMining[_outMiningId].toPlanetId
+                ) ==
+                address(this),
+            "AppStorage: Not empty or owner"
+        );
         require(
             block.timestamp >= s.outMining[_outMiningId].arrivalTime,
             "FleetsFacet: not ready yet"
