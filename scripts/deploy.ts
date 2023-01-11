@@ -194,6 +194,12 @@ export async function deployDiamond() {
   console.log("adding ships");
   await addFleets(ships.address);
 
+  console.log("starting init");
+  const initPlanets = await adminFacet.startInit(50);
+  await initPlanets.wait();
+
+  console.log("ALL DONE");
+
   //@TODO @notice create some planets to assign
   //@TODO currently gives a revert error for no apparent reason
   //@notice added a genesis nft mint to the planet contract instead..

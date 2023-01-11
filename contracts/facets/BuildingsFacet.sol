@@ -25,9 +25,24 @@ contract BuildingsFacet is Modifiers {
         uint256 readyTimestamp = block.timestamp + craftTime;
         CraftItem memory newBuilding = CraftItem(_buildingId, readyTimestamp);
         s.craftBuildings[_planetId] = newBuilding;
-        IERC20(s.metalAddress).burnFrom(msg.sender, price[0]);
-        IERC20(s.crystalAddress).burnFrom(msg.sender, price[1]);
-        IERC20(s.ethereusAddress).burnFrom(msg.sender, price[2]);
+        require(
+            s.planetResources[_planetId][0] >= price[0],
+            "BuildingsFacet: not enough metal"
+        );
+        require(
+            s.planetResources[_planetId][1] >= price[1],
+            "BuildingsFacet: not enough crystal"
+        );
+        require(
+            s.planetResources[_planetId][2] >= price[2],
+            "BuildingsFacet: not enough ethereus"
+        );
+        s.planetResources[_planetId][0] -= price[0];
+        s.planetResources[_planetId][1] -= price[1];
+        s.planetResources[_planetId][2] -= price[2];
+        IERC20(s.metalAddress).burnFrom(address(this), price[0]);
+        IERC20(s.crystalAddress).burnFrom(address(this), price[1]);
+        IERC20(s.ethereusAddress).burnFrom(address(this), price[2]);
     }
 
     function claimBuilding(uint256 _planetId)
@@ -72,10 +87,8 @@ contract BuildingsFacet is Modifiers {
         uint256 amountMined = 500 ether + (boost * 1e18);
         IPlanets(s.planetsAddress).mineResource(_planetId, 0, amountMined);
         s.lastClaimed[_planetId][0] = block.timestamp;
-        IResource(s.metalAddress).mint(
-            IERC721(s.planetsAddress).ownerOf(_planetId),
-            amountMined
-        );
+        IResource(s.metalAddress).mint(address(this), amountMined);
+        s.planetResources[_planetId][0] += amountMined;
     }
 
     function mineCrystal(uint256 _planetId)
@@ -91,10 +104,8 @@ contract BuildingsFacet is Modifiers {
         uint256 amountMined = 300 ether + (boost * 1e18);
         IPlanets(s.planetsAddress).mineResource(_planetId, 1, amountMined);
         s.lastClaimed[_planetId][1] = block.timestamp;
-        IResource(s.crystalAddress).mint(
-            IERC721(s.planetsAddress).ownerOf(_planetId),
-            amountMined
-        );
+        IResource(s.crystalAddress).mint(address(this), amountMined);
+        s.planetResources[_planetId][1] += amountMined;
     }
 
     function mineEthereus(uint256 _planetId)
@@ -110,10 +121,8 @@ contract BuildingsFacet is Modifiers {
         uint256 amountMined = 200 ether + (boost * 1e18);
         IPlanets(s.planetsAddress).mineResource(_planetId, 2, amountMined);
         s.lastClaimed[_planetId][2] = block.timestamp;
-        IResource(s.ethereusAddress).mint(
-            IERC721(s.planetsAddress).ownerOf(_planetId),
-            amountMined
-        );
+        IResource(s.ethereusAddress).mint(address(this), amountMined);
+        s.planetResources[_planetId][2] += amountMined;
     }
 
     function getCraftBuildings(uint256 _planetId)
@@ -164,5 +173,13 @@ contract BuildingsFacet is Modifiers {
         returns (uint256)
     {
         return s.boosts[_planetId][_resourceId];
+    }
+
+    function getPlanetResources(uint256 _planetId, uint256 _resourceId)
+        external
+        view
+        returns (uint256)
+    {
+        return s.planetResources[_planetId][_resourceId];
     }
 }
