@@ -143,6 +143,7 @@ contract FleetsFacet is Modifiers {
             "not your ship!"
         );
 
+        //@TODO replace with simple ID check to save gas.
         require(
             compareStrings(
                 IShips(s.shipsAddress).getShipStats(_shipId).name,
@@ -325,23 +326,46 @@ contract FleetsFacet is Modifiers {
     function startSendResources(
         uint256 _fromPlanetId,
         uint256 _toPlanetId,
-        uint256 _fleetId,
+        uint256 _shipId,
         uint256 _resourceId,
         uint256 _amount
     ) external onlyPlanetOwner(_fromPlanetId) {
+        //only owned planets/ allied planets can receive resources
         require(
-            _fleetId == 7 || _fleetId == 8,
-            "FleetsFacet: only cargo/courier"
+            checkAlliance(IERC721(s.planetsAddress).ownerOf(_toPlanetId)) ==
+                checkAlliance(msg.sender) ||
+                msg.sender == IERC721(s.planetsAddress).ownerOf(_toPlanetId),
+            "not a friendly destination!"
         );
+
+        //check if ship is owned by Player & assigned to the planet. Check if ship is the right type
+
+        //@notice, can be refactored to less calls to external contract
+
         require(
-            s.fleets[_fromPlanetId][_fleetId] > 0,
-            "FleetsFacet: no fleet on planet"
+            IShips(s.shipsAddress).checkAssignedPlanet(_shipId) ==
+                _fromPlanetId,
+            "ship is not assigned to this planet!"
         );
-        require(_amount > 0, "FleetsFacet: amount must be > 0");
+
+        require(
+            IShips(s.shipsAddress).ownerOf(_shipId) == msg.sender,
+            "not your ship!"
+        );
+
+        uint256 shipType = IShips(s.shipsAddress)
+            .getShipStats(_shipId)
+            .shipType;
+
+        require(shipType == 7 || shipType == 8, "only cargo/courier");
+
         require(
             s.planetResources[_fromPlanetId][_resourceId] >= _amount,
             "FleetsFacet: not enough resources"
         );
+
+        IShips(s.shipsAddress).deleteShipFromPlanet(_shipId);
+
         (uint256 fromX, uint256 fromY) = IPlanets(s.planetsAddress)
             .getCoordinates(_fromPlanetId);
         (uint256 toX, uint256 toY) = IPlanets(s.planetsAddress).getCoordinates(
@@ -353,7 +377,7 @@ contract FleetsFacet is Modifiers {
         TransferResource memory newTransferResource = TransferResource(
             _fromPlanetId,
             _toPlanetId,
-            _fleetId,
+            _shipId,
             _resourceId,
             _amount,
             block.timestamp,
@@ -365,21 +389,20 @@ contract FleetsFacet is Modifiers {
             _fromPlanetId,
             _toPlanetId,
             msg.sender,
-            _fleetId,
+            _shipId,
             _resourceId,
             _amount,
             arrivalTime
         );
     }
 
-    function resolveSendResources(uint256 _transferResourceId) external {
-        require(
-            msg.sender ==
-                IERC721(s.planetsAddress).ownerOf(
-                    s.transferResource[_transferResourceId].fromPlanetId
-                ),
-            "AppStorage: Not owner"
-        );
+    function resolveSendResources(
+        uint256 _transferResourceId,
+        uint256 _optionalReturnPlanet
+    ) external {
+        //if the from Planet is conquered,we need an alternate return planet. default for 0 for now.
+        require(_optionalReturnPlanet == 0, "WIP PATH");
+
         require(
             block.timestamp >=
                 s.transferResource[_transferResourceId].arrivalTime,
@@ -407,6 +430,20 @@ contract FleetsFacet is Modifiers {
                 s.transferResource[_transferResourceId].toPlanetId
             ][2] += s.transferResource[_transferResourceId].amount;
         }
+
+        IShips(s.shipsAddress).assignShipToPlanet(
+            s.transferResource[_transferResourceId].fleetId,
+            s.transferResource[_transferResourceId].fromPlanetId
+        );
+
         delete s.transferResource[_transferResourceId];
+    }
+
+    function checkAlliance(address _playerToCheck)
+        public
+        view
+        returns (bytes32)
+    {
+        return s.allianceOfPlayer[_playerToCheck];
     }
 }
