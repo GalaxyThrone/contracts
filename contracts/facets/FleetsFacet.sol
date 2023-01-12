@@ -218,17 +218,37 @@ contract FleetsFacet is Modifiers {
     function startOutMining(
         uint256 _fromPlanetId,
         uint256 _toPlanetId,
-        uint256 _fleetId,
+        uint256 _shipId,
         uint256 _resourceId
     ) external onlyPlanetOwner(_fromPlanetId) {
+        // only unowned planets can be outmined ( see GAL-62 Asteroid Feature)
         require(
-            _fleetId == 7 || _fleetId == 8,
-            "FleetsFacet: only cargo/courier"
+            IERC721(s.planetsAddress).ownerOf(_toPlanetId) == address(this),
+            "AppStorage: Planet is owned by somebody else!"
         );
+
+        //check if ship is owned by Player & assigned to the planet. Check if ship is the right type
+
+        //@notice, can be refactored to less calls to external contract
+
         require(
-            s.fleets[_fromPlanetId][_fleetId] > 0,
-            "FleetsFacet: no fleet on planet"
+            IShips(s.shipsAddress).checkAssignedPlanet(_shipId) ==
+                _fromPlanetId,
+            "ship is not assigned to this planet!"
         );
+
+        require(
+            IShips(s.shipsAddress).ownerOf(_shipId) == msg.sender,
+            "not your ship!"
+        );
+
+        uint256 shipType = IShips(s.shipsAddress)
+            .getShipStats(_shipId)
+            .shipType;
+
+        require(shipType == 7 || shipType == 8, "only cargo/courier");
+
+        IShips(s.shipsAddress).deleteShipFromPlanet(_shipId);
 
         (uint256 fromX, uint256 fromY) = IPlanets(s.planetsAddress)
             .getCoordinates(_fromPlanetId);
@@ -242,7 +262,7 @@ contract FleetsFacet is Modifiers {
         OutMining memory newOutMining = OutMining(
             _fromPlanetId,
             _toPlanetId,
-            _fleetId,
+            _shipId,
             _resourceId,
             block.timestamp,
             arrivalTime
@@ -253,37 +273,24 @@ contract FleetsFacet is Modifiers {
             _fromPlanetId,
             _toPlanetId,
             msg.sender,
-            _fleetId,
+            _shipId,
             _resourceId,
             arrivalTime
         );
     }
 
-    function resolveOutMining(uint256 _outMiningId) external {
-        require(
-            msg.sender ==
-                IERC721(s.planetsAddress).ownerOf(
-                    s.outMining[_outMiningId].fromPlanetId
-                ),
-            "AppStorage: Not owner"
-        );
-        // require owner of toPlanetId == msg.sender || owner of toPlanetId == address(this)
-        require(
-            IERC721(s.planetsAddress).ownerOf(
-                s.outMining[_outMiningId].toPlanetId
-            ) ==
-                msg.sender ||
-                IERC721(s.planetsAddress).ownerOf(
-                    s.outMining[_outMiningId].toPlanetId
-                ) ==
-                address(this),
-            "AppStorage: Not empty or owner"
-        );
+    function resolveOutMining(
+        uint256 _outMiningId,
+        uint256 _optionalReturnPlanet
+    ) external {
+        //if the from Planet is conquered,we need an alternate return planet. default for 0 for now.
+        require(_optionalReturnPlanet == 0, "WIP PATH");
+
         require(
             block.timestamp >= s.outMining[_outMiningId].arrivalTime,
             "FleetsFacet: not ready yet"
         );
-        uint256 cargo = IShips(s.fleetsAddress).getCargo(
+        uint256 cargo = IShips(s.shipsAddress).getCargo(
             s.outMining[_outMiningId].fleetId
         );
         IPlanets(s.planetsAddress).mineResource(
@@ -307,6 +314,11 @@ contract FleetsFacet is Modifiers {
                 2
             ] += cargo;
         }
+
+        IShips(s.shipsAddress).assignShipToPlanet(
+            s.outMining[_outMiningId].fleetId,
+            s.outMining[_outMiningId].fromPlanetId
+        );
         delete s.outMining[_outMiningId];
     }
 
@@ -316,7 +328,7 @@ contract FleetsFacet is Modifiers {
         uint256 _fleetId,
         uint256 _resourceId,
         uint256 _amount
-    ) external onlyPlanetOwner(_fromPlanetId) onlyPlanetOwner(_toPlanetId) {
+    ) external onlyPlanetOwner(_fromPlanetId) {
         require(
             _fleetId == 7 || _fleetId == 8,
             "FleetsFacet: only cargo/courier"

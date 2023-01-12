@@ -94,7 +94,6 @@ struct AppStorage {
     address ethereusAddress;
     address metalAddress;
     address buildingsAddress;
-    address fleetsAddress;
     address planetsAddress;
     address shipsAddress;
     mapping(address => bool) registered;

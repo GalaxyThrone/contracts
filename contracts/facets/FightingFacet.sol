@@ -124,6 +124,8 @@ contract FightingFacet is Modifiers {
             IShips(s.shipsAddress).deleteShipFromPlanet(_shipIds[i]);
         }
 
+        //@notice can be removed, it overcomplicates things for small improvements in the frontend UX
+        //@notice this can be replaced
         unAssignNewShipTypeAmount(_fromPlanetId, _shipIds);
 
         assignNewShipTypeAmount(_toPlanetId, _shipIds);
