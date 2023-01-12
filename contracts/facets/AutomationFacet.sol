@@ -149,10 +149,7 @@ contract AutomationFacet is Modifiers, AutomationCompatibleInterface {
             FleetsFacet(address(this)).claimFleet(planetId);
         }
 
-        //@notice check if attack can be resolved
-
-        attackStatus memory attackInstance = IPlanets(s.planetsAddress)
-            .getAttackStatus(planetId);
+        attackStatus memory attackInstance = getAttackStatus(planetId);
 
         if (
             attackInstance.attackStarted != 0 &&
@@ -160,5 +157,13 @@ contract AutomationFacet is Modifiers, AutomationCompatibleInterface {
         ) {
             FightingFacet(address(this)).resolveAttack(planetId);
         }
+    }
+
+    function getAttackStatus(uint256 _instanceId)
+        internal
+        view
+        returns (attackStatus memory)
+    {
+        return s.runningAttacks[_instanceId];
     }
 }

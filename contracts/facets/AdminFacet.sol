@@ -119,12 +119,15 @@ contract AdminFacet is Modifiers {
         s.init = false;
     }
 
+    //deprecated until VRF is readded
+    /*
     function finalizeAttackSeed(
         uint256 _attackId,
         uint256[] calldata _randomness
     ) external onlySelf {
         IPlanets(s.planetsAddress).addAttackSeed(_attackId, _randomness);
-    }
+    } 
+    */
 
     function onERC721Received(
         address,
