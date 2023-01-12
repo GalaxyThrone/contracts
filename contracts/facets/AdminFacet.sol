@@ -66,8 +66,7 @@ contract AdminFacet is Modifiers {
                 )
             );
         }
-
-        IPlanets(s.planetsAddress).addAttackSeed(_attackId, _randomness);
+        s.runningAttacks[_attackId].attackSeed = _randomness;
     }
 
     function startInit(uint256 _amount) external onlyOwner {

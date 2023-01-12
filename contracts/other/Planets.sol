@@ -141,7 +141,6 @@ contract Planets is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         address _newOwner,
         uint256 _attackIdResolved
     ) external onlyGameDiamond {
-        delete runningAttacks[_attackIdResolved];
         _safeTransfer(_oldOwner, _newOwner, _tokenId, "");
         emit planetConquered(_tokenId, _oldOwner, _newOwner);
     }
@@ -162,8 +161,6 @@ contract Planets is ERC721EnumerableUpgradeable, OwnableUpgradeable {
             runningAttacks[_attackIdResolved].toPlanet,
             runningAttacks[_attackIdResolved].attacker
         );
-
-        delete runningAttacks[_attackIdResolved];
     }
 
     function getPVPStatus(uint256 _planetId) external view returns (bool) {
@@ -279,6 +276,8 @@ contract Planets is ERC721EnumerableUpgradeable, OwnableUpgradeable {
     }
 
     //@notice get all incoming attacks of a planet NFT id
+    //@notice deprecated, see FightingFacet.
+    /*
     function getAllIncomingAttacksPlanet(uint256 _planetId)
         external
         view
@@ -305,4 +304,5 @@ contract Planets is ERC721EnumerableUpgradeable, OwnableUpgradeable {
 
         return planetIncomingAttacks;
     }
+    */
 }
