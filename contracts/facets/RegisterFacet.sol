@@ -62,12 +62,15 @@ contract RegisterFacet is Modifiers {
                     tokenId
                 );
                 s.registered[msg.sender] = true;
+                IERC20(s.metalAddress).mint(address(this), 120000 ether);
+                IERC20(s.crystalAddress).mint(address(this), 80000 ether);
+                IERC20(s.ethereusAddress).mint(address(this), 60000 ether);
+                s.planetResources[tokenId][0] += 120000 ether;
+                s.planetResources[tokenId][1] += 80000 ether;
+                s.planetResources[tokenId][2] += 60000 ether;
                 break;
             }
         }
-        IERC20(s.metalAddress).mint(_player, 120000 ether);
-        IERC20(s.crystalAddress).mint(_player, 80000 ether);
-        IERC20(s.ethereusAddress).mint(_player, 60000 ether);
 
         if (!s.registered[msg.sender]) {
             s.registrationStarted[_player] = false;

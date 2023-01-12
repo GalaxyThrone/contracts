@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-import {AppStorage, Modifiers, CraftItem, SendCargo, SendTerraform, attackStatus, ShipType, Building} from "../libraries/AppStorage.sol";
+import {AppStorage, Modifiers, CraftItem, SendTerraform, attackStatus, ShipType, Building} from "../libraries/AppStorage.sol";
 import "../interfaces/IPlanets.sol";
 import "../interfaces/IShips.sol";
 import "../interfaces/IERC20.sol";
@@ -23,14 +23,12 @@ contract FightingFacet is Modifiers {
         );
 
         require(
-
             IERC721(s.planetsAddress).ownerOf(_toPlanetId) != address(this),
             "planet is uninhabited!"
         );
 
         require(
             checkAlliance(IERC721(s.planetsAddress).ownerOf(_toPlanetId)) !=
-
                 checkAlliance(msg.sender) ||
                 checkAlliance(msg.sender) == bytes32(0),
             "friendly target!"
@@ -126,6 +124,8 @@ contract FightingFacet is Modifiers {
             IShips(s.shipsAddress).deleteShipFromPlanet(_shipIds[i]);
         }
 
+        //@notice can be removed, it overcomplicates things for small improvements in the frontend UX
+        //@notice this can be replaced
         unAssignNewShipTypeAmount(_fromPlanetId, _shipIds);
 
         assignNewShipTypeAmount(_toPlanetId, _shipIds);

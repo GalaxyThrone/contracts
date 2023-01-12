@@ -161,11 +161,14 @@ describe("Game", function () {
       0
     );
 
-    const beforeMining = await metalToken.balanceOf(randomUser.address);
+    const beforeMining = await buildingsFacet.getPlanetResources(planetId, 0);
 
     await buildingsFacet.connect(randomUser).mineMetal(planetId);
 
-    const balanceAfterMining = await metalToken.balanceOf(randomUser.address);
+    const balanceAfterMining = await buildingsFacet.getPlanetResources(
+      planetId,
+      0
+    );
 
     expect(balanceAfterMining).to.be.above(beforeMining);
 

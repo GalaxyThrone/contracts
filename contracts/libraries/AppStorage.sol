@@ -9,12 +9,13 @@ struct CraftItem {
     uint256 readyTimestamp;
 }
 
-struct SendCargo {
+struct OutMining {
     uint256 fromPlanetId;
     uint256 toPlanetId;
     uint256 fleetId;
     uint256 resourceId;
     uint256 timestamp;
+    uint256 arrivalTime;
 }
 
 struct SendTerraform {
@@ -78,21 +79,32 @@ struct VrfRequest {
     uint256 attackId;
 }
 
+struct TransferResource {
+    uint256 fromPlanetId;
+    uint256 toPlanetId;
+    uint256 fleetId;
+    uint256 resourceId;
+    uint256 amount;
+    uint256 timestamp;
+    uint256 arrivalTime;
+}
+
 struct AppStorage {
     address crystalAddress;
     address ethereusAddress;
     address metalAddress;
     address buildingsAddress;
-    address fleetsAddress;
     address planetsAddress;
     address shipsAddress;
     mapping(address => bool) registered;
     mapping(uint256 => CraftItem) craftBuildings;
     mapping(uint256 => CraftItem) craftFleets;
     // sendCargoId => SendCargo
-    mapping(uint256 => SendCargo) sendCargo;
+    mapping(uint256 => OutMining) outMining;
     // sendTerraformId => SendTerraform
     mapping(uint256 => SendTerraform) sendTerraform;
+    // transferResourceId => TransferResource
+    mapping(uint256 => TransferResource) transferResource;
     //alliance Mappings
     mapping(address => bool) isInvitedToAlliance;
     mapping(bytes32 => address) allianceOwner;
@@ -100,8 +112,9 @@ struct AppStorage {
     mapping(bytes32 => uint256) allianceMemberCount;
     mapping(uint256 => bytes32) registeredAlliances;
     uint256 totalAllianceCount;
-    uint256 sendCargoId;
+    uint256 outMiningId;
     uint256 sendTerraformId;
+    uint256 transferResourceId;
     // heroId => vrf/reg data
     mapping(uint256 => VrfRequest) vrfRequest;
     mapping(address => bool) registrationStarted;
@@ -119,6 +132,12 @@ struct AppStorage {
     mapping(uint256 => mapping(uint256 => uint256)) boosts;
     // planetId => resource => lastClaimed
     mapping(uint256 => mapping(uint256 => uint256)) lastClaimed;
+    //shipId => planetId
+    mapping(uint256 => uint256) assignedPlanet;
+    //ship categories template
+    mapping(uint256 => ShipType) shipType;
+    // planetId => resource => amount
+    mapping(uint256 => mapping(uint256 => uint256)) planetResources;
 }
 
 library LibAppStorage {
