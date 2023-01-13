@@ -14,7 +14,7 @@ contract FleetsFacet is Modifiers {
     event SendTerraformer(
         uint256 indexed toPlanet,
         uint256 indexed arrivalTime,
-        address indexed sender
+        uint256 indexed instanceId
     );
     event StartOutMining(
         uint256 indexed fromPlanetId,
@@ -167,20 +167,23 @@ contract FleetsFacet is Modifiers {
         uint256 yDist = fromY > toY ? fromY - toY : toY - fromY;
         uint256 arrivalTime = xDist + yDist + block.timestamp;
 
+        s.sendTerraformId++;
+
         SendTerraform memory newSendTerraform = SendTerraform(
+            s.sendTerraformId,
             _fromPlanetId,
             _toPlanetId,
             _shipId,
             block.timestamp,
             arrivalTime
         );
-        s.sendTerraformId++;
+
         s.sendTerraform[s.sendTerraformId] = newSendTerraform;
 
         //unassign ship from home planet & substract amount
         IShips(s.shipsAddress).deleteShipFromPlanet(_shipId);
         unAssignNewShipTypeIdAmount(_fromPlanetId, _shipId);
-        emit SendTerraformer(_toPlanetId, arrivalTime, msg.sender);
+        emit SendTerraformer(_toPlanetId, arrivalTime, s.sendTerraformId);
     }
 
     //@notice resolve arrival of terraformer
