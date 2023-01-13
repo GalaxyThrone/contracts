@@ -440,10 +440,38 @@ contract FleetsFacet is Modifiers {
     }
 
     function checkAlliance(address _playerToCheck)
-        public
+        internal
         view
         returns (bytes32)
     {
         return s.allianceOfPlayer[_playerToCheck];
+    }
+
+    function showIncomingTerraformersPlanet(uint256 _planetId)
+        external
+        view
+        returns (SendTerraform[] memory)
+    {
+        uint256 totalCount;
+        for (uint256 i = 0; i < s.sendTerraformId; i++) {
+            if (s.sendTerraform[i].toPlanetId == _planetId) {
+                totalCount++;
+            }
+        }
+
+        SendTerraform[] memory incomingTerraformers = new SendTerraform[](
+            totalCount
+        );
+
+        uint256 counter = 0;
+
+        for (uint256 i = 0; i < s.sendTerraformId; i++) {
+            if (s.sendTerraform[i].toPlanetId == _planetId) {
+                incomingTerraformers[counter] = s.sendTerraform[i];
+                counter++;
+            }
+        }
+
+        return incomingTerraformers;
     }
 }

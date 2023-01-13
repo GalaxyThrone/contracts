@@ -12,6 +12,14 @@ import "./AdminFacet.sol";
 import "./BuildingsFacet.sol";
 
 contract FightingFacet is Modifiers {
+    event AttackSent(
+        uint256 indexed id,
+        uint256 indexed toPlanet,
+        address indexed fromPlayer
+    );
+
+    event attackLost(uint256 indexed attackedPlanet, address indexed Attacker);
+
     function sendAttack(
         uint256 _fromPlanetId,
         uint256 _toPlanetId,
@@ -85,11 +93,12 @@ contract FightingFacet is Modifiers {
 
         attackToBeAdded.attacker = msg.sender;
 
-        uint256 _attackInstanceId = IPlanets(s.planetsAddress).addAttack(
-            attackToBeAdded
-        );
+        s.sendAttackId++;
+        s.runningAttacks[s.sendAttackId] = attackToBeAdded;
 
-        AdminFacet(address(this)).drawRandomAttackSeed(_attackInstanceId);
+        AdminFacet(address(this)).drawRandomAttackSeed(s.sendAttackId);
+
+        emit AttackSent(s.sendAttackId, _toPlanetId, msg.sender);
     }
 
     //@TODO currently instantenous for hackathon.
@@ -167,8 +176,9 @@ contract FightingFacet is Modifiers {
     }
 
     function resolveAttack(uint256 _attackInstanceId) external {
-        attackStatus memory attackToResolve = IPlanets(s.planetsAddress)
-            .getAttackStatus(_attackInstanceId);
+        attackStatus memory attackToResolve = s.runningAttacks[
+            _attackInstanceId
+        ];
 
         require(
             block.timestamp >= attackToResolve.timeToBeResolved,
@@ -358,8 +368,9 @@ contract FightingFacet is Modifiers {
                     );
                 }
 
-                IPlanets(s.planetsAddress).resolveLostAttack(
-                    attackToResolve.attackInstanceId
+                emit attackLost(
+                    attackToResolve.toPlanet,
+                    attackToResolve.attacker
                 );
             }
         }
@@ -394,9 +405,7 @@ contract FightingFacet is Modifiers {
                 );
             }
 
-            IPlanets(s.planetsAddress).resolveLostAttack(
-                attackToResolve.attackInstanceId
-            );
+            emit attackLost(attackToResolve.toPlanet, attackToResolve.attacker);
         }
 
         //draw -> currently leads to zero losses, only a retreat
@@ -410,10 +419,10 @@ contract FightingFacet is Modifiers {
 
             //sending ships home
             assignNewShipTypeAmount(attackToResolve.fromPlanet, attackerShips);
-            IPlanets(s.planetsAddress).resolveLostAttack(
-                attackToResolve.attackInstanceId
-            );
+            emit attackLost(attackToResolve.toPlanet, attackToResolve.attacker);
         }
+
+        delete s.runningAttacks[_attackInstanceId];
     }
 
     function checkAlliance(address _playerToCheck)
@@ -423,4 +432,119 @@ contract FightingFacet is Modifiers {
     {
         return s.allianceOfPlayer[_playerToCheck];
     }
+
+    function getAttackStatus(uint256 _instanceId)
+        external
+        view
+        returns (attackStatus memory)
+    {
+        return s.runningAttacks[_instanceId];
+    }
+
+    function getMultipleRunningAttacks(uint256 _startRange, uint256 _endRange)
+        external
+        view
+        returns (attackStatus[] memory)
+    {
+        attackStatus[] memory queriedAttacks = new attackStatus[](
+            _startRange - _endRange
+        );
+
+        uint256 counter = 0;
+
+        for (uint256 i = _startRange; i < _endRange; i++) {
+            queriedAttacks[counter] = s.runningAttacks[i];
+
+            counter++;
+        }
+    }
+
+    function getAllIncomingAttacksPlayer(address _player)
+        external
+        view
+        returns (attackStatus[] memory)
+    {
+        uint256 counter = 0;
+
+        uint256 totalCount;
+        for (uint256 i = 0; i < s.sendAttackId; i++) {
+            if (
+                IERC721(s.planetsAddress).ownerOf(
+                    s.runningAttacks[i].toPlanet
+                ) == _player
+            ) {
+                counter += 1;
+            }
+        }
+
+        attackStatus[] memory incomingAttacksPlayer = new attackStatus[](
+            counter
+        );
+
+        for (uint256 i = 0; i < s.sendAttackId; i++) {
+            if (
+                IERC721(s.planetsAddress).ownerOf(
+                    s.runningAttacks[i].toPlanet
+                ) == _player
+            ) {
+                incomingAttacksPlayer[counter] = s.runningAttacks[i];
+                counter++;
+            }
+        }
+
+        return incomingAttacksPlayer;
+    }
+
+    function getAllOutgoingAttacks(address _player)
+        external
+        view
+        returns (attackStatus[] memory)
+    {
+        uint256 counter = 0;
+        for (uint256 i = 0; i < s.sendAttackId; i++) {
+            if (s.runningAttacks[i].attacker == _player) {
+                counter++;
+            }
+        }
+
+        attackStatus[] memory outgoingAttacks = new attackStatus[](counter);
+
+        for (uint256 i = 0; i < s.sendAttackId; i++) {
+            if (s.runningAttacks[i].attacker == _player) {
+                outgoingAttacks[counter] = s.runningAttacks[i];
+                counter++;
+            }
+        }
+
+        return outgoingAttacks;
+    }
+
+    function getAllIncomingAttacksPlanet(uint256 _planetId)
+        external
+        view
+        returns (attackStatus[] memory)
+    {
+        uint256 totalCount;
+        for (uint256 i = 0; i < s.sendAttackId; i++) {
+            if (s.runningAttacks[i].toPlanet == _planetId) {
+                totalCount++;
+            }
+        }
+
+        attackStatus[] memory incomingAttacks = new attackStatus[](totalCount);
+
+        uint256 counter = 0;
+
+        for (uint256 i = 0; i < s.sendAttackId; i++) {
+            if (s.runningAttacks[i].toPlanet == _planetId) {
+                incomingAttacks[counter] = s.runningAttacks[i];
+                counter++;
+            }
+        }
+
+        return incomingAttacks;
+    }
+
+    //@notice deprecated view function for now
+    //function checkIfPlayerHasAttackRunning(address _player)
 }
