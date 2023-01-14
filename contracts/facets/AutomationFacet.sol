@@ -49,7 +49,9 @@ contract AutomationFacet is Modifiers, AutomationCompatibleInterface {
         if (keccak256(checkData) == keccak256(abi.encode(metalId))) {
             for (uint256 i = 0; i < totalPlanetAmount; i++) {
                 uint256 lastClaimed = s.lastClaimed[i][metalId];
-                if (block.timestamp > lastClaimed + 8 hours) {
+                if (
+                    block.timestamp > lastClaimed + 8 hours && lastClaimed != 0
+                ) {
                     return (true, abi.encode(i));
                 }
             }
@@ -58,7 +60,9 @@ contract AutomationFacet is Modifiers, AutomationCompatibleInterface {
         if (keccak256(checkData) == keccak256(abi.encode(crystalId))) {
             for (uint256 i = 0; i < totalPlanetAmount; i++) {
                 uint256 lastClaimed = s.lastClaimed[i][crystalId];
-                if (block.timestamp > lastClaimed + 8 hours) {
+                if (
+                    block.timestamp > lastClaimed + 8 hours && lastClaimed != 0
+                ) {
                     return (true, abi.encode(i));
                 }
             }
@@ -67,7 +71,9 @@ contract AutomationFacet is Modifiers, AutomationCompatibleInterface {
         if (keccak256(checkData) == keccak256(abi.encode(ethereusId))) {
             for (uint256 i = 0; i < totalPlanetAmount; i++) {
                 uint256 lastClaimed = s.lastClaimed[i][ethereusId];
-                if (block.timestamp > lastClaimed + 8 hours) {
+                if (
+                    block.timestamp > lastClaimed + 8 hours && lastClaimed != 0
+                ) {
                     return (true, abi.encode(i));
                 }
             }
@@ -75,7 +81,10 @@ contract AutomationFacet is Modifiers, AutomationCompatibleInterface {
         //@notice check  claim buildings
         if (keccak256(checkData) == keccak256(abi.encode(craftBuildingId))) {
             for (uint256 i = 0; i < totalPlanetAmount; i++) {
-                if (block.timestamp >= s.craftBuildings[i].readyTimestamp) {
+                if (
+                    block.timestamp >= s.craftBuildings[i].readyTimestamp &&
+                    s.craftBuildings[i].readyTimestamp != 0
+                ) {
                     return (true, abi.encode(i));
                 }
             }
@@ -83,7 +92,10 @@ contract AutomationFacet is Modifiers, AutomationCompatibleInterface {
         //@notice check  claim ships
         if (keccak256(checkData) == keccak256(abi.encode(craftShipsId))) {
             for (uint256 i = 0; i < totalPlanetAmount; i++) {
-                if (block.timestamp >= s.craftFleets[i].readyTimestamp) {
+                if (
+                    block.timestamp >= s.craftFleets[i].readyTimestamp &&
+                    s.craftFleets[i].readyTimestamp != 0
+                ) {
                     return (true, abi.encode(i));
                 }
             }
