@@ -90,15 +90,8 @@ contract AutomationFacet is Modifiers, AutomationCompatibleInterface {
         }
         //@notice check resolve attacks
         if (keccak256(checkData) == keccak256(abi.encode(resolveAttacksPath))) {
-            attackStatus[] memory currentlyRunningAttacks = IPlanets(
-                s.planetsAddress
-            ).getAllRunningAttacks();
-
-            for (uint256 i = 0; i < currentlyRunningAttacks.length; i++) {
-                if (
-                    currentlyRunningAttacks[i].timeToBeResolved >=
-                    block.timestamp
-                ) {
+            for (uint256 i = 0; i < s.sendAttackId; i++) {
+                if (s.runningAttacks[i].timeToBeResolved >= block.timestamp) {
                     return (true, abi.encode(i));
                 }
             }
