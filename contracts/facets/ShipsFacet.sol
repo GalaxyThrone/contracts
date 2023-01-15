@@ -426,6 +426,7 @@ contract ShipsFacet is Modifiers {
         IERC20(s.crystalAddress).burnFrom(address(this), _resourcesToSend[1]);
         IERC20(s.ethereusAddress).burnFrom(address(this), _resourcesToSend[2]);
 
+        //@notice WIP
         //@TODO (in that order)
         //load all owned ships from player
         //filter by courier ships
@@ -434,7 +435,7 @@ contract ShipsFacet is Modifiers {
 
         //check if ship is owned by Player & assigned to the planet. Check if ship is the right type
         //@notice, can be refactored to less calls to external contract
-        /*
+
         for (uint256 i; i < _shipIds.length; i++) {
             require(
                 IShips(s.shipsAddress).checkAssignedPlanet(_shipIds[i]) ==
@@ -480,8 +481,6 @@ contract ShipsFacet is Modifiers {
             _shipIds,
             arrivalTime
         );
-
-        */
     }
 
     function checkShippingCapacities(uint256 _planetId)
