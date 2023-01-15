@@ -14,8 +14,7 @@ struct CraftItem {
 struct OutMining {
     uint256 fromPlanetId;
     uint256 toPlanetId;
-    uint256 fleetId;
-    uint256 resourceId;
+    uint256[] shipsIds;
     uint256 timestamp;
     uint256 arrivalTime;
 }
@@ -85,9 +84,7 @@ struct VrfRequest {
 struct TransferResource {
     uint256 fromPlanetId;
     uint256 toPlanetId;
-    uint256 fleetId;
-    uint256 resourceId;
-    uint256 amount;
+    uint256[] shipsIds;
     uint256 timestamp;
     uint256 arrivalTime;
 }
