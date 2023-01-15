@@ -275,7 +275,7 @@ contract ShipsFacet is Modifiers {
         uint256 _toPlanetId,
         uint256[] calldata _shipIds
     ) external onlyPlanetOwner(_fromPlanetId) {
-        // only unowned planets can be outmined ( see GAL-62 Asteroid Feature)
+        // only unowned planets can be outmined ( see GAL-62 Asteroid Feature for future plans)
         require(
             IERC721(s.planetsAddress).ownerOf(_toPlanetId) == address(this),
             "AppStorage: Planet is owned by somebody else!"
@@ -301,13 +301,7 @@ contract ShipsFacet is Modifiers {
                 .getShipStats(_shipIds[i])
                 .shipType;
 
-            require(
-                shipType == 7 ||
-                    shipType == 8 ||
-                    shipType == 10 ||
-                    shipType == 11,
-                "only cargo/courier"
-            );
+            require(shipType == 7, "only minerShip!");
 
             IShips(s.shipsAddress).deleteShipFromPlanet(_shipIds[i]);
         }
@@ -358,6 +352,9 @@ contract ShipsFacet is Modifiers {
                 s.outMining[_outMiningId].shipsIds[i]
             );
             // cargo metal
+
+            //@TODO make mining yield random
+            //@TODO refactor
             if (shipType == 7) {
                 IPlanets(s.planetsAddress).mineResource(
                     s.outMining[_outMiningId].toPlanetId,
@@ -367,58 +364,15 @@ contract ShipsFacet is Modifiers {
                 IResource(s.metalAddress).mint(address(this), cargo);
                 s.planetResources[s.outMining[_outMiningId].fromPlanetId][
                         0
-                    ] += cargo;
-                // cargo crystal
-            } else if (shipType == 10) {
-                IPlanets(s.planetsAddress).mineResource(
-                    s.outMining[_outMiningId].toPlanetId,
-                    1,
-                    cargo
-                );
-                IResource(s.crystalAddress).mint(address(this), cargo);
+                    ] += calculatePercentage(cargo, 40);
+
                 s.planetResources[s.outMining[_outMiningId].fromPlanetId][
                         1
-                    ] += cargo;
-                // cargo ethereus
-            } else if (shipType == 11) {
-                IPlanets(s.planetsAddress).mineResource(
-                    s.outMining[_outMiningId].toPlanetId,
-                    2,
-                    cargo
-                );
-                IResource(s.ethereusAddress).mint(address(this), cargo);
+                    ] += calculatePercentage(cargo, 30);
+
                 s.planetResources[s.outMining[_outMiningId].fromPlanetId][
                         2
-                    ] += cargo;
-                // courier
-            } else if (shipType == 8) {
-                IPlanets(s.planetsAddress).mineResource(
-                    s.outMining[_outMiningId].toPlanetId,
-                    0,
-                    cargo
-                );
-                IResource(s.metalAddress).mint(address(this), cargo);
-                s.planetResources[s.outMining[_outMiningId].fromPlanetId][
-                        0
-                    ] += cargo;
-                IPlanets(s.planetsAddress).mineResource(
-                    s.outMining[_outMiningId].toPlanetId,
-                    1,
-                    cargo / 3
-                );
-                IResource(s.crystalAddress).mint(address(this), cargo / 3);
-                s.planetResources[s.outMining[_outMiningId].fromPlanetId][1] +=
-                    cargo /
-                    3;
-                IPlanets(s.planetsAddress).mineResource(
-                    s.outMining[_outMiningId].toPlanetId,
-                    2,
-                    cargo / 6
-                );
-                IResource(s.ethereusAddress).mint(address(this), cargo / 6);
-                s.planetResources[s.outMining[_outMiningId].fromPlanetId][2] +=
-                    cargo /
-                    6;
+                    ] += calculatePercentage(cargo, 30);
             }
 
             IShips(s.shipsAddress).assignShipToPlanet(
@@ -430,10 +384,17 @@ contract ShipsFacet is Modifiers {
         delete s.outMining[_outMiningId];
     }
 
+    function calculatePercentage(uint256 amount, uint256 percentage)
+        public
+        returns (uint256)
+    {
+        return (amount * percentage * 100) / 1e4;
+    }
+
     function startSendResources(
         uint256 _fromPlanetId,
         uint256 _toPlanetId,
-        uint256[] calldata _shipIds
+        uint256[3] memory _resourcesToSend
     ) external onlyPlanetOwner(_fromPlanetId) {
         //only owned planets/ allied planets can receive resources
         require(
@@ -443,10 +404,37 @@ contract ShipsFacet is Modifiers {
             "not a friendly destination!"
         );
 
+        //check and reduce resources from origin transport
+
+        require(
+            s.planetResources[_fromPlanetId][0] >= _resourcesToSend[0],
+            "ShipsFacet: not enough metal"
+        );
+        require(
+            s.planetResources[_fromPlanetId][1] >= _resourcesToSend[1],
+            "ShipsFacet: not enough crystal"
+        );
+        require(
+            s.planetResources[_fromPlanetId][2] >= _resourcesToSend[2],
+            "ShipsFacet: not enough ethereus"
+        );
+        s.planetResources[_fromPlanetId][0] -= _resourcesToSend[0];
+        s.planetResources[_fromPlanetId][1] -= _resourcesToSend[1];
+        s.planetResources[_fromPlanetId][2] -= _resourcesToSend[2];
+
+        IERC20(s.metalAddress).burnFrom(address(this), _resourcesToSend[0]);
+        IERC20(s.crystalAddress).burnFrom(address(this), _resourcesToSend[1]);
+        IERC20(s.ethereusAddress).burnFrom(address(this), _resourcesToSend[2]);
+
+        //@TODO (in that order)
+        //load all owned ships from player
+        //filter by courier ships
+        //filter by ships on the planet
+        //assign necessary nft ids to the mission
+
         //check if ship is owned by Player & assigned to the planet. Check if ship is the right type
-
         //@notice, can be refactored to less calls to external contract
-
+        /*
         for (uint256 i; i < _shipIds.length; i++) {
             require(
                 IShips(s.shipsAddress).checkAssignedPlanet(_shipIds[i]) ==
@@ -463,7 +451,7 @@ contract ShipsFacet is Modifiers {
                 .getShipStats(_shipIds[i])
                 .shipType;
 
-            require(shipType == 7 || shipType == 8, "only cargo/courier");
+            require(shipType == 8, "only courier");
 
             IShips(s.shipsAddress).deleteShipFromPlanet(_shipIds[i]);
         }
@@ -492,6 +480,44 @@ contract ShipsFacet is Modifiers {
             _shipIds,
             arrivalTime
         );
+
+        */
+    }
+
+    function checkShippingCapacities(uint256 _planetId)
+        external
+        view
+        returns (uint256)
+    {
+        uint256 totalShippingCapacity;
+        address _player = IERC721(s.planetsAddress).ownerOf(_planetId);
+        uint256 totalCount = IERC721(s.shipsAddress).balanceOf(_player);
+
+        uint256[] memory ownedShips = new uint256[](totalCount);
+        for (uint256 i = 0; i < totalCount; i++) {
+            ownedShips[i] = IERC721(s.shipsAddress).tokenOfOwnerByIndex(
+                _player,
+                i
+            );
+        }
+
+        uint256 currShipType;
+        uint256 currShipCargo;
+        for (uint256 i = 0; i < totalCount; i++) {
+            currShipType = IShips(s.shipsAddress)
+                .getShipStats(ownedShips[i])
+                .shipType;
+            currShipCargo = IShips(s.shipsAddress).getCargo(ownedShips[i]);
+
+            if (currShipType == 7) {
+                if (
+                    IShips(s.shipsAddress).checkAssignedPlanet(ownedShips[i]) ==
+                    _planetId
+                ) {
+                    totalShippingCapacity += currShipCargo;
+                }
+            }
+        }
     }
 
     function resolveSendResources(

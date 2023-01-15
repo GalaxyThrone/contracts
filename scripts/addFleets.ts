@@ -124,7 +124,7 @@ export async function addFleets(fleetsAddress: string) {
     cargo: 1000,
     craftTime: 18,
     craftedFrom: 7,
-    name: "Cargo Metal",
+    name: "Miner Ship",
     moduleSlots: 1,
     equippedShipModule: [{ attackBoostStat: 0, healthBoostStat: 0 }],
   };
@@ -175,7 +175,7 @@ export async function addFleets(fleetsAddress: string) {
     cargo: 500,
     craftTime: 9,
     craftedFrom: 7,
-    name: "Cargo Crystal",
+    name: "Cargo Crystal WIP",
     moduleSlots: 1,
     equippedShipModule: [{ attackBoostStat: 0, healthBoostStat: 0 }],
   };
@@ -192,7 +192,7 @@ export async function addFleets(fleetsAddress: string) {
     cargo: 250,
     craftTime: 9,
     craftedFrom: 7,
-    name: "Cargo Ethereus",
+    name: "Cargo Ethereus WIP",
     moduleSlots: 1,
     equippedShipModule: [{ attackBoostStat: 0, healthBoostStat: 0 }],
   };
