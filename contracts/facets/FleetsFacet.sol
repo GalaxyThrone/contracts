@@ -34,39 +34,53 @@ contract FleetsFacet is Modifiers {
         uint256 arrivalTime
     );
 
-    function craftFleet(uint256 _fleetId, uint256 _planetId)
-        external
-        onlyPlanetOwner(_planetId)
-    {
+    function craftFleet(
+        uint256 _fleetId,
+        uint256 _planetId,
+        uint256 _amount
+    ) external onlyPlanetOwner(_planetId) {
         IShips fleetsContract = IShips(s.shipsAddress);
         uint256[3] memory price = fleetsContract.getPrice(_fleetId);
         uint256 craftTime = fleetsContract.getCraftTime(_fleetId);
         uint256 craftedFrom = fleetsContract.getCraftedFrom(_fleetId);
         uint256 buildings = s.buildings[_planetId][craftedFrom];
+        require(
+            _amount > 0 && _amount % 1 == 0,
+            "minimum 1, only in 1 increments"
+        );
         require(craftTime > 0, "FleetsFacet: not released yet");
         require(
             s.craftFleets[_planetId].itemId == 0,
             "FleetsFacet: planet already crafting"
         );
         require(buildings > 0, "FleetsFacet: missing building requirement");
-        uint256 readyTimestamp = block.timestamp + craftTime;
-        CraftItem memory newFleet = CraftItem(_fleetId, readyTimestamp);
+        uint256 readyTimestamp = block.timestamp + (craftTime * _amount);
+        CraftItem memory newFleet = CraftItem(
+            _amount,
+            _planetId,
+            _fleetId,
+            readyTimestamp
+        );
         s.craftFleets[_planetId] = newFleet;
         require(
-            s.planetResources[_planetId][0] >= price[0],
+            s.planetResources[_planetId][0] >= price[0] * _amount,
             "FleetsFacet: not enough metal"
         );
         require(
-            s.planetResources[_planetId][1] >= price[1],
+            s.planetResources[_planetId][1] >= price[1] * _amount,
             "FleetsFacet: not enough crystal"
         );
         require(
-            s.planetResources[_planetId][2] >= price[2],
+            s.planetResources[_planetId][2] >= price[2] * _amount,
             "FleetsFacet: not enough ethereus"
         );
-        IERC20(s.metalAddress).burnFrom(address(this), price[0]);
-        IERC20(s.crystalAddress).burnFrom(address(this), price[1]);
-        IERC20(s.ethereusAddress).burnFrom(address(this), price[2]);
+
+        s.planetResources[_planetId][0] -= price[0] * _amount;
+        s.planetResources[_planetId][1] -= price[1] * _amount;
+        s.planetResources[_planetId][2] -= price[2] * _amount;
+        IERC20(s.metalAddress).burnFrom(address(this), price[0] * _amount);
+        IERC20(s.crystalAddress).burnFrom(address(this), price[1] * _amount);
+        IERC20(s.ethereusAddress).burnFrom(address(this), price[2] * _amount);
     }
 
     function claimFleet(uint256 _planetId)
@@ -77,15 +91,25 @@ contract FleetsFacet is Modifiers {
             block.timestamp >= s.craftFleets[_planetId].readyTimestamp,
             "FleetsFacet: not ready yet"
         );
-        uint256 shipId = IShips(s.shipsAddress).mint(
-            msg.sender,
-            s.craftFleets[_planetId].itemId
-        );
-        uint256 shipTypeId = s.craftFleets[_planetId].itemId;
-        delete s.craftFleets[_planetId];
 
-        s.fleets[_planetId][shipTypeId] += 1;
-        IShips(s.shipsAddress).assignShipToPlanet(shipId, _planetId);
+        uint256 shipTypeId;
+        uint256 shipId;
+
+        for (uint256 i = 0; i < s.craftFleets[_planetId].amount; i++) {
+            //@TODO refactor to batchMinting
+            shipId = IShips(s.shipsAddress).mint(
+                msg.sender,
+                s.craftFleets[_planetId].itemId
+            );
+
+            shipTypeId = s.craftFleets[_planetId].itemId;
+
+            s.fleets[_planetId][shipTypeId] += 1;
+
+            IShips(s.shipsAddress).assignShipToPlanet(shipId, _planetId);
+        }
+
+        delete s.craftFleets[_planetId];
 
         //@notice for the alpha, you are PVP enabled once you are claiming your first spaceship
         IPlanets(s.planetsAddress).enablePVP(_planetId);
@@ -94,12 +118,42 @@ contract FleetsFacet is Modifiers {
     function getCraftFleets(uint256 _planetId)
         external
         view
-        returns (uint256, uint256)
+        returns (CraftItem memory)
     {
-        return (
-            s.craftFleets[_planetId].itemId,
-            s.craftFleets[_planetId].readyTimestamp
+        return (s.craftFleets[_planetId]);
+    }
+
+    function getAllCraftShipsPlayer(address _player)
+        external
+        view
+        returns (CraftItem[] memory)
+    {
+        uint256 totalCount = IERC721(s.planetsAddress).balanceOf(_player);
+
+        uint256 counter;
+
+        uint256 totalPlanetAmount = IPlanets(s.planetsAddress)
+            .getTotalPlanetCount();
+
+        CraftItem[] memory currentlyCraftedBuildings = new CraftItem[](
+            totalCount
         );
+
+        uint256[] memory ownedPlanets = new uint256[](totalCount);
+
+        for (uint256 i = 0; i < totalCount; i++) {
+            ownedPlanets[i] = IERC721(s.planetsAddress).tokenOfOwnerByIndex(
+                _player,
+                i
+            );
+        }
+
+        for (uint256 i = 0; i < totalCount; i++) {
+            currentlyCraftedBuildings[counter] = s.craftFleets[ownedPlanets[i]];
+            counter++;
+        }
+
+        return currentlyCraftedBuildings;
     }
 
     function assignNewShipTypeAmount(

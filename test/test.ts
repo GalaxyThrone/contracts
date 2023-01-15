@@ -231,7 +231,7 @@ describe("Game", function () {
 
     await buildingsFacet
       .connect(randomUser)
-      .craftBuilding(1, planetId);
+      .craftBuilding(1, planetId, 1);
 
     const blockBefore = await ethers.provider.getBlock(
       await ethers.provider.getBlockNumber()
@@ -288,7 +288,7 @@ describe("Game", function () {
 
     await buildingsFacet
       .connect(randomUser)
-      .craftBuilding(7, planetId);
+      .craftBuilding(7, planetId, 1);
 
     const blockBefore = await ethers.provider.getBlock(
       await ethers.provider.getBlockNumber()
@@ -302,7 +302,7 @@ describe("Game", function () {
       .connect(randomUser)
       .claimBuilding(planetId);
 
-    await fleetsFacet.connect(randomUser).craftFleet(1, planetId);
+    await fleetsFacet.connect(randomUser).craftFleet(1, planetId, 1);
 
     let checkOwnershipShipsPlayer = await shipNfts.balanceOf(
       randomUser.address
@@ -311,7 +311,7 @@ describe("Game", function () {
     expect(checkOwnershipShipsPlayer).to.equal(0);
 
     await ethers.provider.send("evm_mine", [
-      timestampBefore + 1200 + 1200,
+      timestampBefore + 1200 + 12000,
     ]);
 
     await fleetsFacet.connect(randomUser).claimFleet(planetId);
@@ -349,7 +349,7 @@ describe("Game", function () {
 
     await buildingsFacet
       .connect(randomUser)
-      .craftBuilding(7, planetIdPlayer1);
+      .craftBuilding(7, planetIdPlayer1, 1);
 
     let blockBefore = await ethers.provider.getBlock(
       await ethers.provider.getBlockNumber()
@@ -365,7 +365,7 @@ describe("Game", function () {
 
     await fleetsFacet
       .connect(randomUser)
-      .craftFleet(6, planetIdPlayer1);
+      .craftFleet(6, planetIdPlayer1, 1);
 
     let checkOwnershipShipsPlayer = await shipNfts.balanceOf(
       randomUser.address
@@ -388,7 +388,7 @@ describe("Game", function () {
     //@notice player two
     await buildingsFacet
       .connect(randomUserTwo)
-      .craftBuilding(7, planetIdPlayer2);
+      .craftBuilding(7, planetIdPlayer2, 1);
 
     blockBefore = await ethers.provider.getBlock(
       await ethers.provider.getBlockNumber()
@@ -404,7 +404,7 @@ describe("Game", function () {
 
     await fleetsFacet
       .connect(randomUserTwo)
-      .craftFleet(1, planetIdPlayer2);
+      .craftFleet(1, planetIdPlayer2, 1);
 
     checkOwnershipShipsPlayer = await shipNfts.balanceOf(
       randomUserTwo.address

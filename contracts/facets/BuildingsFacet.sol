@@ -10,39 +10,51 @@ import "../interfaces/IResource.sol";
 import "./FleetsFacet.sol";
 
 contract BuildingsFacet is Modifiers {
-    function craftBuilding(uint256 _buildingId, uint256 _planetId)
-        external
-        onlyPlanetOwner(_planetId)
-    {
+    function craftBuilding(
+        uint256 _buildingId,
+        uint256 _planetId,
+        uint256 _amount
+    ) external onlyPlanetOwner(_planetId) {
         IBuildings buildingsContract = IBuildings(s.buildingsAddress);
         uint256[3] memory price = buildingsContract.getPrice(_buildingId);
         uint256 craftTime = buildingsContract.getCraftTime(_buildingId);
+
+        require(
+            _amount > 0 && _amount % 1 == 0,
+            "minimum 1, only in 1 increments"
+        );
         require(craftTime > 0, "BuildingsFacet: not released yet");
+
         require(
             s.craftBuildings[_planetId].itemId == 0,
             "BuildingsFacet: planet already crafting"
         );
-        uint256 readyTimestamp = block.timestamp + craftTime;
-        CraftItem memory newBuilding = CraftItem(_buildingId, readyTimestamp);
+        uint256 readyTimestamp = block.timestamp + (craftTime * _amount);
+        CraftItem memory newBuilding = CraftItem(
+            _amount,
+            _planetId,
+            _buildingId,
+            readyTimestamp
+        );
         s.craftBuildings[_planetId] = newBuilding;
         require(
-            s.planetResources[_planetId][0] >= price[0],
+            s.planetResources[_planetId][0] >= price[0] * _amount,
             "BuildingsFacet: not enough metal"
         );
         require(
-            s.planetResources[_planetId][1] >= price[1],
+            s.planetResources[_planetId][1] >= price[1] * _amount,
             "BuildingsFacet: not enough crystal"
         );
         require(
-            s.planetResources[_planetId][2] >= price[2],
+            s.planetResources[_planetId][2] >= price[2] * _amount,
             "BuildingsFacet: not enough ethereus"
         );
-        s.planetResources[_planetId][0] -= price[0];
-        s.planetResources[_planetId][1] -= price[1];
-        s.planetResources[_planetId][2] -= price[2];
-        IERC20(s.metalAddress).burnFrom(address(this), price[0]);
-        IERC20(s.crystalAddress).burnFrom(address(this), price[1]);
-        IERC20(s.ethereusAddress).burnFrom(address(this), price[2]);
+        s.planetResources[_planetId][0] -= price[0] * _amount;
+        s.planetResources[_planetId][1] -= price[1] * _amount;
+        s.planetResources[_planetId][2] -= price[2] * _amount;
+        IERC20(s.metalAddress).burnFrom(address(this), price[0] * _amount);
+        IERC20(s.crystalAddress).burnFrom(address(this), price[1] * _amount);
+        IERC20(s.ethereusAddress).burnFrom(address(this), price[2] * _amount);
     }
 
     function claimBuilding(uint256 _planetId)
@@ -53,13 +65,21 @@ contract BuildingsFacet is Modifiers {
             block.timestamp >= s.craftBuildings[_planetId].readyTimestamp,
             "BuildingsFacet: not ready yet"
         );
-        IBuildings(s.buildingsAddress).mint(
-            IERC721(s.planetsAddress).ownerOf(_planetId),
-            s.craftBuildings[_planetId].itemId
-        );
+
         uint256 buildingId = s.craftBuildings[_planetId].itemId;
+
+        for (uint256 i = 0; i < s.craftBuildings[_planetId].amount; i++) {
+            //@TODO refactor to batchMinting
+            IBuildings(s.buildingsAddress).mint(
+                IERC721(s.planetsAddress).ownerOf(_planetId),
+                s.craftBuildings[_planetId].itemId
+            );
+
+            s.buildings[_planetId][buildingId] += 1;
+        }
+
         delete s.craftBuildings[_planetId];
-        s.buildings[_planetId][buildingId] += 1;
+
         uint256[3] memory boosts = IBuildings(s.buildingsAddress).getBoosts(
             buildingId
         );
@@ -125,15 +145,49 @@ contract BuildingsFacet is Modifiers {
         s.planetResources[_planetId][2] += amountMined;
     }
 
+    //@notice see all running craftbuildings for a planet
     function getCraftBuildings(uint256 _planetId)
         external
         view
-        returns (uint256, uint256)
+        returns (CraftItem memory)
     {
-        return (
-            s.craftBuildings[_planetId].itemId,
-            s.craftBuildings[_planetId].readyTimestamp
+        return (s.craftBuildings[_planetId]);
+    }
+
+    //@notice see all running craftbuildings for a planet
+    function getAllCraftBuildingsPlayer(address _player)
+        external
+        view
+        returns (CraftItem[] memory)
+    {
+        uint256 totalCount = IERC721(s.planetsAddress).balanceOf(_player);
+
+        uint256 counter;
+
+        uint256 totalPlanetAmount = IPlanets(s.planetsAddress)
+            .getTotalPlanetCount();
+
+        CraftItem[] memory currentlyCraftedBuildings = new CraftItem[](
+            totalCount
         );
+
+        uint256[] memory ownedPlanets = new uint256[](totalCount);
+
+        for (uint256 i = 0; i < totalCount; i++) {
+            ownedPlanets[i] = IERC721(s.planetsAddress).tokenOfOwnerByIndex(
+                _player,
+                i
+            );
+        }
+
+        for (uint256 i = 0; i < totalCount; i++) {
+            currentlyCraftedBuildings[counter] = s.craftBuildings[
+                ownedPlanets[i]
+            ];
+            counter++;
+        }
+
+        return currentlyCraftedBuildings;
     }
 
     function getBuildings(uint256 _planetId, uint256 _buildingId)

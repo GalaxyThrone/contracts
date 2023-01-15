@@ -5,6 +5,8 @@ import {LibDiamond} from "./LibDiamond.sol";
 import "../interfaces/IERC721.sol";
 
 struct CraftItem {
+    uint256 amount;
+    uint256 planetId;
     uint256 itemId;
     uint256 readyTimestamp;
 }

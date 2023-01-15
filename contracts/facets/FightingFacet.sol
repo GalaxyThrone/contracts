@@ -291,7 +291,6 @@ contract FightingFacet is Modifiers {
                     IShips(s.shipsAddress).deleteShipFromPlanet(
                         defenderShips[i]
                     );
-                    //@TODO burn defense buildings / transfer buildings
                 }
 
                 //conquer planet
@@ -310,7 +309,6 @@ contract FightingFacet is Modifiers {
                 //damage to attackerForce, random? @TODO
 
                 //assign attacker ships to new planet
-
                 unAssignNewShipTypeAmount(
                     attackToResolve.toPlanet,
                     defenderShips
