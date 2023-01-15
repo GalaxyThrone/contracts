@@ -8,7 +8,7 @@ import "../interfaces/IERC20.sol";
 import "../interfaces/IERC721.sol";
 import "../interfaces/IResource.sol";
 import "../interfaces/IBuildings.sol";
-import "./FleetsFacet.sol";
+import "./ShipsFacet.sol";
 import "./FightingFacet.sol";
 import "./BuildingsFacet.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/AutomationCompatibleInterface.sol";
@@ -151,7 +151,7 @@ contract AutomationFacet is Modifiers, AutomationCompatibleInterface {
         uint256 shipReadyTimestamp = s.craftFleets[planetId].readyTimestamp;
 
         if (block.timestamp >= shipReadyTimestamp) {
-            FleetsFacet(address(this)).claimFleet(planetId);
+            ShipsFacet(address(this)).claimFleet(planetId);
         }
 
         attackStatus memory attackInstance = getAttackStatus(planetId);

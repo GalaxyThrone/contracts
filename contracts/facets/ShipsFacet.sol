@@ -10,7 +10,7 @@ import "../interfaces/IResource.sol";
 import "../interfaces/IBuildings.sol";
 import "./AdminFacet.sol";
 
-contract FleetsFacet is Modifiers {
+contract ShipsFacet is Modifiers {
     event SendTerraformer(
         uint256 indexed toPlanet,
         uint256 indexed arrivalTime,
@@ -20,17 +20,14 @@ contract FleetsFacet is Modifiers {
         uint256 indexed fromPlanetId,
         uint256 indexed toPlanetId,
         address indexed sender,
-        uint256 fleetId,
-        uint256 resourceId,
+        uint256[] shipsIds,
         uint256 arrivalTime
     );
     event StartSendResources(
         uint256 indexed fromPlanetId,
         uint256 indexed toPlanetId,
         address indexed sender,
-        uint256 fleetId,
-        uint256 resourceId,
-        uint256 amount,
+        uint256[] shipsIds,
         uint256 arrivalTime
     );
 
@@ -276,8 +273,7 @@ contract FleetsFacet is Modifiers {
     function startOutMining(
         uint256 _fromPlanetId,
         uint256 _toPlanetId,
-        uint256 _shipId,
-        uint256 _resourceId
+        uint256[] calldata _shipIds
     ) external onlyPlanetOwner(_fromPlanetId) {
         // only unowned planets can be outmined ( see GAL-62 Asteroid Feature)
         require(
@@ -289,24 +285,32 @@ contract FleetsFacet is Modifiers {
 
         //@notice, can be refactored to less calls to external contract
 
-        require(
-            IShips(s.shipsAddress).checkAssignedPlanet(_shipId) ==
-                _fromPlanetId,
-            "ship is not assigned to this planet!"
-        );
+        for (uint256 i; i < _shipIds.length; i++) {
+            require(
+                IShips(s.shipsAddress).checkAssignedPlanet(_shipIds[i]) ==
+                    _fromPlanetId,
+                "ship is not assigned to this planet!"
+            );
 
-        require(
-            IShips(s.shipsAddress).ownerOf(_shipId) == msg.sender,
-            "not your ship!"
-        );
+            require(
+                IShips(s.shipsAddress).ownerOf(_shipIds[i]) == msg.sender,
+                "not your ship!"
+            );
 
-        uint256 shipType = IShips(s.shipsAddress)
-            .getShipStats(_shipId)
-            .shipType;
+            uint256 shipType = IShips(s.shipsAddress)
+                .getShipStats(_shipIds[i])
+                .shipType;
 
-        require(shipType == 7 || shipType == 8, "only cargo/courier");
+            require(
+                shipType == 7 ||
+                    shipType == 8 ||
+                    shipType == 10 ||
+                    shipType == 11,
+                "only cargo/courier"
+            );
 
-        IShips(s.shipsAddress).deleteShipFromPlanet(_shipId);
+            IShips(s.shipsAddress).deleteShipFromPlanet(_shipIds[i]);
+        }
 
         (uint256 fromX, uint256 fromY) = IPlanets(s.planetsAddress)
             .getCoordinates(_fromPlanetId);
@@ -320,8 +324,7 @@ contract FleetsFacet is Modifiers {
         OutMining memory newOutMining = OutMining(
             _fromPlanetId,
             _toPlanetId,
-            _shipId,
-            _resourceId,
+            _shipIds,
             block.timestamp,
             arrivalTime
         );
@@ -331,8 +334,7 @@ contract FleetsFacet is Modifiers {
             _fromPlanetId,
             _toPlanetId,
             msg.sender,
-            _shipId,
-            _resourceId,
+            _shipIds,
             arrivalTime
         );
     }
@@ -348,44 +350,90 @@ contract FleetsFacet is Modifiers {
             block.timestamp >= s.outMining[_outMiningId].arrivalTime,
             "FleetsFacet: not ready yet"
         );
-        uint256 cargo = IShips(s.shipsAddress).getCargo(
-            s.outMining[_outMiningId].fleetId
-        );
-        IPlanets(s.planetsAddress).mineResource(
-            s.outMining[_outMiningId].toPlanetId,
-            s.outMining[_outMiningId].resourceId,
-            cargo
-        );
-        if (s.outMining[_outMiningId].resourceId == 0) {
-            IResource(s.metalAddress).mint(address(this), cargo);
-            s.planetResources[s.outMining[_outMiningId].fromPlanetId][
-                0
-            ] += cargo;
-        } else if (s.outMining[_outMiningId].resourceId == 1) {
-            IResource(s.crystalAddress).mint(address(this), cargo);
-            s.planetResources[s.outMining[_outMiningId].fromPlanetId][
-                1
-            ] += cargo;
-        } else if (s.outMining[_outMiningId].resourceId == 2) {
-            IResource(s.ethereusAddress).mint(address(this), cargo);
-            s.planetResources[s.outMining[_outMiningId].fromPlanetId][
-                2
-            ] += cargo;
+        for (uint256 i; i < s.outMining[_outMiningId].shipsIds.length; i++) {
+            uint256 shipType = IShips(s.shipsAddress)
+                .getShipStats(s.outMining[_outMiningId].shipsIds[i])
+                .shipType;
+            uint256 cargo = IShips(s.shipsAddress).getCargo(
+                s.outMining[_outMiningId].shipsIds[i]
+            );
+            // cargo metal
+            if (shipType == 7) {
+                IPlanets(s.planetsAddress).mineResource(
+                    s.outMining[_outMiningId].toPlanetId,
+                    0,
+                    cargo
+                );
+                IResource(s.metalAddress).mint(address(this), cargo);
+                s.planetResources[s.outMining[_outMiningId].fromPlanetId][
+                        0
+                    ] += cargo;
+                // cargo crystal
+            } else if (shipType == 10) {
+                IPlanets(s.planetsAddress).mineResource(
+                    s.outMining[_outMiningId].toPlanetId,
+                    1,
+                    cargo
+                );
+                IResource(s.crystalAddress).mint(address(this), cargo);
+                s.planetResources[s.outMining[_outMiningId].fromPlanetId][
+                        1
+                    ] += cargo;
+                // cargo ethereus
+            } else if (shipType == 11) {
+                IPlanets(s.planetsAddress).mineResource(
+                    s.outMining[_outMiningId].toPlanetId,
+                    2,
+                    cargo
+                );
+                IResource(s.ethereusAddress).mint(address(this), cargo);
+                s.planetResources[s.outMining[_outMiningId].fromPlanetId][
+                        2
+                    ] += cargo;
+                // courier
+            } else if (shipType == 8) {
+                IPlanets(s.planetsAddress).mineResource(
+                    s.outMining[_outMiningId].toPlanetId,
+                    0,
+                    cargo
+                );
+                IResource(s.metalAddress).mint(address(this), cargo);
+                s.planetResources[s.outMining[_outMiningId].fromPlanetId][
+                        0
+                    ] += cargo;
+                IPlanets(s.planetsAddress).mineResource(
+                    s.outMining[_outMiningId].toPlanetId,
+                    1,
+                    cargo / 3
+                );
+                IResource(s.crystalAddress).mint(address(this), cargo / 3);
+                s.planetResources[s.outMining[_outMiningId].fromPlanetId][1] +=
+                    cargo /
+                    3;
+                IPlanets(s.planetsAddress).mineResource(
+                    s.outMining[_outMiningId].toPlanetId,
+                    2,
+                    cargo / 6
+                );
+                IResource(s.ethereusAddress).mint(address(this), cargo / 6);
+                s.planetResources[s.outMining[_outMiningId].fromPlanetId][2] +=
+                    cargo /
+                    6;
+            }
+
+            IShips(s.shipsAddress).assignShipToPlanet(
+                s.outMining[_outMiningId].shipsIds[i],
+                s.outMining[_outMiningId].fromPlanetId
+            );
         }
 
-        IShips(s.shipsAddress).assignShipToPlanet(
-            s.outMining[_outMiningId].fleetId,
-            s.outMining[_outMiningId].fromPlanetId
-        );
         delete s.outMining[_outMiningId];
     }
 
     function startSendResources(
         uint256 _fromPlanetId,
         uint256 _toPlanetId,
-        uint256 _shipId,
-        uint256 _resourceId,
-        uint256 _amount
+        uint256[] calldata _shipIds
     ) external onlyPlanetOwner(_fromPlanetId) {
         //only owned planets/ allied planets can receive resources
         require(
@@ -399,29 +447,26 @@ contract FleetsFacet is Modifiers {
 
         //@notice, can be refactored to less calls to external contract
 
-        require(
-            IShips(s.shipsAddress).checkAssignedPlanet(_shipId) ==
-                _fromPlanetId,
-            "ship is not assigned to this planet!"
-        );
+        for (uint256 i; i < _shipIds.length; i++) {
+            require(
+                IShips(s.shipsAddress).checkAssignedPlanet(_shipIds[i]) ==
+                    _fromPlanetId,
+                "ship is not assigned to this planet!"
+            );
 
-        require(
-            IShips(s.shipsAddress).ownerOf(_shipId) == msg.sender,
-            "not your ship!"
-        );
+            require(
+                IShips(s.shipsAddress).ownerOf(_shipIds[i]) == msg.sender,
+                "not your ship!"
+            );
 
-        uint256 shipType = IShips(s.shipsAddress)
-            .getShipStats(_shipId)
-            .shipType;
+            uint256 shipType = IShips(s.shipsAddress)
+                .getShipStats(_shipIds[i])
+                .shipType;
 
-        require(shipType == 7 || shipType == 8, "only cargo/courier");
+            require(shipType == 7 || shipType == 8, "only cargo/courier");
 
-        require(
-            s.planetResources[_fromPlanetId][_resourceId] >= _amount,
-            "FleetsFacet: not enough resources"
-        );
-
-        IShips(s.shipsAddress).deleteShipFromPlanet(_shipId);
+            IShips(s.shipsAddress).deleteShipFromPlanet(_shipIds[i]);
+        }
 
         (uint256 fromX, uint256 fromY) = IPlanets(s.planetsAddress)
             .getCoordinates(_fromPlanetId);
@@ -434,9 +479,7 @@ contract FleetsFacet is Modifiers {
         TransferResource memory newTransferResource = TransferResource(
             _fromPlanetId,
             _toPlanetId,
-            _shipId,
-            _resourceId,
-            _amount,
+            _shipIds,
             block.timestamp,
             arrivalTime
         );
@@ -446,9 +489,7 @@ contract FleetsFacet is Modifiers {
             _fromPlanetId,
             _toPlanetId,
             msg.sender,
-            _shipId,
-            _resourceId,
-            _amount,
+            _shipIds,
             arrivalTime
         );
     }
@@ -465,33 +506,71 @@ contract FleetsFacet is Modifiers {
                 s.transferResource[_transferResourceId].arrivalTime,
             "FleetsFacet: not ready yet"
         );
-        if (s.transferResource[_transferResourceId].resourceId == 0) {
-            s.planetResources[
-                s.transferResource[_transferResourceId].fromPlanetId
-            ][0] -= s.transferResource[_transferResourceId].amount;
-            s.planetResources[
-                s.transferResource[_transferResourceId].toPlanetId
-            ][0] += s.transferResource[_transferResourceId].amount;
-        } else if (s.transferResource[_transferResourceId].resourceId == 1) {
-            s.planetResources[
-                s.transferResource[_transferResourceId].fromPlanetId
-            ][1] -= s.transferResource[_transferResourceId].amount;
-            s.planetResources[
-                s.transferResource[_transferResourceId].toPlanetId
-            ][1] += s.transferResource[_transferResourceId].amount;
-        } else if (s.transferResource[_transferResourceId].resourceId == 2) {
-            s.planetResources[
-                s.transferResource[_transferResourceId].fromPlanetId
-            ][2] -= s.transferResource[_transferResourceId].amount;
-            s.planetResources[
-                s.transferResource[_transferResourceId].toPlanetId
-            ][2] += s.transferResource[_transferResourceId].amount;
-        }
 
-        IShips(s.shipsAddress).assignShipToPlanet(
-            s.transferResource[_transferResourceId].fleetId,
-            s.transferResource[_transferResourceId].fromPlanetId
-        );
+        for (
+            uint256 i;
+            i < s.transferResource[_transferResourceId].shipsIds.length;
+            i++
+        ) {
+            uint256 shipType = IShips(s.shipsAddress)
+                .getShipStats(
+                    s.transferResource[_transferResourceId].shipsIds[i]
+                )
+                .shipType;
+            uint256 cargo = IShips(s.shipsAddress).getCargo(
+                s.transferResource[_transferResourceId].shipsIds[i]
+            );
+            // cargo metal
+            if (shipType == 7) {
+                s.planetResources[
+                    s.transferResource[_transferResourceId].fromPlanetId
+                ][0] -= cargo;
+                s.planetResources[
+                    s.transferResource[_transferResourceId].toPlanetId
+                ][0] += cargo;
+                // cargo crystal
+            } else if (shipType == 10) {
+                s.planetResources[
+                    s.transferResource[_transferResourceId].fromPlanetId
+                ][1] -= cargo;
+                s.planetResources[
+                    s.transferResource[_transferResourceId].toPlanetId
+                ][1] += cargo;
+                // cargo ethereus
+            } else if (shipType == 11) {
+                s.planetResources[
+                    s.transferResource[_transferResourceId].fromPlanetId
+                ][2] -= cargo;
+                s.planetResources[
+                    s.transferResource[_transferResourceId].toPlanetId
+                ][2] += cargo;
+                // courier
+            } else if (shipType == 8) {
+                s.planetResources[
+                    s.transferResource[_transferResourceId].fromPlanetId
+                ][0] -= cargo;
+                s.planetResources[
+                    s.transferResource[_transferResourceId].toPlanetId
+                ][0] += cargo;
+                s.planetResources[
+                    s.transferResource[_transferResourceId].fromPlanetId
+                ][1] -= cargo / 3;
+                s.planetResources[
+                    s.transferResource[_transferResourceId].toPlanetId
+                ][1] += cargo / 3;
+                s.planetResources[
+                    s.transferResource[_transferResourceId].fromPlanetId
+                ][2] -= cargo / 6;
+                s.planetResources[
+                    s.transferResource[_transferResourceId].toPlanetId
+                ][2] += cargo / 6;
+            }
+
+            IShips(s.shipsAddress).assignShipToPlanet(
+                s.transferResource[_transferResourceId].shipsIds[i],
+                s.transferResource[_transferResourceId].fromPlanetId
+            );
+        }
 
         delete s.transferResource[_transferResourceId];
     }

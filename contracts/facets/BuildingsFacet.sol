@@ -7,7 +7,7 @@ import "../interfaces/IPlanets.sol";
 import "../interfaces/IERC20.sol";
 import "../interfaces/IERC721.sol";
 import "../interfaces/IResource.sol";
-import "./FleetsFacet.sol";
+import "./ShipsFacet.sol";
 
 contract BuildingsFacet is Modifiers {
     function craftBuilding(
