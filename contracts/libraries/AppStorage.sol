@@ -87,6 +87,7 @@ struct TransferResource {
     uint256[] shipsIds;
     uint256 timestamp;
     uint256 arrivalTime;
+    uint256[3] sentResources;
 }
 
 struct AppStorage {

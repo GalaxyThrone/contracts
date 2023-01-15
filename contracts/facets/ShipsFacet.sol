@@ -426,35 +426,36 @@ contract ShipsFacet is Modifiers {
         IERC20(s.crystalAddress).burnFrom(address(this), _resourcesToSend[1]);
         IERC20(s.ethereusAddress).burnFrom(address(this), _resourcesToSend[2]);
 
-        //@notice WIP
-        //@TODO (in that order)
-        //load all owned ships from player
-        //filter by courier ships
-        //filter by ships on the planet
-        //assign necessary nft ids to the mission
+        uint256 totalAmount = _resourcesToSend[0] +
+            _resourcesToSend[1] +
+            _resourcesToSend[2];
 
-        //check if ship is owned by Player & assigned to the planet. Check if ship is the right type
-        //@notice, can be refactored to less calls to external contract
+        (
+            uint256 totalCapacity,
+            uint256[] memory cargoShipIds,
+            uint256[] memory CargoCapacitiesShips
+        ) = getCargoShipsPlanet(_fromPlanetId);
 
-        for (uint256 i; i < _shipIds.length; i++) {
+        require(totalCapacity >= totalAmount, "above capacity!");
+
+        uint256 carriedAmount;
+
+        for (uint256 i; i < cargoShipIds.length; i++) {
             require(
-                IShips(s.shipsAddress).checkAssignedPlanet(_shipIds[i]) ==
-                    _fromPlanetId,
-                "ship is not assigned to this planet!"
-            );
-
-            require(
-                IShips(s.shipsAddress).ownerOf(_shipIds[i]) == msg.sender,
+                IShips(s.shipsAddress).ownerOf(cargoShipIds[i]) == msg.sender,
                 "not your ship!"
             );
 
-            uint256 shipType = IShips(s.shipsAddress)
-                .getShipStats(_shipIds[i])
-                .shipType;
+            carriedAmount += CargoCapacitiesShips[i];
 
-            require(shipType == 8, "only courier");
+            IShips(s.shipsAddress).deleteShipFromPlanet(cargoShipIds[i]);
 
-            IShips(s.shipsAddress).deleteShipFromPlanet(_shipIds[i]);
+            if (carriedAmount >= totalAmount) {
+                for (uint256 j = 0; j + i < cargoShipIds.length; j++) {
+                    delete cargoShipIds[j];
+                }
+                break;
+            }
         }
 
         (uint256 fromX, uint256 fromY) = IPlanets(s.planetsAddress)
@@ -468,9 +469,10 @@ contract ShipsFacet is Modifiers {
         TransferResource memory newTransferResource = TransferResource(
             _fromPlanetId,
             _toPlanetId,
-            _shipIds,
+            cargoShipIds,
             block.timestamp,
-            arrivalTime
+            arrivalTime,
+            _resourcesToSend
         );
         s.transferResource[s.transferResourceId] = newTransferResource;
         s.transferResourceId++;
@@ -478,7 +480,7 @@ contract ShipsFacet is Modifiers {
             _fromPlanetId,
             _toPlanetId,
             msg.sender,
-            _shipIds,
+            cargoShipIds,
             arrivalTime
         );
     }
@@ -508,7 +510,7 @@ contract ShipsFacet is Modifiers {
                 .shipType;
             currShipCargo = IShips(s.shipsAddress).getCargo(ownedShips[i]);
 
-            if (currShipType == 7) {
+            if (currShipType == 8) {
                 if (
                     IShips(s.shipsAddress).checkAssignedPlanet(ownedShips[i]) ==
                     _planetId
@@ -521,7 +523,9 @@ contract ShipsFacet is Modifiers {
         return currShipCargo;
     }
 
-    function checkShippingCapacities(uint256 _planetId)
+    //@TODO  to be refactored to backend/frontend nft selection. its a waste of gas imho
+
+    function checkShippingCapacitiesInternal(uint256 _planetId)
         internal
         view
         returns (uint256)
@@ -540,13 +544,14 @@ contract ShipsFacet is Modifiers {
 
         uint256 currShipType;
         uint256 currShipCargo;
+
         for (uint256 i = 0; i < totalCount; i++) {
             currShipType = IShips(s.shipsAddress)
                 .getShipStats(ownedShips[i])
                 .shipType;
             currShipCargo = IShips(s.shipsAddress).getCargo(ownedShips[i]);
 
-            if (currShipType == 7) {
+            if (currShipType == 8) {
                 if (
                     IShips(s.shipsAddress).checkAssignedPlanet(ownedShips[i]) ==
                     _planetId
@@ -557,6 +562,51 @@ contract ShipsFacet is Modifiers {
         }
 
         return currShipCargo;
+    }
+
+    function getCargoShipsPlanet(uint256 _planetId)
+        internal
+        view
+        returns (
+            uint256,
+            uint256[] memory,
+            uint256[] memory
+        )
+    {
+        address _player = IERC721(s.planetsAddress).ownerOf(_planetId);
+        uint256 totalCount = IERC721(s.shipsAddress).balanceOf(_player);
+        uint256 counter;
+        uint256[] memory ownedShips = new uint256[](totalCount);
+        uint256[] memory cargoShips = new uint256[](totalCount);
+        uint256[] memory cargoCapacity = new uint256[](totalCount);
+
+        uint256 totalShippingCapacity;
+        uint256 currShipType;
+        uint256 currShipCargo;
+
+        for (uint256 i = 0; i < totalCount; i++) {
+            ownedShips[i] = IERC721(s.shipsAddress).tokenOfOwnerByIndex(
+                _player,
+                i
+            );
+        }
+
+        for (uint256 i = 0; i < totalCount; i++) {
+            if (currShipType == 8) {
+                if (
+                    IShips(s.shipsAddress).checkAssignedPlanet(ownedShips[i]) ==
+                    _planetId
+                ) {
+                    currShipCargo = IShips(s.shipsAddress).getCargo(
+                        ownedShips[i]
+                    );
+                    cargoShips[counter] = ownedShips[i];
+                    cargoCapacity[counter] = currShipCargo;
+                    totalShippingCapacity += currShipCargo;
+                }
+            }
+        }
+        return (totalShippingCapacity, cargoShips, cargoCapacity);
     }
 
     function resolveSendResources(
@@ -572,65 +622,23 @@ contract ShipsFacet is Modifiers {
             "ShipsFacet: not ready yet"
         );
 
+        //fulfill delivery
+        s.planetResources[s.transferResource[_transferResourceId].toPlanetId][
+                0
+            ] += s.transferResource[_transferResourceId].sentResources[0];
+        s.planetResources[s.transferResource[_transferResourceId].toPlanetId][
+                1
+            ] += s.transferResource[_transferResourceId].sentResources[1];
+        s.planetResources[s.transferResource[_transferResourceId].toPlanetId][
+                2
+            ] += s.transferResource[_transferResourceId].sentResources[2];
+
         for (
             uint256 i;
             i < s.transferResource[_transferResourceId].shipsIds.length;
             i++
         ) {
-            uint256 shipType = IShips(s.shipsAddress)
-                .getShipStats(
-                    s.transferResource[_transferResourceId].shipsIds[i]
-                )
-                .shipType;
-            uint256 cargo = IShips(s.shipsAddress).getCargo(
-                s.transferResource[_transferResourceId].shipsIds[i]
-            );
-            // cargo metal
-            if (shipType == 7) {
-                s.planetResources[
-                    s.transferResource[_transferResourceId].fromPlanetId
-                ][0] -= cargo;
-                s.planetResources[
-                    s.transferResource[_transferResourceId].toPlanetId
-                ][0] += cargo;
-                // cargo crystal
-            } else if (shipType == 10) {
-                s.planetResources[
-                    s.transferResource[_transferResourceId].fromPlanetId
-                ][1] -= cargo;
-                s.planetResources[
-                    s.transferResource[_transferResourceId].toPlanetId
-                ][1] += cargo;
-                // cargo ethereus
-            } else if (shipType == 11) {
-                s.planetResources[
-                    s.transferResource[_transferResourceId].fromPlanetId
-                ][2] -= cargo;
-                s.planetResources[
-                    s.transferResource[_transferResourceId].toPlanetId
-                ][2] += cargo;
-                // courier
-            } else if (shipType == 8) {
-                s.planetResources[
-                    s.transferResource[_transferResourceId].fromPlanetId
-                ][0] -= cargo;
-                s.planetResources[
-                    s.transferResource[_transferResourceId].toPlanetId
-                ][0] += cargo;
-                s.planetResources[
-                    s.transferResource[_transferResourceId].fromPlanetId
-                ][1] -= cargo / 3;
-                s.planetResources[
-                    s.transferResource[_transferResourceId].toPlanetId
-                ][1] += cargo / 3;
-                s.planetResources[
-                    s.transferResource[_transferResourceId].fromPlanetId
-                ][2] -= cargo / 6;
-                s.planetResources[
-                    s.transferResource[_transferResourceId].toPlanetId
-                ][2] += cargo / 6;
-            }
-
+            //@TODO can create new function that batch-assigns ships to save gas
             IShips(s.shipsAddress).assignShipToPlanet(
                 s.transferResource[_transferResourceId].shipsIds[i],
                 s.transferResource[_transferResourceId].fromPlanetId
