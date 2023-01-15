@@ -45,12 +45,12 @@ contract ShipsFacet is Modifiers {
             _amount > 0 && _amount % 1 == 0,
             "minimum 1, only in 1 increments"
         );
-        require(craftTime > 0, "FleetsFacet: not released yet");
+        require(craftTime > 0, "ShipsFacet: not released yet");
         require(
             s.craftFleets[_planetId].itemId == 0,
-            "FleetsFacet: planet already crafting"
+            "ShipsFacet: planet already crafting"
         );
-        require(buildings > 0, "FleetsFacet: missing building requirement");
+        require(buildings > 0, "ShipsFacet: missing building requirement");
         uint256 readyTimestamp = block.timestamp + (craftTime * _amount);
         CraftItem memory newFleet = CraftItem(
             _amount,
@@ -61,15 +61,15 @@ contract ShipsFacet is Modifiers {
         s.craftFleets[_planetId] = newFleet;
         require(
             s.planetResources[_planetId][0] >= price[0] * _amount,
-            "FleetsFacet: not enough metal"
+            "ShipsFacet: not enough metal"
         );
         require(
             s.planetResources[_planetId][1] >= price[1] * _amount,
-            "FleetsFacet: not enough crystal"
+            "ShipsFacet: not enough crystal"
         );
         require(
             s.planetResources[_planetId][2] >= price[2] * _amount,
-            "FleetsFacet: not enough ethereus"
+            "ShipsFacet: not enough ethereus"
         );
 
         s.planetResources[_planetId][0] -= price[0] * _amount;
@@ -86,7 +86,7 @@ contract ShipsFacet is Modifiers {
     {
         require(
             block.timestamp >= s.craftFleets[_planetId].readyTimestamp,
-            "FleetsFacet: not ready yet"
+            "ShipsFacet: not ready yet"
         );
 
         uint256 shipTypeId;
@@ -241,7 +241,7 @@ contract ShipsFacet is Modifiers {
     function endTerraform(uint256 _sendTerraformId) external {
         require(
             block.timestamp >= s.sendTerraform[_sendTerraformId].arrivalTime,
-            "FleetsFacet: not ready yet"
+            "ShipsFacet: not ready yet"
         );
 
         //@notice transferring planet to terraformer owner. Event on Planet contract
@@ -348,7 +348,7 @@ contract ShipsFacet is Modifiers {
 
         require(
             block.timestamp >= s.outMining[_outMiningId].arrivalTime,
-            "FleetsFacet: not ready yet"
+            "ShipsFacet: not ready yet"
         );
         for (uint256 i; i < s.outMining[_outMiningId].shipsIds.length; i++) {
             uint256 shipType = IShips(s.shipsAddress)
@@ -504,7 +504,7 @@ contract ShipsFacet is Modifiers {
         require(
             block.timestamp >=
                 s.transferResource[_transferResourceId].arrivalTime,
-            "FleetsFacet: not ready yet"
+            "ShipsFacet: not ready yet"
         );
 
         for (
@@ -609,5 +609,59 @@ contract ShipsFacet is Modifiers {
         }
 
         return incomingTerraformers;
+    }
+
+    function getAllOutMining(uint256 _planetId)
+        external
+        view
+        returns (OutMining[] memory)
+    {
+        uint256 totalCount;
+        for (uint256 i = 0; i <= s.outMiningId; i++) {
+            if (s.outMining[i].fromPlanetId == _planetId) {
+                totalCount++;
+            }
+        }
+
+        OutMining[] memory allOutMinings = new OutMining[](totalCount);
+
+        uint256 counter = 0;
+
+        for (uint256 i = 0; i <= s.outMiningId; i++) {
+            if (s.outMining[i].fromPlanetId == _planetId) {
+                allOutMinings[counter] = s.outMining[i];
+                counter++;
+            }
+        }
+
+        return allOutMinings;
+    }
+
+    function getAllSendResources(uint256 _planetId)
+        external
+        view
+        returns (TransferResource[] memory)
+    {
+        uint256 totalCount;
+        for (uint256 i = 0; i <= s.transferResourceId; i++) {
+            if (s.transferResource[i].fromPlanetId == _planetId) {
+                totalCount++;
+            }
+        }
+
+        TransferResource[] memory allSendResources = new TransferResource[](
+            totalCount
+        );
+
+        uint256 counter = 0;
+
+        for (uint256 i = 0; i <= s.transferResourceId; i++) {
+            if (s.transferResource[i].fromPlanetId == _planetId) {
+                allSendResources[counter] = s.transferResource[i];
+                counter++;
+            }
+        }
+
+        return allSendResources;
     }
 }
