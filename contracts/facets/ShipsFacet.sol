@@ -95,7 +95,7 @@ contract ShipsFacet is Modifiers {
         for (uint256 i = 0; i < s.craftFleets[_planetId].amount; i++) {
             //@TODO refactor to batchMinting
             shipId = IShips(s.shipsAddress).mint(
-                msg.sender,
+                IERC721(s.planetsAddress).ownerOf(_planetId),
                 s.craftFleets[_planetId].itemId
             );
 

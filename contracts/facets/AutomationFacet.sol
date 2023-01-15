@@ -11,9 +11,8 @@ import "../interfaces/IBuildings.sol";
 import "./ShipsFacet.sol";
 import "./FightingFacet.sol";
 import "./BuildingsFacet.sol";
-import "@chainlink/contracts/src/v0.8/interfaces/AutomationCompatibleInterface.sol";
 
-contract AutomationFacet is Modifiers, AutomationCompatibleInterface {
+contract AutomationFacet is Modifiers {
     //@notice
     //@params   checkData -> what functionality we are checking
     //          currently there are 6 paths
@@ -25,7 +24,6 @@ contract AutomationFacet is Modifiers, AutomationCompatibleInterface {
     function checkUpkeep(bytes calldata checkData)
         external
         view
-        override
         returns (
             bool upkeepNeeded,
             bytes memory /* performData */
@@ -112,7 +110,10 @@ contract AutomationFacet is Modifiers, AutomationCompatibleInterface {
         return (false, abi.encode(address(0)));
     }
 
-    function performUpkeep(bytes calldata performData) external override {
+    function performUpkeep(bytes calldata performData)
+        external
+        onlyChainRunner
+    {
         uint256 metalId = 0;
         uint256 crystalId = 1;
         uint256 ethereusId = 2;
