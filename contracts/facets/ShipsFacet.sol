@@ -517,6 +517,46 @@ contract ShipsFacet is Modifiers {
                 }
             }
         }
+
+        return currShipCargo;
+    }
+
+    function checkShippingCapacities(uint256 _planetId)
+        internal
+        view
+        returns (uint256)
+    {
+        uint256 totalShippingCapacity;
+        address _player = IERC721(s.planetsAddress).ownerOf(_planetId);
+        uint256 totalCount = IERC721(s.shipsAddress).balanceOf(_player);
+
+        uint256[] memory ownedShips = new uint256[](totalCount);
+        for (uint256 i = 0; i < totalCount; i++) {
+            ownedShips[i] = IERC721(s.shipsAddress).tokenOfOwnerByIndex(
+                _player,
+                i
+            );
+        }
+
+        uint256 currShipType;
+        uint256 currShipCargo;
+        for (uint256 i = 0; i < totalCount; i++) {
+            currShipType = IShips(s.shipsAddress)
+                .getShipStats(ownedShips[i])
+                .shipType;
+            currShipCargo = IShips(s.shipsAddress).getCargo(ownedShips[i]);
+
+            if (currShipType == 7) {
+                if (
+                    IShips(s.shipsAddress).checkAssignedPlanet(ownedShips[i]) ==
+                    _planetId
+                ) {
+                    totalShippingCapacity += currShipCargo;
+                }
+            }
+        }
+
+        return currShipCargo;
     }
 
     function resolveSendResources(
