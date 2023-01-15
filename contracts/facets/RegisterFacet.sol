@@ -54,7 +54,9 @@ contract RegisterFacet is Modifiers {
     {
         uint256 totalSupply = IERC721(s.planetsAddress).totalSupply();
         for (uint256 i; i < totalSupply; i++) {
-            uint256 tokenId = _randomness[0] % totalSupply;
+            uint256 tokenId = uint256(
+                bytes32(abi.encodePacked(_randomness[0], i))
+            ) % (totalSupply - 1);
             if (IERC721(s.planetsAddress).ownerOf(tokenId) == address(this)) {
                 IERC721(s.planetsAddress).safeTransferFrom(
                     address(this),
