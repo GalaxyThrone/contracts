@@ -439,6 +439,10 @@ contract FightingFacet is Modifiers {
         return s.runningAttacks[_instanceId];
     }
 
+    function getCurrentAttackStorageSize() external view returns (uint256) {
+        return s.sendAttackId;
+    }
+
     function getMultipleRunningAttacks(uint256 _startRange, uint256 _endRange)
         external
         view
