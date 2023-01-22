@@ -11,7 +11,7 @@ import { upgradeContract } from "../scripts/upgradeContract";
 let g: any;
 let adminFacet: AdminFacet;
 
-describe("Debug", function () {
+describe.skip("Debug", function () {
   before(async function () {
     this.timeout(20000000);
 

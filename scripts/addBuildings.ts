@@ -16,7 +16,8 @@ export async function addBuildings(buildingsAddress: string) {
       ethers.utils.parseEther("7000"),
     ],
     boosts: [0, 0, 0],
-    attack: 300,
+
+    defenseTypes: [1, 10, 10],
     health: 600,
     craftTime: 108,
     name: "Space Station",
@@ -29,7 +30,8 @@ export async function addBuildings(buildingsAddress: string) {
       ethers.utils.parseEther("1000"),
     ],
     boosts: [0, 0, 0],
-    attack: 100,
+
+    defenseTypes: [1, 10, 10],
     health: 100,
     craftTime: 72,
     name: "Tower",
@@ -42,7 +44,8 @@ export async function addBuildings(buildingsAddress: string) {
       ethers.utils.parseEther("200"),
     ],
     boosts: [0, 0, 0],
-    attack: 50,
+
+    defenseTypes: [1, 10, 10],
     health: 30,
     craftTime: 18,
     name: "Cannon",
@@ -55,7 +58,8 @@ export async function addBuildings(buildingsAddress: string) {
       ethers.utils.parseEther("0"),
     ],
     boosts: [0, 0, 200],
-    attack: 0,
+
+    defenseTypes: [1, 10, 10],
     health: 0,
     craftTime: 36,
     name: "Ethereus Miner",
@@ -68,7 +72,8 @@ export async function addBuildings(buildingsAddress: string) {
       ethers.utils.parseEther("200"),
     ],
     boosts: [300, 0, 0],
-    attack: 0,
+
+    defenseTypes: [1, 10, 10],
     health: 0,
     craftTime: 36,
     name: "Metal Miner",
@@ -81,7 +86,8 @@ export async function addBuildings(buildingsAddress: string) {
       ethers.utils.parseEther("200"),
     ],
     boosts: [0, 250, 0],
-    attack: 0,
+
+    defenseTypes: [1, 10, 10],
     health: 0,
     craftTime: 36,
     name: "Crystal Miner",
@@ -94,30 +100,52 @@ export async function addBuildings(buildingsAddress: string) {
       ethers.utils.parseEther("700"),
     ],
     boosts: [0, 0, 0],
-    attack: 0,
+
+    defenseTypes: [1, 10, 10],
     health: 0,
     craftTime: 72,
     name: "Shipyard",
   };
 
-  const addBuilding1Tx = await buildingsContract.addBuilding(1, building1);
+  const addBuilding1Tx = await buildingsContract.addBuilding(
+    1,
+    building1
+  );
   await addBuilding1Tx.wait();
 
-  const addBuilding2Tx = await buildingsContract.addBuilding(2, building2);
+  const addBuilding2Tx = await buildingsContract.addBuilding(
+    2,
+    building2
+  );
   await addBuilding2Tx.wait();
 
-  const addBuilding3Tx = await buildingsContract.addBuilding(3, building3);
+  const addBuilding3Tx = await buildingsContract.addBuilding(
+    3,
+    building3
+  );
   await addBuilding3Tx.wait();
 
-  const addBuilding4Tx = await buildingsContract.addBuilding(4, building4);
+  const addBuilding4Tx = await buildingsContract.addBuilding(
+    4,
+    building4
+  );
   await addBuilding4Tx.wait();
 
-  const addBuilding5Tx = await buildingsContract.addBuilding(5, building5);
+  const addBuilding5Tx = await buildingsContract.addBuilding(
+    5,
+    building5
+  );
   await addBuilding5Tx.wait();
 
-  const addBuilding6Tx = await buildingsContract.addBuilding(6, building6);
+  const addBuilding6Tx = await buildingsContract.addBuilding(
+    6,
+    building6
+  );
   await addBuilding6Tx.wait();
 
-  const addBuilding7Tx = await buildingsContract.addBuilding(7, building7);
+  const addBuilding7Tx = await buildingsContract.addBuilding(
+    7,
+    building7
+  );
   await addBuilding7Tx.wait();
 }

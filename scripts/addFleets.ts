@@ -17,6 +17,8 @@ export async function addFleets(fleetsAddress: string) {
       ethers.utils.parseEther("50"),
     ],
     attack: 30,
+    attackTypes: [100, 10, 10],
+    defenseTypes: [100, 10, 10],
     health: 20,
     cargo: 0,
     craftTime: 18,
@@ -24,7 +26,6 @@ export async function addFleets(fleetsAddress: string) {
     name: "Fighter",
     moduleSlots: 1,
     //@TODO right syntax?
-    equippedShipModule: [{ attackBoostStat: 0, healthBoostStat: 0 }],
   };
 
   const fleet2: ship = {
@@ -35,13 +36,14 @@ export async function addFleets(fleetsAddress: string) {
       ethers.utils.parseEther("400"),
     ],
     attack: 200,
+    attackTypes: [100, 10, 10],
+    defenseTypes: [100, 10, 10],
     health: 300,
     cargo: 0,
     craftTime: 72,
     craftedFrom: 7,
     name: "Frigate",
     moduleSlots: 1,
-    equippedShipModule: [{ attackBoostStat: 0, healthBoostStat: 0 }],
   };
 
   const fleet3: ship = {
@@ -52,13 +54,14 @@ export async function addFleets(fleetsAddress: string) {
       ethers.utils.parseEther("1000"),
     ],
     attack: 400,
+    attackTypes: [100, 10, 10],
+    defenseTypes: [100, 10, 10],
     health: 600,
     cargo: 0,
     craftTime: 144,
     craftedFrom: 7,
     name: "Cruiser",
     moduleSlots: 1,
-    equippedShipModule: [{ attackBoostStat: 0, healthBoostStat: 0 }],
   };
 
   const fleet4: ship = {
@@ -69,13 +72,14 @@ export async function addFleets(fleetsAddress: string) {
       ethers.utils.parseEther("150"),
     ],
     attack: 80,
+    attackTypes: [100, 10, 10],
+    defenseTypes: [100, 10, 10],
     health: 100,
     cargo: 0,
     craftTime: 36,
     craftedFrom: 7,
     name: "Raider",
     moduleSlots: 1,
-    equippedShipModule: [{ attackBoostStat: 0, healthBoostStat: 0 }],
   };
 
   const fleet5: ship = {
@@ -86,13 +90,14 @@ export async function addFleets(fleetsAddress: string) {
       ethers.utils.parseEther("800"),
     ],
     attack: 300,
+    attackTypes: [100, 10, 10],
+    defenseTypes: [100, 10, 10],
     health: 300,
     cargo: 0,
     craftTime: 72,
     craftedFrom: 7,
     name: "Warship",
     moduleSlots: 1,
-    equippedShipModule: [{ attackBoostStat: 0, healthBoostStat: 0 }],
   };
 
   const fleet6: ship = {
@@ -103,13 +108,14 @@ export async function addFleets(fleetsAddress: string) {
       ethers.utils.parseEther("1500"),
     ],
     attack: 600,
+    attackTypes: [600, 400, 200],
+    defenseTypes: [100, 10, 10],
     health: 100,
     cargo: 50,
     craftTime: 72,
     craftedFrom: 7,
     name: "Bomber",
     moduleSlots: 1,
-    equippedShipModule: [{ attackBoostStat: 0, healthBoostStat: 0 }],
   };
 
   const fleet7: ship = {
@@ -120,13 +126,14 @@ export async function addFleets(fleetsAddress: string) {
       ethers.utils.parseEther("200"),
     ],
     attack: 10,
+    attackTypes: [100, 10, 10],
+    defenseTypes: [100, 10, 10],
     health: 100,
     cargo: 1000,
     craftTime: 18,
     craftedFrom: 7,
     name: "Miner Ship",
     moduleSlots: 1,
-    equippedShipModule: [{ attackBoostStat: 0, healthBoostStat: 0 }],
   };
 
   const fleet8: ship = {
@@ -137,13 +144,14 @@ export async function addFleets(fleetsAddress: string) {
       ethers.utils.parseEther("50"),
     ],
     attack: 0,
+    attackTypes: [100, 10, 10],
+    defenseTypes: [100, 10, 10],
     health: 30,
     cargo: 300,
     craftTime: 9,
     craftedFrom: 7,
     name: "Courier",
     moduleSlots: 1,
-    equippedShipModule: [{ attackBoostStat: 0, healthBoostStat: 0 }],
   };
 
   const fleet9: ship = {
@@ -154,13 +162,14 @@ export async function addFleets(fleetsAddress: string) {
       ethers.utils.parseEther("11000"),
     ],
     attack: 100,
+    attackTypes: [100, 10, 10],
+    defenseTypes: [100, 10, 10],
     health: 500,
     cargo: 0,
     craftTime: 180,
     craftedFrom: 7,
     name: "Terraformer",
     moduleSlots: 1,
-    equippedShipModule: [{ attackBoostStat: 0, healthBoostStat: 0 }],
   };
 
   const fleet10: ship = {
@@ -171,13 +180,14 @@ export async function addFleets(fleetsAddress: string) {
       ethers.utils.parseEther("50"),
     ],
     attack: 0,
+    attackTypes: [100, 10, 10],
+    defenseTypes: [100, 10, 10],
     health: 30,
     cargo: 500,
     craftTime: 9,
     craftedFrom: 7,
     name: "Cargo Crystal WIP",
     moduleSlots: 1,
-    equippedShipModule: [{ attackBoostStat: 0, healthBoostStat: 0 }],
   };
 
   const fleet11: ship = {
@@ -188,13 +198,14 @@ export async function addFleets(fleetsAddress: string) {
       ethers.utils.parseEther("50"),
     ],
     attack: 0,
+    attackTypes: [100, 10, 10],
+    defenseTypes: [100, 10, 10],
     health: 30,
     cargo: 250,
     craftTime: 9,
     craftedFrom: 7,
     name: "Cargo Ethereus WIP",
     moduleSlots: 1,
-    equippedShipModule: [{ attackBoostStat: 0, healthBoostStat: 0 }],
   };
 
   const addFleet1Tx = await fleetsContract.addShipType(1, fleet1);

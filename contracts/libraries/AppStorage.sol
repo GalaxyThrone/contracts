@@ -52,26 +52,27 @@ struct ShipType {
     uint256 shipType;
     uint256[3] price; // [metal, crystal, ethereus]
     uint256 attack;
+    uint256[3] attackTypes;
+    uint256[3] defenseTypes;
     uint256 health;
     uint256 cargo;
     uint256 craftTime;
     uint256 craftedFrom;
     string name;
     uint256 moduleSlots;
-    ShipModule[] equippedShipModule;
 }
-
 struct Building {
     uint256[3] price; // [metal, crystal, ethereus]
     uint256[3] boosts; // [metal, crystal, ethereus]
-    uint256 attack;
+    uint256[3] defenseTypes;
     uint256 health;
     uint256 craftTime;
     string name;
 }
 
 struct ShipModule {
-    uint256 attackBoostStat;
+    uint256[3] attackBoostStat;
+    uint256[3] defenseBoostStat;
     uint256 healthBoostStat;
 }
 
@@ -138,7 +139,18 @@ struct AppStorage {
     //shipId => planetId
     mapping(uint256 => uint256) assignedPlanet;
     //ship categories template
+    //@TODO to be removed. Its duplicated on the actual ship contract
     mapping(uint256 => ShipType) shipType;
+    //individual spaceShip Nfts
+
+    mapping(uint256 => ShipType) SpaceShips;
+    //shipModuleTypes
+    mapping(uint256 => ShipModule) shipModuleType;
+    //equippedShipModuleTypes
+    uint256 totalAvailableShipModules;
+    mapping(uint256 => mapping(uint256 => ShipModule)) equippedShipModuleType;
+    //how many moduleSlots are still available to use for ship
+    mapping(uint256 => uint256) availableModuleSlots;
     // planetId => resource => amount
     mapping(uint256 => mapping(uint256 => uint256)) planetResources;
 }

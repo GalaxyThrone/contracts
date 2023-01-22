@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-import {AppStorage, Modifiers} from "../libraries/AppStorage.sol";
+import {AppStorage, Modifiers, ShipType, ShipModule} from "../libraries/AppStorage.sol";
 import "../interfaces/IPlanets.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
@@ -38,6 +38,21 @@ contract AdminFacet is Modifiers {
                 5
             );
         s.vrfRequest[requestId].kind = 0;
+    }
+
+    function addShipType(uint256 _id, ShipType calldata _newShipType)
+        external
+        onlyOwner
+    {
+        s.shipType[_id] = _newShipType;
+    }
+
+    function addShipModuleType(uint256 _id, ShipModule calldata _newShipType)
+        external
+        onlyOwner
+    {
+        s.totalAvailableShipModules += 1;
+        s.shipModuleType[_id] = _newShipType;
     }
 
     function drawRandomAttackSeed(uint256 _attackId) external onlySelf {

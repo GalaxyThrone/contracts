@@ -15,13 +15,14 @@ interface IShips {
         uint256 shipType;
         uint256[3] price; // [metal, crystal, ethereus]
         uint256 attack;
+        uint256[3] attackTypes;
+        uint256[3] defenseTypes;
         uint256 health;
         uint256 cargo;
         uint256 craftTime;
         uint256 craftedFrom;
         string name;
         uint256 moduleSlots;
-        ShipModule[] equippedShipModule;
     }
 
     struct ShipModule {

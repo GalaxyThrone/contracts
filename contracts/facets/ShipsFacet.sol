@@ -94,16 +94,24 @@ contract ShipsFacet is Modifiers {
 
         for (uint256 i = 0; i < s.craftFleets[_planetId].amount; i++) {
             //@TODO refactor to batchMinting
+
             shipId = IShips(s.shipsAddress).mint(
                 IERC721(s.planetsAddress).ownerOf(_planetId),
                 s.craftFleets[_planetId].itemId
             );
+
+            //assign shipType to shipNFTID on Diamond
+            s.SpaceShips[shipId] = s.shipType[s.craftFleets[_planetId].itemId];
 
             shipTypeId = s.craftFleets[_planetId].itemId;
 
             s.fleets[_planetId][shipTypeId] += 1;
 
             IShips(s.shipsAddress).assignShipToPlanet(shipId, _planetId);
+
+            s.availableModuleSlots[shipId] += s
+                .shipType[s.craftFleets[_planetId].itemId]
+                .moduleSlots;
         }
 
         delete s.craftFleets[_planetId];
@@ -736,5 +744,31 @@ contract ShipsFacet is Modifiers {
         }
 
         return allSendResources;
+    }
+
+    //@TODO crafting shipModules.
+    //@TODO unequipping shipModules.
+
+    function equipShipModule(uint256 _moduleToEquip, uint256 _shipId) external {
+        require(
+            _moduleToEquip <= s.totalAvailableShipModules,
+            "Module Item Id Doesnt exist!"
+        );
+        require(
+            IShips(s.shipsAddress).ownerOf(_shipId) == msg.sender,
+            "not your ship!"
+        );
+        require(s.availableModuleSlots[_shipId] > 0, "all Module slots taken!");
+
+        //@TODO require crafted shipModule OR Resources
+
+        //@TODO require free slot.
+        //@TODO check moduleSlots(hmm..can we combine those?)
+
+        s.equippedShipModuleType[_shipId][
+            s.availableModuleSlots[_shipId] - 1
+        ] = s.shipModuleType[_moduleToEquip];
+
+        s.availableModuleSlots[_shipId] -= 1;
     }
 }
