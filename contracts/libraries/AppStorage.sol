@@ -146,8 +146,9 @@ struct AppStorage {
     mapping(uint256 => ShipType) SpaceShips;
     //shipModuleTypes
     mapping(uint256 => ShipModule) shipModuleType;
-    //equippedShipModuleTypes
+    //total shipModuleTypes that exist currently
     uint256 totalAvailableShipModules;
+    //equippedShipModuleTypes
     mapping(uint256 => mapping(uint256 => ShipModule)) equippedShipModuleType;
     //how many moduleSlots are still available to use for ship
     mapping(uint256 => uint256) availableModuleSlots;

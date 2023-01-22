@@ -769,7 +769,6 @@ contract ShipsFacet is Modifiers {
         s.availableModuleSlots[_shipId] -= 1;
 
         //@TODO instead of having to add even more logic into the battle resolve, lets add the bonuses on the ship itself upon equipping
-        //@TODO has to be removed upon unequipping. Also needs a view function to show what kind of modules are equipped atm
         //@TODO and how many slots are still free
 
         s.SpaceShips[_shipId].health += s
@@ -785,5 +784,27 @@ contract ShipsFacet is Modifiers {
                 .shipModuleType[_moduleToEquip]
                 .defenseBoostStat[i];
         }
+    }
+
+    function checkAvailableModuleSlots(uint256 _shipId)
+        external
+        view
+        returns (uint256)
+    {
+        return s.availableModuleSlots[_shipId];
+    }
+
+    function returnEquippedModuleSlots(uint256 _shipId)
+        external
+        view
+        returns (ShipModule[] memory)
+    {
+        uint256 maxModules = s.SpaceShips[_shipId].moduleSlots;
+        ShipModule[] memory currentModules = new ShipModule[](maxModules);
+        for (uint256 i = 0; i < s.SpaceShips[_shipId].moduleSlots; i++) {
+            currentModules[i] = s.equippedShipModuleType[_shipId][i];
+        }
+
+        return currentModules;
     }
 }
