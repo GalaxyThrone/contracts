@@ -762,13 +762,28 @@ contract ShipsFacet is Modifiers {
 
         //@TODO require crafted shipModule OR Resources
 
-        //@TODO require free slot.
-        //@TODO check moduleSlots(hmm..can we combine those?)
-
         s.equippedShipModuleType[_shipId][
             s.availableModuleSlots[_shipId] - 1
         ] = s.shipModuleType[_moduleToEquip];
 
         s.availableModuleSlots[_shipId] -= 1;
+
+        //@TODO instead of having to add even more logic into the battle resolve, lets add the bonuses on the ship itself upon equipping
+        //@TODO has to be removed upon unequipping. Also needs a view function to show what kind of modules are equipped atm
+        //@TODO and how many slots are still free
+
+        s.SpaceShips[_shipId].health += s
+            .shipModuleType[_moduleToEquip]
+            .healthBoostStat;
+
+        for (uint256 i = 0; i < 3; i++) {
+            s.SpaceShips[_shipId].attackTypes[i] += s
+                .shipModuleType[_moduleToEquip]
+                .attackBoostStat[i];
+
+            s.SpaceShips[_shipId].attackTypes[i] += s
+                .shipModuleType[_moduleToEquip]
+                .defenseBoostStat[i];
+        }
     }
 }
