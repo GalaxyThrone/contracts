@@ -758,18 +758,63 @@ contract ShipsFacet is Modifiers {
             IShips(s.shipsAddress).ownerOf(_shipId) == msg.sender,
             "not your ship!"
         );
+
+        uint256 currAssignedPlanet = IShips(s.shipsAddress).checkAssignedPlanet(
+            _shipId
+        );
+
+        require(
+            IERC721(s.planetsAddress).ownerOf(currAssignedPlanet) == msg.sender,
+            "ship is not on an owned planet!"
+        );
+
         require(s.availableModuleSlots[_shipId] > 0, "all Module slots taken!");
 
-        //@TODO require crafted shipModule OR Resources
+        //currently there is a flat resource price per module. Simple
+
+        require(
+            s.planetResources[currAssignedPlanet][0] >=
+                s.shipModuleType[_moduleToEquip].price[0],
+            "ShipsFacet: not enough metal"
+        );
+        require(
+            s.planetResources[currAssignedPlanet][1] >=
+                s.shipModuleType[_moduleToEquip].price[1],
+            "ShipsFacet: not enough crystal"
+        );
+        require(
+            s.planetResources[currAssignedPlanet][2] >=
+                s.shipModuleType[_moduleToEquip].price[2],
+            "ShipsFacet: not enough ethereus"
+        );
+
+        s.planetResources[currAssignedPlanet][0] -= s
+            .shipModuleType[_moduleToEquip]
+            .price[0];
+        s.planetResources[currAssignedPlanet][1] -= s
+            .shipModuleType[_moduleToEquip]
+            .price[1];
+        s.planetResources[currAssignedPlanet][2] -= s
+            .shipModuleType[_moduleToEquip]
+            .price[2];
+        IERC20(s.metalAddress).burnFrom(
+            address(this),
+            s.shipModuleType[_moduleToEquip].price[0]
+        );
+        IERC20(s.crystalAddress).burnFrom(
+            address(this),
+            s.shipModuleType[_moduleToEquip].price[1]
+        );
+        IERC20(s.ethereusAddress).burnFrom(
+            address(this),
+            s.shipModuleType[_moduleToEquip].price[2]
+        );
 
         s.equippedShipModuleType[_shipId][
             s.availableModuleSlots[_shipId] - 1
         ] = s.shipModuleType[_moduleToEquip];
 
         s.availableModuleSlots[_shipId] -= 1;
-
-        //@TODO instead of having to add even more logic into the battle resolve, lets add the bonuses on the ship itself upon equipping
-        //@TODO and how many slots are still free
 
         s.SpaceShips[_shipId].health += s
             .shipModuleType[_moduleToEquip]

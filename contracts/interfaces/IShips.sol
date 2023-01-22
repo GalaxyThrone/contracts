@@ -26,8 +26,11 @@ interface IShips {
     }
 
     struct ShipModule {
-        uint256 attackBoostStat;
+        string name;
+        uint256[3] attackBoostStat;
+        uint256[3] defenseBoostStat;
         uint256 healthBoostStat;
+        uint256[3] price;
     }
 
     function getCraftTime(uint256 _fleetId) external view returns (uint256);

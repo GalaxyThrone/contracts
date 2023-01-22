@@ -71,9 +71,11 @@ struct Building {
 }
 
 struct ShipModule {
+    string name;
     uint256[3] attackBoostStat;
     uint256[3] defenseBoostStat;
     uint256 healthBoostStat;
+    uint256[3] price;
 }
 
 struct VrfRequest {

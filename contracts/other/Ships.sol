@@ -25,9 +25,11 @@ contract Ships is ERC721EnumerableUpgradeable, OwnableUpgradeable {
     }
 
     struct ShipModule {
+        string name;
         uint256[3] attackBoostStat;
         uint256[3] defenseBoostStat;
         uint256 healthBoostStat;
+        uint256[3] price;
     }
 
     //what kind of ship each tokenId actually is
@@ -88,13 +90,6 @@ contract Ships is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         onlyOwner
     {
         shipType[_id] = _newShipType;
-    }
-
-    function addShipModuleType(uint256 _id, ShipModule calldata _newShipType)
-        external
-        onlyOwner
-    {
-        shipModuleType[_id] = _newShipType;
     }
 
     function checkAssignedPlanet(uint256 _shipId)
