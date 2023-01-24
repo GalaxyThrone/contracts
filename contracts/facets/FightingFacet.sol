@@ -502,6 +502,14 @@ contract FightingFacet is Modifiers {
 
             counter++;
         }
+
+        return queriedAttacks;
+
+
+
+
+
+
     }
 
     function getAllIncomingAttacksPlayer(address _player)
