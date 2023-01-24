@@ -670,7 +670,7 @@ contract ShipsFacet is Modifiers {
         returns (SendTerraform[] memory)
     {
         uint256 totalCount;
-        for (uint256 i = 0; i <= s.sendTerraformId; i++) {
+        for (uint256 i = 0; i < s.sendTerraformId; i++) {
             if (s.sendTerraform[i].toPlanetId == _planetId) {
                 totalCount++;
             }
@@ -682,7 +682,7 @@ contract ShipsFacet is Modifiers {
 
         uint256 counter = 0;
 
-        for (uint256 i = 0; i <= s.sendTerraformId; i++) {
+        for (uint256 i = 0; i < s.sendTerraformId; i++) {
             if (s.sendTerraform[i].toPlanetId == _planetId) {
                 incomingTerraformers[counter] = s.sendTerraform[i];
                 counter++;
