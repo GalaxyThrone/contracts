@@ -20,8 +20,8 @@ contract BuildingsFacet is Modifiers {
         uint256 craftTime = buildingsContract.getCraftTime(_buildingId);
 
         require(
-            _amount > 0 && _amount % 1 == 0,
-            "minimum 1, only in 1 increments"
+            _amount > 0 && _amount % 1 == 0 && _amount <= 10,
+            "minimum 1, only in 1 increments, max 10"
         );
         require(craftTime > 0, "BuildingsFacet: not released yet");
 

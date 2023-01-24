@@ -42,8 +42,8 @@ contract ShipsFacet is Modifiers {
         uint256 craftedFrom = fleetsContract.getCraftedFrom(_fleetId);
         uint256 buildings = s.buildings[_planetId][craftedFrom];
         require(
-            _amount > 0 && _amount % 1 == 0,
-            "minimum 1, only in 1 increments"
+            _amount > 0 && _amount % 1 == 0 && _amount <= 10,
+            "minimum 1, only in 1 increments, max 10"
         );
         require(craftTime > 0, "ShipsFacet: not released yet");
         require(
