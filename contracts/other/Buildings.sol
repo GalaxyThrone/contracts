@@ -11,7 +11,7 @@ contract Buildings is ERC1155Upgradeable, OwnableUpgradeable {
     struct Building {
         uint256[3] price; // [metal, crystal, ethereus]
         uint256[3] boosts; // [metal, crystal, ethereus]
-        uint256 attack;
+        uint256[3] defenseTypes;
         uint256 health;
         uint256 craftTime;
         string name;

@@ -137,4 +137,14 @@ contract AllianceFacet is Modifiers {
 
         return allAllianceNames;
     }
+
+    function getCurrentAlliancePlanet(uint256 _planetId)
+        external
+        view
+        returns (bytes32)
+    {
+        address currPlayerowner = IERC721(s.planetsAddress).ownerOf(_planetId);
+
+        return s.allianceOfPlayer[currPlayerowner];
+    }
 }

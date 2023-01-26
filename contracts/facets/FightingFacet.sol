@@ -175,6 +175,95 @@ contract FightingFacet is Modifiers {
         ] -= 1;
     }
 
+    function calculateAttackBattleStats(
+        uint256[] memory shipIds,
+        uint256[] memory attackSeed
+    ) internal returns (int256[3] memory, int256) {
+        int256[3] memory attackStrength;
+        int256 attackHealth;
+
+        for (uint256 i = 0; i < shipIds.length; i++) {
+            attackStrength[0] += int256(
+                s.SpaceShips[shipIds[i]].attackTypes[0]
+            );
+            attackStrength[1] += int256(
+                s.SpaceShips[shipIds[i]].attackTypes[1]
+            );
+            attackStrength[2] += int256(
+                s.SpaceShips[shipIds[i]].attackTypes[2]
+            );
+
+            attackHealth += int256(s.SpaceShips[shipIds[i]].health);
+        }
+
+        for (uint256 i = 0; i < attackStrength.length; i++) {
+            attackStrength[i] +=
+                (attackStrength[i] * int256((attackSeed[0] % 15))) /
+                100;
+            attackStrength[i] -=
+                (attackStrength[i] * int256((attackSeed[1] % 15))) /
+                100;
+        }
+
+        return (attackStrength, attackHealth);
+    }
+
+    function calculateDefenseBattleStats(
+        uint256[] memory shipIds,
+        uint256[] memory buildingsPlanetCount,
+        uint256[] memory attackSeed,
+        uint256 _planetId
+    ) internal returns (int256[3] memory, int256) {
+        int256[3] memory defenseStrength;
+        int256 defenseHealth;
+
+        for (uint256 i = 0; i < shipIds.length; i++) {
+            defenseStrength[0] += int256(
+                s.SpaceShips[shipIds[i]].defenseTypes[0]
+            );
+            defenseStrength[1] += int256(
+                s.SpaceShips[shipIds[i]].defenseTypes[1]
+            );
+            defenseStrength[2] += int256(
+                s.SpaceShips[shipIds[i]].defenseTypes[2]
+            );
+
+            defenseHealth += int256(s.SpaceShips[shipIds[i]].health);
+        }
+
+        //Building metadata type array
+        Building[] memory buildingTypesArray = IBuildings(s.buildingsAddress)
+            .getBuildingTypes(buildingsPlanetCount);
+
+        //@TODO buildings need types as well
+        for (uint256 i = 0; i < buildingsPlanetCount.length; i++) {
+            defenseStrength[0] += int256(
+                buildingsPlanetCount[i] * buildingTypesArray[i].defenseTypes[0]
+            );
+
+            defenseStrength[1] += int256(
+                buildingsPlanetCount[i] * buildingTypesArray[i].defenseTypes[1]
+            );
+
+            defenseStrength[2] += int256(
+                buildingsPlanetCount[i] * buildingTypesArray[i].defenseTypes[2]
+            );
+        }
+
+        for (uint256 i = 0; i < defenseStrength.length; i++) {
+            defenseStrength[i] +=
+                (defenseStrength[i] * int256((attackSeed[2] % 15))) /
+                100;
+            defenseStrength[i] -=
+                (defenseStrength[i] * int256((attackSeed[3] % 15))) /
+                100;
+        }
+
+        return (defenseStrength, defenseHealth);
+    }
+
+    function calculateRandomnessBattle() internal {}
+
     function resolveAttack(uint256 _attackInstanceId) external {
         attackStatus memory attackToResolve = s.runningAttacks[
             _attackInstanceId
@@ -189,92 +278,46 @@ contract FightingFacet is Modifiers {
         uint256[] memory defenderShips = IShips(s.shipsAddress)
             .getDefensePlanet(attackToResolve.toPlanet);
 
-        int256 attackStrength;
+        int256[3] memory attackStrength;
         int256 attackHealth;
 
-        int256 defenseStrength;
+        int256[3] memory defenseStrength;
         int256 defenseHealth;
-        for (uint256 i = 0; i < attackerShips.length; i++) {
-            attackStrength += int256(
-                IShips(s.shipsAddress).getShipStats(attackerShips[i]).attack
-            );
-            attackHealth += int256(
-                IShips(s.shipsAddress).getShipStats(attackerShips[i]).health
-            );
-        }
 
-        for (uint256 i = 0; i < defenderShips.length; i++) {
-            defenseStrength += int256(
-                IShips(s.shipsAddress).getShipStats(defenderShips[i]).attack
-            );
-
-            defenseHealth += int256(
-                IShips(s.shipsAddress).getShipStats(defenderShips[i]).health
-            );
-        }
-
-        //add buildings defense strength
-
-        // Array of BuildingAmounts per BuildingId (ArrayIndex == BuildingTypeId)
+        //load defense buildings
         uint256[] memory buildingsPlanetCount = BuildingsFacet(address(this))
             .getAllBuildings(
                 attackToResolve.toPlanet,
                 IBuildings(s.buildingsAddress).getTotalBuildingTypes()
             );
 
-        //Building metadata type array
-        Building[] memory buildingTypesArray = IBuildings(s.buildingsAddress)
-            .getBuildingTypes(buildingsPlanetCount);
+        //@TODO to be refactored to accomodate new attackTypes / Defense Types
+        (attackStrength, attackHealth) = calculateAttackBattleStats(
+            attackerShips,
+            attackToResolve.attackSeed
+        );
 
-        for (uint256 i = 0; i < buildingsPlanetCount.length; i++) {
-            defenseStrength += int256(
-                buildingsPlanetCount[i] * buildingTypesArray[i].attack
-            );
+        (defenseStrength, defenseHealth) = calculateDefenseBattleStats(
+            defenderShips,
+            buildingsPlanetCount,
+            attackToResolve.attackSeed,
+            attackToResolve.toPlanet
+        );
+
+        //battle calculation
+        int256 battleResult;
+
+        for (uint256 i = 0; i < 3; i++) {
+            //if (attackStrength[i] - defenseStrength[i] > 0) { }
+
+            //weakness modifier by, 15% if the difference between the two is 30% in favour of the attacker
+            if (attackStrength[i] * 7 > defenseStrength[i] * 10) {
+                battleResult += attackStrength[i] - defenseStrength[i];
+                battleResult += ((attackStrength[i] * 15) / 100);
+            } else {
+                battleResult += attackStrength[i] - defenseStrength[i];
+            }
         }
-
-        //every planet has a minimum defense strength, even if its only the spaceship debris of their destroyed fleet blocking the way
-        if (defenseStrength == 0) {
-            defenseStrength += 10;
-        }
-
-        //even a ship without weapons still has its warpdrive ( as demonstrated in the extremely plot-holey star wars movie)
-        if (attackStrength == 0) {
-            attackStrength += 10;
-        }
-
-        //attack strength bonus/malus
-
-        attackStrength +=
-            (attackStrength * int256((attackToResolve.attackSeed[0] % 25))) /
-            100;
-        attackStrength -=
-            (attackStrength * int256((attackToResolve.attackSeed[1] % 25))) /
-            100;
-
-        //defense strength bonus/malus
-
-        //everyone loves an underdog
-        if (defenseStrength * 5 < attackStrength) {
-            defenseStrength +=
-                (defenseStrength *
-                    int256((attackToResolve.attackSeed[2] % 100))) /
-                100;
-            defenseStrength -=
-                (defenseStrength *
-                    int256((attackToResolve.attackSeed[3] % 5))) /
-                100;
-        } else {
-            defenseStrength +=
-                (defenseStrength *
-                    int256((attackToResolve.attackSeed[2] % 25))) /
-                100;
-            defenseStrength -=
-                (defenseStrength *
-                    int256((attackToResolve.attackSeed[3] % 25))) /
-                100;
-        }
-
-        int256 battleResult = attackStrength - defenseStrength;
 
         //attacker has higher atk than defender
         if (battleResult > 0) {
@@ -459,6 +502,14 @@ contract FightingFacet is Modifiers {
 
             counter++;
         }
+
+        return queriedAttacks;
+
+
+
+
+
+
     }
 
     function getAllIncomingAttacksPlayer(address _player)

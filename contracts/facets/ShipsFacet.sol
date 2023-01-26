@@ -42,8 +42,8 @@ contract ShipsFacet is Modifiers {
         uint256 craftedFrom = fleetsContract.getCraftedFrom(_fleetId);
         uint256 buildings = s.buildings[_planetId][craftedFrom];
         require(
-            _amount > 0 && _amount % 1 == 0,
-            "minimum 1, only in 1 increments"
+            _amount > 0 && _amount % 1 == 0 && _amount <= 10,
+            "minimum 1, only in 1 increments, max 10"
         );
         require(craftTime > 0, "ShipsFacet: not released yet");
         require(
@@ -94,16 +94,24 @@ contract ShipsFacet is Modifiers {
 
         for (uint256 i = 0; i < s.craftFleets[_planetId].amount; i++) {
             //@TODO refactor to batchMinting
+
             shipId = IShips(s.shipsAddress).mint(
                 IERC721(s.planetsAddress).ownerOf(_planetId),
                 s.craftFleets[_planetId].itemId
             );
+
+            //assign shipType to shipNFTID on Diamond
+            s.SpaceShips[shipId] = s.shipType[s.craftFleets[_planetId].itemId];
 
             shipTypeId = s.craftFleets[_planetId].itemId;
 
             s.fleets[_planetId][shipTypeId] += 1;
 
             IShips(s.shipsAddress).assignShipToPlanet(shipId, _planetId);
+
+            s.availableModuleSlots[shipId] += s
+                .shipType[s.craftFleets[_planetId].itemId]
+                .moduleSlots;
         }
 
         delete s.craftFleets[_planetId];
@@ -662,7 +670,7 @@ contract ShipsFacet is Modifiers {
         returns (SendTerraform[] memory)
     {
         uint256 totalCount;
-        for (uint256 i = 0; i <= s.sendTerraformId; i++) {
+        for (uint256 i = 0; i < s.sendTerraformId; i++) {
             if (s.sendTerraform[i].toPlanetId == _planetId) {
                 totalCount++;
             }
@@ -674,7 +682,7 @@ contract ShipsFacet is Modifiers {
 
         uint256 counter = 0;
 
-        for (uint256 i = 0; i <= s.sendTerraformId; i++) {
+        for (uint256 i = 0; i < s.sendTerraformId; i++) {
             if (s.sendTerraform[i].toPlanetId == _planetId) {
                 incomingTerraformers[counter] = s.sendTerraform[i];
                 counter++;
@@ -736,5 +744,112 @@ contract ShipsFacet is Modifiers {
         }
 
         return allSendResources;
+    }
+
+    //@TODO crafting shipModules.
+    //@TODO unequipping shipModules.
+
+    function equipShipModule(uint256 _moduleToEquip, uint256 _shipId) external {
+        require(
+            _moduleToEquip <= s.totalAvailableShipModules,
+            "Module Item Id Doesnt exist!"
+        );
+        require(
+            IShips(s.shipsAddress).ownerOf(_shipId) == msg.sender,
+            "not your ship!"
+        );
+
+        uint256 currAssignedPlanet = IShips(s.shipsAddress).checkAssignedPlanet(
+            _shipId
+        );
+
+        require(
+            IERC721(s.planetsAddress).ownerOf(currAssignedPlanet) == msg.sender,
+            "ship is not on an owned planet!"
+        );
+
+        require(s.availableModuleSlots[_shipId] > 0, "all Module slots taken!");
+
+        //currently there is a flat resource price per module. Simple
+
+        require(
+            s.planetResources[currAssignedPlanet][0] >=
+                s.shipModuleType[_moduleToEquip].price[0],
+            "ShipsFacet: not enough metal"
+        );
+        require(
+            s.planetResources[currAssignedPlanet][1] >=
+                s.shipModuleType[_moduleToEquip].price[1],
+            "ShipsFacet: not enough crystal"
+        );
+        require(
+            s.planetResources[currAssignedPlanet][2] >=
+                s.shipModuleType[_moduleToEquip].price[2],
+            "ShipsFacet: not enough ethereus"
+        );
+
+        s.planetResources[currAssignedPlanet][0] -= s
+            .shipModuleType[_moduleToEquip]
+            .price[0];
+        s.planetResources[currAssignedPlanet][1] -= s
+            .shipModuleType[_moduleToEquip]
+            .price[1];
+        s.planetResources[currAssignedPlanet][2] -= s
+            .shipModuleType[_moduleToEquip]
+            .price[2];
+        IERC20(s.metalAddress).burnFrom(
+            address(this),
+            s.shipModuleType[_moduleToEquip].price[0]
+        );
+        IERC20(s.crystalAddress).burnFrom(
+            address(this),
+            s.shipModuleType[_moduleToEquip].price[1]
+        );
+        IERC20(s.ethereusAddress).burnFrom(
+            address(this),
+            s.shipModuleType[_moduleToEquip].price[2]
+        );
+
+        s.equippedShipModuleType[_shipId][
+            s.availableModuleSlots[_shipId] - 1
+        ] = s.shipModuleType[_moduleToEquip];
+
+        s.availableModuleSlots[_shipId] -= 1;
+
+        s.SpaceShips[_shipId].health += s
+            .shipModuleType[_moduleToEquip]
+            .healthBoostStat;
+
+        for (uint256 i = 0; i < 3; i++) {
+            s.SpaceShips[_shipId].attackTypes[i] += s
+                .shipModuleType[_moduleToEquip]
+                .attackBoostStat[i];
+
+            s.SpaceShips[_shipId].attackTypes[i] += s
+                .shipModuleType[_moduleToEquip]
+                .defenseBoostStat[i];
+        }
+    }
+
+    function checkAvailableModuleSlots(uint256 _shipId)
+        external
+        view
+        returns (uint256)
+    {
+        return s.availableModuleSlots[_shipId];
+    }
+
+    function returnEquippedModuleSlots(uint256 _shipId)
+        external
+        view
+        returns (ShipModule[] memory)
+    {
+        uint256 maxModules = s.SpaceShips[_shipId].moduleSlots;
+        ShipModule[] memory currentModules = new ShipModule[](maxModules);
+        for (uint256 i = 0; i < s.SpaceShips[_shipId].moduleSlots; i++) {
+            currentModules[i] = s.equippedShipModuleType[_shipId][i];
+        }
+
+        return currentModules;
     }
 }

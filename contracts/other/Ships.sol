@@ -14,18 +14,22 @@ contract Ships is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         uint256 shipType;
         uint256[3] price; // [metal, crystal, ethereus]
         uint256 attack;
+        uint256[3] attackTypes;
+        uint256[3] defenseTypes;
         uint256 health;
         uint256 cargo;
         uint256 craftTime;
         uint256 craftedFrom;
         string name;
         uint256 moduleSlots;
-        ShipModule[] equippedShipModule;
     }
 
     struct ShipModule {
-        uint256 attackBoostStat;
+        string name;
+        uint256[3] attackBoostStat;
+        uint256[3] defenseBoostStat;
         uint256 healthBoostStat;
+        uint256[3] price;
     }
 
     //what kind of ship each tokenId actually is
@@ -36,6 +40,11 @@ contract Ships is ERC721EnumerableUpgradeable, OwnableUpgradeable {
 
     //ship categories template
     mapping(uint256 => ShipType) public shipType;
+
+    mapping(uint256 => ShipModule) public shipModuleType;
+    //equippedShipModuleTypes
+
+    mapping(uint256 => mapping(uint256 => ShipModule)) equippedShipModuleType;
 
     string private _uri;
 
@@ -194,6 +203,7 @@ contract Ships is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         return (defenseFleetToReturn, defenseFleetShipTypesToReturn);
     }
 
+    //@TODO to be refactored to backend, to accomodate more realtime-traits
     function tokenURI(uint256 _tokenId)
         public
         view
