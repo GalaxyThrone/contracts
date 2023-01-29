@@ -89,4 +89,12 @@ contract RegisterFacet is Modifiers {
     function getRegistered(address _account) external view returns (bool) {
         return s.registered[_account];
     }
+
+    function getPlayersFaction(address _account)
+        external
+        view
+        returns (uint256)
+    {
+        return s.playersFaction[_account];
+    }
 }
