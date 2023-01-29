@@ -20,6 +20,7 @@ import {
 } from "../typechain-types";
 import { addBuildings } from "./addBuildings";
 import { addFleets } from "./addFleets";
+import { addShipModules } from "./addShipModules";
 import { initPlanets } from "./initPlanets";
 
 const {
@@ -204,6 +205,7 @@ export async function deployDiamond() {
   console.log("adding ships");
   await addFleets(ships.address);
   await addFleets(diamond.address);
+  await addShipModules(diamond.address);
 
   console.log("starting init");
   const initPlanets = await adminFacet.startInit(50);

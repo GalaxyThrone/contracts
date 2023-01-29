@@ -235,7 +235,6 @@ contract FightingFacet is Modifiers {
         Building[] memory buildingTypesArray = IBuildings(s.buildingsAddress)
             .getBuildingTypes(buildingsPlanetCount);
 
-        //@TODO buildings need types as well
         for (uint256 i = 0; i < buildingsPlanetCount.length; i++) {
             defenseStrength[0] += int256(
                 buildingsPlanetCount[i] * buildingTypesArray[i].defenseTypes[0]
@@ -504,12 +503,6 @@ contract FightingFacet is Modifiers {
         }
 
         return queriedAttacks;
-
-
-
-
-
-
     }
 
     function getAllIncomingAttacksPlayer(address _player)

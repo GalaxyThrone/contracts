@@ -156,6 +156,8 @@ struct AppStorage {
     mapping(uint256 => uint256) availableModuleSlots;
     // planetId => resource => amount
     mapping(uint256 => mapping(uint256 => uint256)) planetResources;
+    mapping(address => uint256) playersFaction;
+    uint256 availableFactions;
 }
 
 library LibAppStorage {

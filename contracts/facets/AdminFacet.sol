@@ -47,12 +47,16 @@ contract AdminFacet is Modifiers {
         s.shipType[_id] = _newShipType;
     }
 
-    function addShipModuleType(uint256 _id, ShipModule calldata _newShipType)
-        external
-        onlyOwner
-    {
+    function addShipModuleType(
+        uint256 _id,
+        ShipModule calldata _newShipModuleType
+    ) external onlyOwner {
         s.totalAvailableShipModules += 1;
-        s.shipModuleType[_id] = _newShipType;
+        s.shipModuleType[_id] = _newShipModuleType;
+    }
+
+    function addFaction(uint256 _newAmount) external onlyOwner {
+        s.availableFactions = _newAmount;
     }
 
     function drawRandomAttackSeed(uint256 _attackId) external onlySelf {

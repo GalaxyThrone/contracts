@@ -10,12 +10,17 @@ import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 
 contract RegisterFacet is Modifiers {
-    function startRegister() external {
+    function startRegister(uint256 _factionChosen) external {
         require(
             !s.registrationStarted[msg.sender],
             "VRFFacet: already registering"
         );
         require(!s.registered[msg.sender], "VRFFacet: already registered");
+
+        require(
+            _factionChosen <= s.availableFactions,
+            "Faction does not exist!"
+        );
 
         // drawRandomNumbers(msg.sender);
         uint256[] memory _randomness = new uint256[](1);
@@ -31,6 +36,8 @@ contract RegisterFacet is Modifiers {
                 )
             );
         }
+
+        s.playersFaction[msg.sender] = _factionChosen;
         finalizeRegister(msg.sender, _randomness);
     }
 
