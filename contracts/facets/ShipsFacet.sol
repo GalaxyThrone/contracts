@@ -101,7 +101,37 @@ contract ShipsFacet is Modifiers {
             );
 
             //assign shipType to shipNFTID on Diamond
-            s.SpaceShips[shipId] = s.shipType[s.craftFleets[_planetId].itemId];
+
+            ShipType memory newShipType = s.shipType[
+                s.craftFleets[_planetId].itemId
+            ];
+
+            if (
+                s.playersFaction[IERC721(s.planetsAddress).ownerOf(_planetId)] >
+                1
+            ) {} else if (
+                s.playersFaction[
+                    IERC721(s.planetsAddress).ownerOf(_planetId)
+                ] == 0
+            ) {
+                newShipType.attackTypes[2] += ((newShipType.attackTypes[0] *
+                    ((10))) / 100);
+
+                newShipType.defenseTypes[2] += ((newShipType.defenseTypes[0] *
+                    ((10))) / 100);
+            } else if (
+                s.playersFaction[
+                    IERC721(s.planetsAddress).ownerOf(_planetId)
+                ] == 1
+            ) {
+                newShipType.attackTypes[0] += ((newShipType.attackTypes[0] *
+                    ((10))) / 100);
+
+                newShipType.defenseTypes[0] += ((newShipType.defenseTypes[0] *
+                    ((10))) / 100);
+            }
+
+            s.SpaceShips[shipId] = newShipType;
 
             shipTypeId = s.craftFleets[_planetId].itemId;
 
