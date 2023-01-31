@@ -52,6 +52,13 @@ contract ShipsFacet is Modifiers {
         );
         require(buildings > 0, "ShipsFacet: missing building requirement");
         uint256 readyTimestamp = block.timestamp + (craftTime * _amount);
+
+        //Hivemind  Craft-Time Buff.
+        if (s.playersFaction[msg.sender] == 3) {
+            readyTimestamp -=
+                ((block.timestamp + (craftTime * _amount)) * 20) /
+                100;
+        }
         CraftItem memory newFleet = CraftItem(
             _amount,
             _planetId,

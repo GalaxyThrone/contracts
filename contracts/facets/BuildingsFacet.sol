@@ -30,6 +30,14 @@ contract BuildingsFacet is Modifiers {
             "BuildingsFacet: planet already crafting"
         );
         uint256 readyTimestamp = block.timestamp + (craftTime * _amount);
+
+        //Hivemind  Craft-Time Buff.
+        if (s.playersFaction[msg.sender] == 3) {
+            readyTimestamp -=
+                ((block.timestamp + (craftTime * _amount)) * 20) /
+                100;
+        }
+
         CraftItem memory newBuilding = CraftItem(
             _amount,
             _planetId,
