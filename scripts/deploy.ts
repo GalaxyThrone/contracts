@@ -17,6 +17,7 @@ import {
   AutomationFacet,
   AllianceFacet,
   FightingFacet,
+  Aether,
 } from "../typechain-types";
 import { addBuildings } from "./addBuildings";
 import { addFleets } from "./addFleets";
@@ -144,6 +145,13 @@ export async function deployDiamond() {
   ])) as Ethereus;
   await ethereus.deployed();
 
+  console.log("deploying Aether");
+  const Aether = await ethers.getContractFactory("Aether");
+  const aether = (await upgrades.deployProxy(Aether, [
+    diamond.address,
+  ])) as Aether;
+  await aether.deployed();
+
   console.log("deploying Planets");
   const Planets = await ethers.getContractFactory("Planets");
   const planets = (await upgrades.deployProxy(Planets, [
@@ -169,6 +177,7 @@ export async function deployDiamond() {
   console.log(`Metal deployed: ${metal.address}`);
   console.log(`Crystal deployed: ${crystal.address}`);
   console.log(`Ethereus deployed: ${ethereus.address}`);
+  console.log(`Aether deployed: ${aether.address}`);
   console.log(`Planets deployed: ${planets.address}`);
   console.log(`Buildings deployed: ${buildings.address}`);
   console.log(`Ships deployed: ${ships.address}`);
@@ -193,6 +202,7 @@ export async function deployDiamond() {
     crystal.address,
     ethereus.address,
     metal.address,
+    aether.address,
     buildings.address,
     ships.address,
     planets.address,
@@ -208,7 +218,7 @@ export async function deployDiamond() {
   await addShipModules(diamond.address);
 
   console.log("starting init");
-  const initPlanets = await adminFacet.startInit(50);
+  const initPlanets = await adminFacet.startInit(20, 0);
   await initPlanets.wait();
 
   console.log("ALL DONE");

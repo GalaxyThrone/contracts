@@ -12,6 +12,7 @@ contract AdminFacet is Modifiers {
         address _crystal,
         address _ethereus,
         address _metal,
+        address _aether,
         address _buildings,
         address _ships,
         address _planets,
@@ -20,6 +21,7 @@ contract AdminFacet is Modifiers {
         s.crystalAddress = _crystal;
         s.ethereusAddress = _ethereus;
         s.metalAddress = _metal;
+        s.aetherAddress = _aether;
         s.buildingsAddress = _buildings;
         s.shipsAddress = _ships;
         s.planetsAddress = _planets;
@@ -88,7 +90,7 @@ contract AdminFacet is Modifiers {
         s.runningAttacks[_attackId].attackSeed = _randomness;
     }
 
-    function startInit(uint256 _amount) external onlyOwner {
+    function startInit(uint256 _amount, uint8 typeOfPlanet) external onlyOwner {
         require(!s.init, "AdminFacet: already running init");
         s.init = true;
 
@@ -106,12 +108,14 @@ contract AdminFacet is Modifiers {
                 )
             );
         }
-        finalizeInit(_amount, _randomness);
+        finalizeInit(_amount, _randomness, typeOfPlanet);
     }
 
-    function finalizeInit(uint256 _amount, uint256[] memory _randomness)
-        internal
-    {
+    function finalizeInit(
+        uint256 _amount,
+        uint256[] memory _randomness,
+        uint8 typeOfPlanet
+    ) internal {
         for (uint256 i = 0; i < _amount; i++) {
             _randomness[0] = uint256(keccak256(abi.encode(_randomness[0], i)));
             _randomness[1] = uint256(keccak256(abi.encode(_randomness[0], i)));
@@ -131,9 +135,12 @@ contract AdminFacet is Modifiers {
                     metal: metal,
                     crystal: crystal,
                     pvpEnabled: false,
-                    owner: address(this)
+                    owner: address(this),
+                    planetType: typeOfPlanet
                 })
             );
+            s.planetType[s.totalPlanetsAmount];
+            s.totalPlanetsAmount++;
         }
         s.init = false;
     }

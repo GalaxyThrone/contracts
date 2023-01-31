@@ -129,7 +129,7 @@ describe("Game", function () {
     )) as FightingFacet;
   });
   it("Mint planets", async function () {
-    await adminFacet.startInit(50);
+    await adminFacet.startInit(30, 1);
   });
   it("register user and get planet NFT ", async function () {
     const {
@@ -526,6 +526,95 @@ describe("Game", function () {
       randomUserThree,
       AdminUser,
     } = await loadFixture(deployUsers);
+  });
+
+  it("registered user can outmine asteroid belt ", async function () {
+    const {
+      owner,
+      randomUser,
+      randomUserTwo,
+      randomUserThree,
+      AdminUser,
+    } = await loadFixture(deployUsers);
+
+    //@notice actual register function for Tron Network
+    const registration = await vrfFacet
+      .connect(randomUser)
+      .startRegister(0);
+
+    const checkOwnershipAmountPlayer = await planetNfts.balanceOf(
+      randomUser.address
+    );
+
+    const planetId = await planetNfts.tokenOfOwnerByIndex(
+      randomUser.address,
+      0
+    );
+
+    await buildingsFacet
+      .connect(randomUser)
+      .craftBuilding(7, planetId, 1);
+
+    const blockBefore = await ethers.provider.getBlock(
+      await ethers.provider.getBlockNumber()
+    );
+
+    const timestampBefore = blockBefore.timestamp;
+
+    await ethers.provider.send("evm_mine", [timestampBefore + 1200]);
+
+    const claimBuild = await buildingsFacet
+      .connect(randomUser)
+      .claimBuilding(planetId);
+
+    await shipsFacet.connect(randomUser).craftFleet(7, planetId, 1);
+
+    let checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+      randomUser.address
+    );
+
+    expect(checkOwnershipShipsPlayer).to.equal(0);
+
+    await ethers.provider.send("evm_mine", [
+      timestampBefore + 1200 + 12000,
+    ]);
+
+    await shipsFacet.connect(randomUser).claimFleet(planetId);
+
+    checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+      randomUser.address
+    );
+
+    expect(checkOwnershipShipsPlayer).to.equal(1);
+
+    let shipIdPlayer1 = await shipNfts.tokenOfOwnerByIndex(
+      randomUser.address,
+      0
+    );
+
+    const aetherBefore = await buildingsFacet.getAetherPlayer(
+      randomUser.address
+    );
+
+    const sendOutmining = await shipsFacet
+      .connect(randomUser)
+      .startOutMining(planetId, 1, [shipIdPlayer1]);
+
+    await ethers.provider.send("evm_mine", [
+      timestampBefore + 1200 + 36000,
+    ]);
+
+    const resolveOutmining = await shipsFacet
+      .connect(randomUser)
+      .resolveOutMining(1, 0);
+
+    const aetherAfter = await buildingsFacet.getAetherPlayer(
+      randomUser.address
+    );
+
+    expect(aetherAfter).to.be.above(aetherBefore);
+
+    console.log(aetherAfter);
   });
 
   it.skip("chainRunner can mine every 24hours for the user ", async function () {

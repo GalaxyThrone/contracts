@@ -9,11 +9,11 @@ interface IShips {
     function getPrice(uint256 _fleetId)
         external
         view
-        returns (uint256[3] memory);
+        returns (uint256[4] memory);
 
     struct ShipType {
         uint256 shipType;
-        uint256[3] price; // [metal, crystal, ethereus]
+        uint256[4] price; // [metal, crystal, ethereus]
         uint256 attack;
         uint256[3] attackTypes;
         uint256[3] defenseTypes;

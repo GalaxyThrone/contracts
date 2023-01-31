@@ -11,7 +11,7 @@ export interface Building {
 
 export interface ship {
   shipType: BigNumberish;
-  price: [BigNumberish, BigNumberish, BigNumberish];
+  price: [BigNumberish, BigNumberish, BigNumberish, BigNumberish];
   attack: BigNumberish;
   attackTypes: [BigNumberish, BigNumberish, BigNumberish];
   defenseTypes: [BigNumberish, BigNumberish, BigNumberish];

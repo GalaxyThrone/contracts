@@ -50,7 +50,7 @@ struct attackStatus {
 
 struct ShipType {
     uint256 shipType;
-    uint256[3] price; // [metal, crystal, ethereus]
+    uint256[4] price; // [metal, crystal, ethereus]
     uint256 attack;
     uint256[3] attackTypes;
     uint256[3] defenseTypes;
@@ -61,6 +61,7 @@ struct ShipType {
     string name;
     uint256 moduleSlots;
 }
+
 struct Building {
     uint256[3] price; // [metal, crystal, ethereus]
     uint256[3] boosts; // [metal, crystal, ethereus]
@@ -97,6 +98,7 @@ struct AppStorage {
     address crystalAddress;
     address ethereusAddress;
     address metalAddress;
+    address aetherAddress;
     address buildingsAddress;
     address planetsAddress;
     address shipsAddress;
@@ -124,6 +126,9 @@ struct AppStorage {
     // heroId => vrf/reg data
     mapping(uint256 => VrfRequest) vrfRequest;
     mapping(address => bool) registrationStarted;
+    mapping(uint256 => uint8) planetType;
+    uint256 totalPlanetsAmount;
+    mapping(address => uint256) aetherHeldPlayer;
     //VRF
     address vrfCoordinator;
     address linkAddress;

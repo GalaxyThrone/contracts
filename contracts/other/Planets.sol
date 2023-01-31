@@ -14,6 +14,7 @@ contract Planets is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         uint256 crystal;
         bool pvpEnabled;
         address owner;
+        uint8 planetType;
     }
 
     struct attackStatus {
@@ -78,6 +79,7 @@ contract Planets is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         uint256 _resourceId,
         uint256 _amount
     ) external onlyGameDiamond {
+        //@TODO underflow seems possible when mined out.
         if (_resourceId == 0) {
             planets[_planetId].metal -= _amount;
         } else if (_resourceId == 1) {

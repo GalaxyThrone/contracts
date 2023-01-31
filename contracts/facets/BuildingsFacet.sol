@@ -153,6 +153,37 @@ contract BuildingsFacet is Modifiers {
         s.planetResources[_planetId][2] += amountMined;
     }
 
+    function withdrawAether(uint256 _amount) external {
+        require(
+            s.aetherHeldPlayer[msg.sender] >= _amount,
+            "ManagementFacet: Player doesnt hold enough Aether!"
+        );
+
+        s.aetherHeldPlayer[msg.sender] -= _amount;
+
+        IResource(s.aetherAddress).transfer(msg.sender, _amount);
+    }
+
+    //@notice requires Aether Token Approval on the Diamond address!
+    function depositAether(uint256 _amount) external {
+        require(
+            IResource(s.aetherAddress).allowance(msg.sender, address(this)) >=
+                _amount,
+            "increase allowance!"
+        );
+
+        require(
+            IResource(s.aetherAddress).transferFrom(
+                msg.sender,
+                address(this),
+                _amount
+            ),
+            "Transfer failed!"
+        );
+
+        s.aetherHeldPlayer[msg.sender] += _amount;
+    }
+
     //@notice see all running craftbuildings for a planet
     function getCraftBuildings(uint256 _planetId)
         external
@@ -243,5 +274,9 @@ contract BuildingsFacet is Modifiers {
         returns (uint256)
     {
         return s.planetResources[_planetId][_resourceId];
+    }
+
+    function getAetherPlayer(address _address) external view returns (uint256) {
+        return s.aetherHeldPlayer[_address];
     }
 }

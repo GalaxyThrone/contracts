@@ -37,7 +37,7 @@ contract ShipsFacet is Modifiers {
         uint256 _amount
     ) external onlyPlanetOwner(_planetId) {
         IShips fleetsContract = IShips(s.shipsAddress);
-        uint256[3] memory price = fleetsContract.getPrice(_fleetId);
+        uint256[4] memory price = fleetsContract.getPrice(_fleetId);
         uint256 craftTime = fleetsContract.getCraftTime(_fleetId);
         uint256 craftedFrom = fleetsContract.getCraftedFrom(_fleetId);
         uint256 buildings = s.buildings[_planetId][craftedFrom];
@@ -79,12 +79,19 @@ contract ShipsFacet is Modifiers {
             "ShipsFacet: not enough ethereus"
         );
 
+        require(
+            s.aetherHeldPlayer[msg.sender] >= price[3] * _amount,
+            "ShipsFacet: not enough Aether held"
+        );
+
         s.planetResources[_planetId][0] -= price[0] * _amount;
         s.planetResources[_planetId][1] -= price[1] * _amount;
         s.planetResources[_planetId][2] -= price[2] * _amount;
+        s.aetherHeldPlayer[msg.sender] -= price[3] * _amount;
         IERC20(s.metalAddress).burnFrom(address(this), price[0] * _amount);
         IERC20(s.crystalAddress).burnFrom(address(this), price[1] * _amount);
         IERC20(s.ethereusAddress).burnFrom(address(this), price[2] * _amount);
+        IERC20(s.aetherAddress).burnFrom(address(this), price[3] * _amount);
     }
 
     function claimFleet(uint256 _planetId)
@@ -378,6 +385,14 @@ contract ShipsFacet is Modifiers {
         );
     }
 
+    function getCargo(uint256 _shipId) internal view returns (uint256) {
+        return s.SpaceShips[_shipId].cargo;
+    }
+
+    function returnCargo(uint256 _shipId) external view returns (uint256) {
+        return getCargo(_shipId);
+    }
+
     function resolveOutMining(
         uint256 _outMiningId,
         uint256 _optionalReturnPlanet
@@ -393,31 +408,50 @@ contract ShipsFacet is Modifiers {
             uint256 shipType = IShips(s.shipsAddress)
                 .getShipStats(s.outMining[_outMiningId].shipsIds[i])
                 .shipType;
-            uint256 cargo = IShips(s.shipsAddress).getCargo(
-                s.outMining[_outMiningId].shipsIds[i]
-            );
+            uint256 cargo = getCargo(s.outMining[_outMiningId].shipsIds[i]);
             // cargo metal
 
             //@TODO make mining yield random
             //@TODO refactor
-            if (shipType == 7) {
-                IPlanets(s.planetsAddress).mineResource(
-                    s.outMining[_outMiningId].toPlanetId,
-                    0,
-                    cargo
-                );
-                IResource(s.metalAddress).mint(address(this), cargo);
-                s.planetResources[s.outMining[_outMiningId].fromPlanetId][
-                        0
-                    ] += calculatePercentage(cargo, 40);
 
-                s.planetResources[s.outMining[_outMiningId].fromPlanetId][
-                        1
-                    ] += calculatePercentage(cargo, 30);
+            for (uint256 j = 0; j < 4; j++) {
+                uint256 minedAmount = calculatePercentage(cargo, 30);
 
-                s.planetResources[s.outMining[_outMiningId].fromPlanetId][
-                        2
-                    ] += calculatePercentage(cargo, 30);
+                if (j < 3) {
+                    s.planetResources[s.outMining[_outMiningId].fromPlanetId][
+                            j
+                        ] += minedAmount;
+
+                    IPlanets(s.planetsAddress).mineResource(
+                        s.outMining[_outMiningId].toPlanetId,
+                        j,
+                        minedAmount
+                    );
+                } else {
+                    minedAmount = calculatePercentage(cargo, 5);
+
+                    s.aetherHeldPlayer[
+                        IShips(s.shipsAddress).ownerOf(
+                            s.outMining[_outMiningId].shipsIds[0]
+                        )
+                    ] += minedAmount;
+                }
+
+                if (j == 0) {
+                    IResource(s.metalAddress).mint(address(this), minedAmount);
+                } else if (j == 1) {
+                    IResource(s.crystalAddress).mint(
+                        address(this),
+                        minedAmount
+                    );
+                } else if (j == 2) {
+                    IResource(s.ethereusAddress).mint(
+                        address(this),
+                        minedAmount
+                    );
+                } else if (j == 3) {
+                    IResource(s.aetherAddress).mint(address(this), minedAmount);
+                }
             }
 
             IShips(s.shipsAddress).assignShipToPlanet(
