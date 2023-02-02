@@ -1,5 +1,9 @@
 import { ethers } from "hardhat";
-import { Ships, ShipsFacet } from "../typechain-types";
+import {
+  BuildingsFacet,
+  Ships,
+  ShipsFacet,
+} from "../typechain-types";
 import {
   AdminFacet,
   ShipModuleStruct,
@@ -39,4 +43,16 @@ export async function addShipModules(diamondAddr: string) {
       await fleetsContract.addShipModuleType(currMod, module1);
     currMod++;
   }
+}
+
+export async function addFaction(
+  diamondAddr: string,
+  amountFactions: number
+) {
+  let adminFacet = (await ethers.getContractAt(
+    "AdminFacet",
+    diamondAddr
+  )) as AdminFacet;
+
+  await adminFacet.addFaction(amountFactions);
 }

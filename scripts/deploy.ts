@@ -21,7 +21,7 @@ import {
 } from "../typechain-types";
 import { addBuildings } from "./addBuildings";
 import { addFleets } from "./addFleets";
-import { addShipModules } from "./addShipModules";
+import { addFaction, addShipModules } from "./addShipModules";
 import { initPlanets } from "./initPlanets";
 
 const {
@@ -216,6 +216,7 @@ export async function deployDiamond() {
   await addFleets(ships.address);
   await addFleets(diamond.address);
   await addShipModules(diamond.address);
+  await addFaction(diamond.address, 4);
 
   console.log("starting init");
   const initPlanets = await adminFacet.startInit(20, 0);
@@ -253,4 +254,7 @@ if (require.main === module) {
       console.error(error);
       process.exit(1);
     });
+}
+function addFactions(address: string, arg1: number) {
+  throw new Error("Function not implemented.");
 }
