@@ -9,8 +9,8 @@ contract Buildings is ERC1155Upgradeable, OwnableUpgradeable {
     address public gameDiamond;
 
     struct Building {
-        uint256[3] price; // [metal, crystal, ethereus]
-        uint256[3] boosts; // [metal, crystal, ethereus]
+        uint256[3] price; // [metal, crystal, antimatter]
+        uint256[3] boosts; // [metal, crystal, antimatter]
         uint256[3] defenseTypes;
         uint256 health;
         uint256 craftTime;

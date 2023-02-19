@@ -10,7 +10,7 @@ import {
   RegisterFacet,
   Metal,
   Crystal,
-  Ethereus,
+  Antimatter,
   Ships,
   ShipsFacet,
   FightingFacet,
@@ -40,7 +40,7 @@ describe("Game", function () {
   let planetNfts: Planets;
   let metalToken: Metal;
   let crystalToken: Crystal;
-  let ethereusToken: Ethereus;
+  let antimatterToken: Antimatter;
   let buildingNfts: Buildings;
   let shipNfts: Ships;
   let fightingFacet: FightingFacet;
@@ -108,10 +108,10 @@ describe("Game", function () {
       g.metalAddress
     )) as Crystal;
 
-    ethereusToken = (await ethers.getContractAt(
-      "Ethereus",
-      g.ethereusAddress
-    )) as Ethereus;
+    antimatterToken = (await ethers.getContractAt(
+      "Antimatter",
+      g.antimatterAddress
+    )) as Antimatter;
 
     buildingsFacet = (await ethers.getContractAt(
       "BuildingsFacet",

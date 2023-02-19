@@ -8,7 +8,7 @@ import {
   AdminFacet,
   Metal,
   Crystal,
-  Ethereus,
+  Antimatter,
   Planets,
   Ships,
   Buildings,
@@ -138,12 +138,12 @@ export async function deployDiamond() {
   ])) as Crystal;
   await crystal.deployed();
 
-  console.log("deploying Ethereus");
-  const Ethereus = await ethers.getContractFactory("Ethereus");
-  const ethereus = (await upgrades.deployProxy(Ethereus, [
+  console.log("deploying Antimatter");
+  const Antimatter = await ethers.getContractFactory("Antimatter");
+  const antimatter = (await upgrades.deployProxy(Antimatter, [
     diamond.address,
-  ])) as Ethereus;
-  await ethereus.deployed();
+  ])) as Antimatter;
+  await antimatter.deployed();
 
   console.log("deploying Aether");
   const Aether = await ethers.getContractFactory("Aether");
@@ -176,7 +176,7 @@ export async function deployDiamond() {
 
   console.log(`Metal deployed: ${metal.address}`);
   console.log(`Crystal deployed: ${crystal.address}`);
-  console.log(`Ethereus deployed: ${ethereus.address}`);
+  console.log(`Antimatter deployed: ${antimatter.address}`);
   console.log(`Aether deployed: ${aether.address}`);
   console.log(`Planets deployed: ${planets.address}`);
   console.log(`Buildings deployed: ${buildings.address}`);
@@ -200,7 +200,7 @@ export async function deployDiamond() {
   console.log("setting diamond addresses");
   const setAddresses = await adminFacet.setAddresses(
     crystal.address,
-    ethereus.address,
+    antimatter.address,
     metal.address,
     aether.address,
     buildings.address,
@@ -238,7 +238,7 @@ export async function deployDiamond() {
     diamondAddress: diamond.address,
     metalAddress: metal.address,
     crystalAddress: crystal.address,
-    ethereusAddress: ethereus.address,
+    antimatterAddress: antimatter.address,
     buildingsAddress: buildings.address,
     planetsAddress: planets.address,
     shipsAddress: ships.address,

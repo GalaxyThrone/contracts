@@ -50,7 +50,7 @@ struct attackStatus {
 
 struct ShipType {
     uint256 shipType;
-    uint256[4] price; // [metal, crystal, ethereus]
+    uint256[4] price; // [metal, crystal, antimatter]
     uint256 attack;
     uint256[3] attackTypes;
     uint256[3] defenseTypes;
@@ -63,8 +63,8 @@ struct ShipType {
 }
 
 struct Building {
-    uint256[3] price; // [metal, crystal, ethereus]
-    uint256[3] boosts; // [metal, crystal, ethereus]
+    uint256[3] price; // [metal, crystal, antimatter]
+    uint256[3] boosts; // [metal, crystal, antimatter]
     uint256[3] defenseTypes;
     uint256 health;
     uint256 craftTime;
@@ -96,7 +96,7 @@ struct TransferResource {
 
 struct AppStorage {
     address crystalAddress;
-    address ethereusAddress;
+    address antimatterAddress;
     address metalAddress;
     address aetherAddress;
     address buildingsAddress;

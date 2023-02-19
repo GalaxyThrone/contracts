@@ -62,7 +62,7 @@ export async function addBuildings(buildingsAddress: string) {
     defenseTypes: [1, 10, 10],
     health: 0,
     craftTime: 36,
-    name: "Ethereus Miner",
+    name: "Antimatter Miner",
   };
 
   const building5: Building = {

@@ -12,7 +12,7 @@ contract Ships is ERC721EnumerableUpgradeable, OwnableUpgradeable {
 
     struct ShipType {
         uint256 shipType;
-        uint256[4] price; // [metal, crystal, ethereus]
+        uint256[4] price; // [metal, crystal, antimatter]
         uint256 attack;
         uint256[3] attackTypes;
         uint256[3] defenseTypes;

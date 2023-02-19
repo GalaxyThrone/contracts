@@ -55,14 +55,14 @@ contract BuildingsFacet is Modifiers {
         );
         require(
             s.planetResources[_planetId][2] >= price[2] * _amount,
-            "BuildingsFacet: not enough ethereus"
+            "BuildingsFacet: not enough antimatter"
         );
         s.planetResources[_planetId][0] -= price[0] * _amount;
         s.planetResources[_planetId][1] -= price[1] * _amount;
         s.planetResources[_planetId][2] -= price[2] * _amount;
         IERC20(s.metalAddress).burnFrom(address(this), price[0] * _amount);
         IERC20(s.crystalAddress).burnFrom(address(this), price[1] * _amount);
-        IERC20(s.ethereusAddress).burnFrom(address(this), price[2] * _amount);
+        IERC20(s.antimatterAddress).burnFrom(address(this), price[2] * _amount);
     }
 
     function claimBuilding(uint256 _planetId)
@@ -136,7 +136,7 @@ contract BuildingsFacet is Modifiers {
         s.planetResources[_planetId][1] += amountMined;
     }
 
-    function mineEthereus(uint256 _planetId)
+    function mineAntimatter(uint256 _planetId)
         external
         onlyPlanetOwnerOrChainRunner(_planetId)
     {
@@ -149,7 +149,7 @@ contract BuildingsFacet is Modifiers {
         uint256 amountMined = 200 ether + (boost * 1e18);
         IPlanets(s.planetsAddress).mineResource(_planetId, 2, amountMined);
         s.lastClaimed[_planetId][2] = block.timestamp;
-        IResource(s.ethereusAddress).mint(address(this), amountMined);
+        IResource(s.antimatterAddress).mint(address(this), amountMined);
         s.planetResources[_planetId][2] += amountMined;
     }
 

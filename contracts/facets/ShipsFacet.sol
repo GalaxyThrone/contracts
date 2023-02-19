@@ -76,7 +76,7 @@ contract ShipsFacet is Modifiers {
         );
         require(
             s.planetResources[_planetId][2] >= price[2] * _amount,
-            "ShipsFacet: not enough ethereus"
+            "ShipsFacet: not enough antimatter"
         );
 
         require(
@@ -90,7 +90,7 @@ contract ShipsFacet is Modifiers {
         s.aetherHeldPlayer[msg.sender] -= price[3] * _amount;
         IERC20(s.metalAddress).burnFrom(address(this), price[0] * _amount);
         IERC20(s.crystalAddress).burnFrom(address(this), price[1] * _amount);
-        IERC20(s.ethereusAddress).burnFrom(address(this), price[2] * _amount);
+        IERC20(s.antimatterAddress).burnFrom(address(this), price[2] * _amount);
         IERC20(s.aetherAddress).burnFrom(address(this), price[3] * _amount);
     }
 
@@ -445,7 +445,7 @@ contract ShipsFacet is Modifiers {
                         minedAmount
                     );
                 } else if (j == 2) {
-                    IResource(s.ethereusAddress).mint(
+                    IResource(s.antimatterAddress).mint(
                         address(this),
                         minedAmount
                     );
@@ -495,7 +495,7 @@ contract ShipsFacet is Modifiers {
         );
         require(
             s.planetResources[_fromPlanetId][2] >= _resourcesToSend[2],
-            "ShipsFacet: not enough ethereus"
+            "ShipsFacet: not enough antimatter"
         );
         s.planetResources[_fromPlanetId][0] -= _resourcesToSend[0];
         s.planetResources[_fromPlanetId][1] -= _resourcesToSend[1];
@@ -503,7 +503,10 @@ contract ShipsFacet is Modifiers {
 
         IERC20(s.metalAddress).burnFrom(address(this), _resourcesToSend[0]);
         IERC20(s.crystalAddress).burnFrom(address(this), _resourcesToSend[1]);
-        IERC20(s.ethereusAddress).burnFrom(address(this), _resourcesToSend[2]);
+        IERC20(s.antimatterAddress).burnFrom(
+            address(this),
+            _resourcesToSend[2]
+        );
 
         uint256 totalAmount = _resourcesToSend[0] +
             _resourcesToSend[1] +
@@ -856,7 +859,7 @@ contract ShipsFacet is Modifiers {
         require(
             s.planetResources[currAssignedPlanet][2] >=
                 s.shipModuleType[_moduleToEquip].price[2],
-            "ShipsFacet: not enough ethereus"
+            "ShipsFacet: not enough antimatter"
         );
 
         s.planetResources[currAssignedPlanet][0] -= s
@@ -876,7 +879,7 @@ contract ShipsFacet is Modifiers {
             address(this),
             s.shipModuleType[_moduleToEquip].price[1]
         );
-        IERC20(s.ethereusAddress).burnFrom(
+        IERC20(s.antimatterAddress).burnFrom(
             address(this),
             s.shipModuleType[_moduleToEquip].price[2]
         );

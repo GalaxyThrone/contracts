@@ -10,7 +10,7 @@ import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 contract AdminFacet is Modifiers {
     function setAddresses(
         address _crystal,
-        address _ethereus,
+        address _antimatter,
         address _metal,
         address _aether,
         address _buildings,
@@ -19,7 +19,7 @@ contract AdminFacet is Modifiers {
         address _chainRunner
     ) external onlyOwner {
         s.crystalAddress = _crystal;
-        s.ethereusAddress = _ethereus;
+        s.antimatterAddress = _antimatter;
         s.metalAddress = _metal;
         s.aetherAddress = _aether;
         s.buildingsAddress = _buildings;
@@ -124,14 +124,14 @@ contract AdminFacet is Modifiers {
             _randomness[4] = uint256(keccak256(abi.encode(_randomness[0], i)));
             uint256 coordinateX = _randomness[0] % 10000;
             uint256 coordinateY = _randomness[1] % 10000;
-            uint256 ethereus = (_randomness[2] % 100000) * 1e18;
+            uint256 antimatter = (_randomness[2] % 100000) * 1e18;
             uint256 metal = (_randomness[3] % 100000) * 1e18;
             uint256 crystal = (_randomness[4] % 100000) * 1e18;
             IPlanets(s.planetsAddress).mint(
                 IPlanets.Planet({
                     coordinateX: coordinateX,
                     coordinateY: coordinateY,
-                    ethereus: ethereus,
+                    antimatter: antimatter,
                     metal: metal,
                     crystal: crystal,
                     pvpEnabled: false,

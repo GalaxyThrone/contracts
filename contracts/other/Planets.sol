@@ -9,7 +9,7 @@ contract Planets is ERC721EnumerableUpgradeable, OwnableUpgradeable {
     struct Planet {
         uint256 coordinateX;
         uint256 coordinateY;
-        uint256 ethereus;
+        uint256 antimatter;
         uint256 metal;
         uint256 crystal;
         bool pvpEnabled;
@@ -85,7 +85,7 @@ contract Planets is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         } else if (_resourceId == 1) {
             planets[_planetId].crystal -= _amount;
         } else if (_resourceId == 2) {
-            planets[_planetId].ethereus -= _amount;
+            planets[_planetId].antimatter -= _amount;
         }
     }
 

@@ -33,7 +33,7 @@ contract AutomationFacet is Modifiers {
 
         uint256 metalId = 0;
         uint256 crystalId = 1;
-        uint256 ethereusId = 2;
+        uint256 antimatterId = 2;
         uint256 craftShipsId = 3;
         uint256 craftBuildingId = 4;
         uint256 resolveAttacksPath = 5;
@@ -65,10 +65,10 @@ contract AutomationFacet is Modifiers {
                 }
             }
         }
-        //@notice check  claim ethereus
-        if (keccak256(checkData) == keccak256(abi.encode(ethereusId))) {
+        //@notice check  claim antimatter
+        if (keccak256(checkData) == keccak256(abi.encode(antimatterId))) {
             for (uint256 i = 0; i < totalPlanetAmount; i++) {
-                uint256 lastClaimed = s.lastClaimed[i][ethereusId];
+                uint256 lastClaimed = s.lastClaimed[i][antimatterId];
                 if (
                     block.timestamp > lastClaimed + 8 hours && lastClaimed != 0
                 ) {
@@ -116,7 +116,7 @@ contract AutomationFacet is Modifiers {
     {
         uint256 metalId = 0;
         uint256 crystalId = 1;
-        uint256 ethereusId = 2;
+        uint256 antimatterId = 2;
         uint256 craftShipsId = 3;
         uint256 craftBuildingPath = 4;
         uint256 resolveAttacksPath = 5;
@@ -133,9 +133,9 @@ contract AutomationFacet is Modifiers {
         if (block.timestamp > lastClaimed + 8 hours) {
             BuildingsFacet(address(this)).mineCrystal(planetId);
         }
-        lastClaimed = s.lastClaimed[planetId][ethereusId];
+        lastClaimed = s.lastClaimed[planetId][antimatterId];
         if (block.timestamp > lastClaimed + 8 hours) {
-            BuildingsFacet(address(this)).mineEthereus(planetId);
+            BuildingsFacet(address(this)).mineAntimatter(planetId);
         }
 
         //@notice check if buildings are available

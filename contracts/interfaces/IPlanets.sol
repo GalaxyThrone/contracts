@@ -6,7 +6,7 @@ interface IPlanets {
     struct Planet {
         uint256 coordinateX;
         uint256 coordinateY;
-        uint256 ethereus;
+        uint256 antimatter;
         uint256 metal;
         uint256 crystal;
         bool pvpEnabled;
