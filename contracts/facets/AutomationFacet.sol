@@ -31,9 +31,8 @@ contract AutomationFacet is Modifiers {
     {
         // path check if buildings are ready to claim
 
-        uint256 metalId = 0;
-        uint256 crystalId = 1;
-        uint256 antimatterId = 2;
+        uint256 resourceId = 0;
+
         uint256 craftShipsId = 3;
         uint256 craftBuildingId = 4;
         uint256 resolveAttacksPath = 5;
@@ -44,9 +43,9 @@ contract AutomationFacet is Modifiers {
         //@TODO  to be refactored to return arrays to avoid starvation later on.
 
         //@notice check claim metal
-        if (keccak256(checkData) == keccak256(abi.encode(metalId))) {
+        if (keccak256(checkData) == keccak256(abi.encode(resourceId))) {
             for (uint256 i = 0; i < totalPlanetAmount; i++) {
-                uint256 lastClaimed = s.lastClaimed[i][metalId];
+                uint256 lastClaimed = s.lastClaimed[i];
                 if (
                     block.timestamp > lastClaimed + 8 hours && lastClaimed != 0
                 ) {
@@ -54,28 +53,7 @@ contract AutomationFacet is Modifiers {
                 }
             }
         }
-        //@notice check  claim crystal
-        if (keccak256(checkData) == keccak256(abi.encode(crystalId))) {
-            for (uint256 i = 0; i < totalPlanetAmount; i++) {
-                uint256 lastClaimed = s.lastClaimed[i][crystalId];
-                if (
-                    block.timestamp > lastClaimed + 8 hours && lastClaimed != 0
-                ) {
-                    return (true, abi.encode(i));
-                }
-            }
-        }
-        //@notice check  claim antimatter
-        if (keccak256(checkData) == keccak256(abi.encode(antimatterId))) {
-            for (uint256 i = 0; i < totalPlanetAmount; i++) {
-                uint256 lastClaimed = s.lastClaimed[i][antimatterId];
-                if (
-                    block.timestamp > lastClaimed + 8 hours && lastClaimed != 0
-                ) {
-                    return (true, abi.encode(i));
-                }
-            }
-        }
+
         //@notice check  claim buildings
         if (keccak256(checkData) == keccak256(abi.encode(craftBuildingId))) {
             for (uint256 i = 0; i < totalPlanetAmount; i++) {
@@ -114,9 +92,8 @@ contract AutomationFacet is Modifiers {
         external
         onlyChainRunner
     {
-        uint256 metalId = 0;
-        uint256 crystalId = 1;
-        uint256 antimatterId = 2;
+        uint256 resourceId = 0;
+
         uint256 craftShipsId = 3;
         uint256 craftBuildingPath = 4;
         uint256 resolveAttacksPath = 5;
@@ -124,18 +101,10 @@ contract AutomationFacet is Modifiers {
         uint256 planetId = abi.decode(performData, (uint256));
 
         //@notice check all mining available on the planet;
-        uint256 lastClaimed = s.lastClaimed[planetId][metalId];
+        uint256 lastClaimed = s.lastClaimed[planetId];
 
         if (block.timestamp > lastClaimed + 8 hours) {
-            BuildingsFacet(address(this)).mineMetal(planetId);
-        }
-        lastClaimed = lastClaimed = s.lastClaimed[planetId][crystalId];
-        if (block.timestamp > lastClaimed + 8 hours) {
-            BuildingsFacet(address(this)).mineCrystal(planetId);
-        }
-        lastClaimed = s.lastClaimed[planetId][antimatterId];
-        if (block.timestamp > lastClaimed + 8 hours) {
-            BuildingsFacet(address(this)).mineAntimatter(planetId);
+            BuildingsFacet(address(this)).mineResources(planetId);
         }
 
         //@notice check if buildings are available

@@ -196,7 +196,7 @@ describe("Game", function () {
       0
     );
 
-    await buildingsFacet.connect(randomUser).mineMetal(planetId);
+    await buildingsFacet.connect(randomUser).mineResources(planetId);
 
     const balanceAfterMining =
       await buildingsFacet.getPlanetResources(planetId, 0);
@@ -634,6 +634,6 @@ describe("Game", function () {
       network
     );
 
-    await buildingsFacet.mineMetal(16);
+    await buildingsFacet.mineResources(16);
   });
 });

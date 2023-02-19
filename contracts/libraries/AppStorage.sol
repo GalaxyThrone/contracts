@@ -141,8 +141,8 @@ struct AppStorage {
     mapping(uint256 => mapping(uint256 => uint256)) buildings;
     // planetId => resource => boost
     mapping(uint256 => mapping(uint256 => uint256)) boosts;
-    // planetId => resource => lastClaimed
-    mapping(uint256 => mapping(uint256 => uint256)) lastClaimed;
+    // planetId => lastClaimed
+    mapping(uint256 => uint256) lastClaimed;
     //shipId => planetId
     mapping(uint256 => uint256) assignedPlanet;
     //ship categories template

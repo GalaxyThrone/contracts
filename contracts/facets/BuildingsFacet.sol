@@ -102,55 +102,42 @@ contract BuildingsFacet is Modifiers {
         }
     }
 
-    function mineMetal(uint256 _planetId)
+    //@notice
+    //replaces mineMetal, mineCrystal, mineAntimatter
+    function mineResources(uint256 _planetId)
         external
         onlyPlanetOwnerOrChainRunner(_planetId)
     {
-        uint256 lastClaimed = s.lastClaimed[_planetId][0];
-        require(
-            block.timestamp > lastClaimed + 8 hours,
-            "BuildingsFacet: 8 hour cooldown"
-        );
-        uint256 boost = s.boosts[_planetId][0];
-        uint256 amountMined = 500 ether + (boost * 1e18);
-        IPlanets(s.planetsAddress).mineResource(_planetId, 0, amountMined);
-        s.lastClaimed[_planetId][0] = block.timestamp;
-        IResource(s.metalAddress).mint(address(this), amountMined);
-        s.planetResources[_planetId][0] += amountMined;
-    }
+        uint256 lastClaimed = s.lastClaimed[_planetId];
 
-    function mineCrystal(uint256 _planetId)
-        external
-        onlyPlanetOwnerOrChainRunner(_planetId)
-    {
-        uint256 lastClaimed = s.lastClaimed[_planetId][1];
         require(
             block.timestamp > lastClaimed + 8 hours,
             "BuildingsFacet: 8 hour cooldown"
         );
-        uint256 boost = s.boosts[_planetId][1];
-        uint256 amountMined = 300 ether + (boost * 1e18);
-        IPlanets(s.planetsAddress).mineResource(_planetId, 1, amountMined);
-        s.lastClaimed[_planetId][1] = block.timestamp;
-        IResource(s.crystalAddress).mint(address(this), amountMined);
-        s.planetResources[_planetId][1] += amountMined;
-    }
 
-    function mineAntimatter(uint256 _planetId)
-        external
-        onlyPlanetOwnerOrChainRunner(_planetId)
-    {
-        uint256 lastClaimed = s.lastClaimed[_planetId][2];
-        require(
-            block.timestamp > lastClaimed + 8 hours,
-            "BuildingsFacet: 8 hour cooldown"
-        );
-        uint256 boost = s.boosts[_planetId][2];
-        uint256 amountMined = 200 ether + (boost * 1e18);
-        IPlanets(s.planetsAddress).mineResource(_planetId, 2, amountMined);
-        s.lastClaimed[_planetId][2] = block.timestamp;
-        IResource(s.antimatterAddress).mint(address(this), amountMined);
-        s.planetResources[_planetId][2] += amountMined;
+        for (uint256 i = 0; i < 3; i++) {
+            uint256 boost = s.boosts[_planetId][i];
+            uint256 amountMined = 500 ether + (boost * 1e18);
+            IPlanets(s.planetsAddress).mineResource(_planetId, i, amountMined);
+
+            //I know its hacky, but loading the resource contract addresses in an array is more gas intensive
+
+            if (i == 0) {
+                IResource(s.metalAddress).mint(address(this), amountMined);
+            }
+
+            if (i == 1) {
+                IResource(s.crystalAddress).mint(address(this), amountMined);
+            }
+
+            if (i == 2) {
+                IResource(s.antimatterAddress).mint(address(this), amountMined);
+            }
+
+            s.planetResources[_planetId][i] += amountMined;
+        }
+
+        s.lastClaimed[_planetId] = block.timestamp;
     }
 
     function withdrawAether(uint256 _amount) external {
@@ -257,7 +244,7 @@ contract BuildingsFacet is Modifiers {
         view
         returns (uint256)
     {
-        return s.lastClaimed[_planetId][_resourceId];
+        return s.lastClaimed[_planetId];
     }
 
     function getBoost(uint256 _planetId, uint256 _resourceId)
