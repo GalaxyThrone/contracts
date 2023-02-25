@@ -65,17 +65,8 @@ contract FightingFacet is Modifiers {
         //unassign ships during attack
         unAssignNewShipTypeAmount(_fromPlanetId, _shipIds);
 
-        //refactor to  an internal func
-
-        (uint256 fromX, uint256 fromY) = IPlanets(s.planetsAddress)
-            .getCoordinates(_fromPlanetId);
-        (uint256 toX, uint256 toY) = IPlanets(s.planetsAddress).getCoordinates(
-            _toPlanetId
-        );
-
-        uint256 xDist = fromX > toX ? fromX - toX : toX - fromX;
-        uint256 yDist = fromY > toY ? fromY - toY : toY - fromY;
-        uint256 distance = xDist + yDist;
+        //to be deleted later @TODO
+        uint256 distance = 420;
 
         attackStatus memory attackToBeAdded;
 
@@ -83,7 +74,11 @@ contract FightingFacet is Modifiers {
 
         attackToBeAdded.distance = distance;
 
-        attackToBeAdded.timeToBeResolved = block.timestamp + 180; // minimum 3mins test ( to ensure VRF called back in time)
+        attackToBeAdded.timeToBeResolved = calculateTravelTime(
+            _fromPlanetId,
+            _toPlanetId,
+            s.playersFaction[msg.sender]
+        );
 
         attackToBeAdded.fromPlanet = _fromPlanetId;
 
@@ -101,7 +96,7 @@ contract FightingFacet is Modifiers {
         emit AttackSent(s.sendAttackId, _toPlanetId, msg.sender);
     }
 
-    //@TODO currently instantenous for hackathon.
+    //@TODO currently instantenous for pre-alpha
     //@notice perhaps require a specific building for instantenous travel / normal travel for others>
 
     function sendFriendlies(
@@ -589,6 +584,27 @@ contract FightingFacet is Modifiers {
         }
 
         return incomingAttacks;
+    }
+
+    function calculateTravelTime(
+        uint256 _from,
+        uint256 _to,
+        uint256 factionOfPlayer
+    ) internal returns (uint256) {
+        (uint256 fromX, uint256 fromY) = IPlanets(s.planetsAddress)
+            .getCoordinates(_from);
+        (uint256 toX, uint256 toY) = IPlanets(s.planetsAddress).getCoordinates(
+            _to
+        );
+        uint256 xDist = fromX > toX ? fromX - toX : toX - fromX;
+        uint256 yDist = fromY > toY ? fromY - toY : toY - fromY;
+
+        uint256 arrivalTime = xDist + yDist + block.timestamp;
+        if (factionOfPlayer == 2) {
+            arrivalTime -= (((xDist + yDist) * 30) / 100);
+        }
+
+        return arrivalTime;
     }
 
     //@notice deprecated view function for now

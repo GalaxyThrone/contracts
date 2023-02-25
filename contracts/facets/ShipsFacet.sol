@@ -261,14 +261,11 @@ contract ShipsFacet is Modifiers {
             "planet already terraformed!"
         );
 
-        (uint256 fromX, uint256 fromY) = IPlanets(s.planetsAddress)
-            .getCoordinates(_fromPlanetId);
-        (uint256 toX, uint256 toY) = IPlanets(s.planetsAddress).getCoordinates(
-            _toPlanetId
+        uint256 arrivalTime = calculateTravelTime(
+            _fromPlanetId,
+            _toPlanetId,
+            s.playersFaction[msg.sender]
         );
-        uint256 xDist = fromX > toX ? fromX - toX : toX - fromX;
-        uint256 yDist = fromY > toY ? fromY - toY : toY - fromY;
-        uint256 arrivalTime = xDist + yDist + block.timestamp;
 
         s.sendTerraformId++;
 
@@ -358,14 +355,11 @@ contract ShipsFacet is Modifiers {
             IShips(s.shipsAddress).deleteShipFromPlanet(_shipIds[i]);
         }
 
-        (uint256 fromX, uint256 fromY) = IPlanets(s.planetsAddress)
-            .getCoordinates(_fromPlanetId);
-        (uint256 toX, uint256 toY) = IPlanets(s.planetsAddress).getCoordinates(
-            _toPlanetId
+        uint256 arrivalTime = calculateTravelTime(
+            _fromPlanetId,
+            _toPlanetId,
+            s.playersFaction[msg.sender]
         );
-        uint256 xDist = fromX > toX ? fromX - toX : toX - fromX;
-        uint256 yDist = fromY > toY ? fromY - toY : toY - fromY;
-        uint256 arrivalTime = xDist + yDist + block.timestamp;
 
         OutMining memory newOutMining = OutMining(
             _fromPlanetId,
@@ -540,14 +534,11 @@ contract ShipsFacet is Modifiers {
             }
         }
 
-        (uint256 fromX, uint256 fromY) = IPlanets(s.planetsAddress)
-            .getCoordinates(_fromPlanetId);
-        (uint256 toX, uint256 toY) = IPlanets(s.planetsAddress).getCoordinates(
-            _toPlanetId
+        uint256 arrivalTime = calculateTravelTime(
+            _fromPlanetId,
+            _toPlanetId,
+            s.playersFaction[msg.sender]
         );
-        uint256 xDist = fromX > toX ? fromX - toX : toX - fromX;
-        uint256 yDist = fromY > toY ? fromY - toY : toY - fromY;
-        uint256 arrivalTime = xDist + yDist + block.timestamp;
         TransferResource memory newTransferResource = TransferResource(
             _fromPlanetId,
             _toPlanetId,
@@ -736,6 +727,27 @@ contract ShipsFacet is Modifiers {
         returns (bytes32)
     {
         return s.allianceOfPlayer[_playerToCheck];
+    }
+
+    function calculateTravelTime(
+        uint256 _from,
+        uint256 _to,
+        uint256 factionOfPlayer
+    ) internal returns (uint256) {
+        (uint256 fromX, uint256 fromY) = IPlanets(s.planetsAddress)
+            .getCoordinates(_from);
+        (uint256 toX, uint256 toY) = IPlanets(s.planetsAddress).getCoordinates(
+            _to
+        );
+        uint256 xDist = fromX > toX ? fromX - toX : toX - fromX;
+        uint256 yDist = fromY > toY ? fromY - toY : toY - fromY;
+
+        uint256 arrivalTime = xDist + yDist + block.timestamp;
+        if (factionOfPlayer == 2) {
+            arrivalTime -= (((xDist + yDist) * 30) / 100);
+        }
+
+        return arrivalTime;
     }
 
     function showIncomingTerraformersPlanet(uint256 _planetId)
