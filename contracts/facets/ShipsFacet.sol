@@ -272,8 +272,6 @@ contract ShipsFacet is Modifiers {
             s.playersFaction[msg.sender]
         );
 
-        s.sendTerraformId++;
-
         SendTerraform memory newSendTerraform = SendTerraform(
             s.sendTerraformId,
             _fromPlanetId,
@@ -289,6 +287,7 @@ contract ShipsFacet is Modifiers {
         IShips(s.shipsAddress).deleteShipFromPlanet(_shipId);
         unAssignNewShipTypeIdAmount(_fromPlanetId, _shipId);
         emit SendTerraformer(_toPlanetId, arrivalTime, s.sendTerraformId);
+        s.sendTerraformId++;
     }
 
     //@notice resolve arrival of terraformer
@@ -776,6 +775,21 @@ contract ShipsFacet is Modifiers {
         return arrivalTime;
     }
 
+    //@notice should multiple terraformings be possible? counterplay?
+
+    function showIncomingTerraformersPlanet2(uint256 _planetId)
+        external
+        view
+        returns (SendTerraform memory)
+    {
+        uint256 totalCount;
+        for (uint256 i = 0; i < s.sendTerraformId; i++) {
+            if (s.sendTerraform[i].toPlanetId == _planetId) {
+                return s.sendTerraform[i];
+            }
+        }
+    }
+
     function showIncomingTerraformersPlanet(uint256 _planetId)
         external
         view
@@ -802,6 +816,14 @@ contract ShipsFacet is Modifiers {
         }
 
         return incomingTerraformers;
+    }
+
+    function showTerraformingInstance(uint256 _idToCheck)
+        external
+        view
+        returns (SendTerraform memory)
+    {
+        return s.sendTerraform[_idToCheck];
     }
 
     function getAllOutMining(uint256 _planetId)

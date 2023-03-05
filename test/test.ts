@@ -1182,6 +1182,109 @@ describe("Game", function () {
     );
   });
 
+  it("User can terraform uninhabited planet", async function () {
+    const {
+      owner,
+      randomUser,
+      randomUserTwo,
+      randomUserThree,
+      AdminUser,
+    } = await loadFixture(deployUsers);
+
+    //@notice actual register function for Tron Network
+    const registration = await vrfFacet
+      .connect(randomUser)
+      .startRegister(0);
+
+    const checkOwnershipAmountPlayer = await planetNfts.balanceOf(
+      randomUser.address
+    );
+
+    const planetId = await planetNfts.tokenOfOwnerByIndex(
+      randomUser.address,
+      0
+    );
+
+    await buildingsFacet
+      .connect(randomUser)
+      .craftBuilding(7, planetId, 1);
+
+    const blockBefore = await ethers.provider.getBlock(
+      await ethers.provider.getBlockNumber()
+    );
+
+    const timestampBefore = blockBefore.timestamp;
+
+    await ethers.provider.send("evm_mine", [timestampBefore + 1200]);
+
+    const claimBuild = await buildingsFacet
+      .connect(randomUser)
+      .claimBuilding(planetId);
+
+    await shipsFacet.connect(randomUser).craftFleet(9, planetId, 1);
+
+    let checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+      randomUser.address
+    );
+
+    expect(checkOwnershipShipsPlayer).to.equal(0);
+
+    await ethers.provider.send("evm_mine", [
+      timestampBefore + 1200 + 12000,
+    ]);
+
+    await shipsFacet.connect(randomUser).claimFleet(planetId);
+
+    checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+      randomUser.address
+    );
+
+    expect(checkOwnershipShipsPlayer).to.equal(1);
+
+    let shipIdPlayer1 = await shipNfts.tokenOfOwnerByIndex(
+      randomUser.address,
+      0
+    );
+
+    const planetToTerraform = 10;
+    const sendTerraformingShip = await shipsFacet
+      .connect(randomUser)
+      .sendTerraform(planetId, planetToTerraform, shipIdPlayer1);
+
+    const currentTerraform = await shipsFacet
+      .connect(randomUser)
+      .showIncomingTerraformersPlanet(planetToTerraform);
+
+    console.log(currentTerraform);
+
+    const blockTwo = await ethers.provider.getBlock(
+      await ethers.provider.getBlockNumber()
+    );
+
+    const blockTwoTime = blockTwo.timestamp;
+
+    await ethers.provider.send("evm_mine", [
+      blockTwoTime + 1200 + 120000,
+    ]);
+
+    checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+      randomUser.address
+    );
+
+    expect(checkOwnershipShipsPlayer).to.equal(1);
+
+    const endTerraforming = await await shipsFacet
+      .connect(randomUser)
+      .endTerraform(0);
+
+    //@planet should be owned by player 1 now
+    const planetsOwnedPlayer1 = await planetNfts.balanceOf(
+      randomUser.address
+    );
+
+    expect(planetsOwnedPlayer1).to.equal(2);
+  });
+
   it.skip("chainRunner can mine every 24hours for the user ", async function () {
     const {
       owner,
