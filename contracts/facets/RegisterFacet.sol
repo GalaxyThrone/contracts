@@ -64,6 +64,10 @@ contract RegisterFacet is Modifiers {
             uint256 tokenId = uint256(
                 bytes32(abi.encodePacked(_randomness[0], i))
             ) % totalSupply;
+
+            //@TODO  @Marco && !checkAsteroidBeltType(tokenId)  makes all the tests really buggy, would need help.
+            //@notice I dont want users getting asteroid belts planetTypes when registering
+
             if (IERC721(s.planetsAddress).ownerOf(tokenId) == address(this)) {
                 IERC721(s.planetsAddress).safeTransferFrom(
                     address(this),
@@ -84,6 +88,18 @@ contract RegisterFacet is Modifiers {
         if (!s.registered[msg.sender]) {
             s.registrationStarted[_player] = false;
         }
+    }
+
+    function checkAsteroidBeltType(uint256 _planetId)
+        internal
+        view
+        returns (bool)
+    {
+        if (s.planetType[_planetId] == 1) {
+            return true;
+        }
+
+        return false;
     }
 
     function getRegistered(address _account) external view returns (bool) {

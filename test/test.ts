@@ -1277,11 +1277,10 @@ describe("Game", function () {
       .connect(randomUser)
       .endTerraform(0);
 
-    //@planet should be owned by player 1 now
     const planetsOwnedPlayer1 = await planetNfts.balanceOf(
       randomUser.address
     );
-
+    //player should have two planets now.
     expect(planetsOwnedPlayer1).to.equal(2);
   });
 
