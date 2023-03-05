@@ -160,20 +160,6 @@ describe("Game", function () {
     );
 
     expect(checkOwnershipAmountPlayer).to.equal(1);
-
-    /*
-    console.log(checkOwnershipAmountPlayer);
-
-    console.log(checkOwnershipAmountPlayer);
-    const expr = await planetNfts.planets(1);
-    console.log("Planet1 Data:");
-    console.log(expr);
-
-    const expr2 = await planetNfts.planets(2);
-    console.log("Planet2 Data:");
-    console.log(expr2);
-
-    */
   });
 
   it("registered user can mine metal every 24hours ", async function () {
@@ -488,7 +474,17 @@ describe("Game", function () {
     expect(planetsOwnedPlayer1).to.equal(2);
   });
 
-  it("registered user attack other user and lose ", async function () {
+  it("registered user attacks other user and lose ", async function () {
+    const {
+      owner,
+      randomUser,
+      randomUserTwo,
+      randomUserThree,
+      AdminUser,
+    } = await loadFixture(deployUsers);
+  });
+
+  it("registered user can send friendly ships to his alliance member", async function () {
     const {
       owner,
       randomUser,
@@ -499,23 +495,192 @@ describe("Game", function () {
   });
 
   it("registered user can send friendly ships to his owned planet ", async function () {
-    const {
-      owner,
-      randomUser,
-      randomUserTwo,
-      randomUserThree,
-      AdminUser,
-    } = await loadFixture(deployUsers);
-  });
+    {
+      const {
+        owner,
+        randomUser,
+        randomUserTwo,
+        randomUserThree,
+        AdminUser,
+      } = await loadFixture(deployUsers);
 
-  it("registered user can send friendly ships to his alliance member ", async function () {
-    const {
-      owner,
-      randomUser,
-      randomUserTwo,
-      randomUserThree,
-      AdminUser,
-    } = await loadFixture(deployUsers);
+      //create two opponents
+
+      await vrfFacet.connect(randomUser).startRegister(0);
+      await vrfFacet.connect(randomUserTwo).startRegister(0);
+
+      const planetIdPlayer1 = await planetNfts.tokenOfOwnerByIndex(
+        randomUser.address,
+        0
+      );
+
+      const planetIdPlayer2 = await planetNfts.tokenOfOwnerByIndex(
+        randomUserTwo.address,
+        0
+      );
+
+      await buildingsFacet
+        .connect(randomUser)
+        .craftBuilding(7, planetIdPlayer1, 1);
+
+      let blockBefore = await ethers.provider.getBlock(
+        await ethers.provider.getBlockNumber()
+      );
+
+      let timestampBefore = blockBefore.timestamp;
+
+      await ethers.provider.send("evm_mine", [
+        timestampBefore + 1200,
+      ]);
+
+      let claimBuild = await buildingsFacet
+        .connect(randomUser)
+        .claimBuilding(planetIdPlayer1);
+
+      let shipAmountToCraft = 2;
+      await shipsFacet
+        .connect(randomUser)
+        .craftFleet(6, planetIdPlayer1, shipAmountToCraft);
+
+      let checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+        randomUser.address
+      );
+
+      expect(checkOwnershipShipsPlayer).to.equal(0);
+
+      await ethers.provider.send("evm_mine", [
+        timestampBefore + 1200 + 1200,
+      ]);
+
+      await shipsFacet
+        .connect(randomUser)
+        .claimFleet(planetIdPlayer1);
+
+      checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+        randomUser.address
+      );
+
+      expect(checkOwnershipShipsPlayer).to.equal(shipAmountToCraft);
+
+      //@notice player two
+      await buildingsFacet
+        .connect(randomUserTwo)
+        .craftBuilding(7, planetIdPlayer2, 1);
+
+      blockBefore = await ethers.provider.getBlock(
+        await ethers.provider.getBlockNumber()
+      );
+
+      timestampBefore = blockBefore.timestamp;
+
+      await ethers.provider.send("evm_mine", [
+        timestampBefore + 1200,
+      ]);
+
+      claimBuild = await buildingsFacet
+        .connect(randomUserTwo)
+        .claimBuilding(planetIdPlayer2);
+
+      await shipsFacet
+        .connect(randomUserTwo)
+        .craftFleet(1, planetIdPlayer2, 1);
+
+      checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+        randomUserTwo.address
+      );
+
+      expect(checkOwnershipShipsPlayer).to.equal(0);
+
+      await ethers.provider.send("evm_mine", [
+        timestampBefore + 1200 + 1200,
+      ]);
+
+      await shipsFacet
+        .connect(randomUserTwo)
+        .claimFleet(planetIdPlayer2);
+
+      checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+        randomUserTwo.address
+      );
+
+      expect(checkOwnershipShipsPlayer).to.equal(1);
+
+      const player1Fleet = await shipNfts.getDefensePlanet(
+        planetIdPlayer1
+      );
+
+      const player2Fleet = await shipNfts.getDefensePlanet(
+        planetIdPlayer2
+      );
+
+      //@user1 attacks user2
+
+      let shipIdPlayer1 = await shipNfts.tokenOfOwnerByIndex(
+        randomUser.address,
+        0
+      );
+
+      let shipIdPlayer1Reinforcement =
+        await shipNfts.tokenOfOwnerByIndex(randomUser.address, 1);
+
+      await fightingFacet
+        .connect(randomUser)
+        .sendAttack(planetIdPlayer1, planetIdPlayer2, [
+          shipIdPlayer1,
+        ]);
+
+      await ethers.provider.send("evm_mine", [
+        timestampBefore + 48000,
+      ]);
+
+      // //@notice we get the instance Id from the event on the planet contract (attackInitated);
+      const attackResolveReceipt = await fightingFacet
+        .connect(randomUser)
+        .resolveAttack(1);
+      const result = attackResolveReceipt.wait();
+
+      // console.log(await (await result).events);
+      // const checkAtkship = await shipNfts.getShipStats(0);
+
+      //@notice user2 defense ships should be burned
+
+      checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+        randomUser.address
+      );
+
+      expect(checkOwnershipShipsPlayer).to.equal(shipAmountToCraft);
+
+      checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+        randomUserTwo.address
+      );
+
+      expect(checkOwnershipShipsPlayer).to.equal(0);
+
+      //@planet should be owned by player 1 now
+      const planetsOwnedPlayer1 = await planetNfts.balanceOf(
+        randomUser.address
+      );
+
+      expect(planetsOwnedPlayer1).to.equal(2);
+
+      const getShipsOnPlanetBefore = await shipNfts.getDefensePlanet(
+        planetIdPlayer2
+      );
+
+      const sendReinforcementsToPlanet = await fightingFacet
+        .connect(randomUser)
+        .sendFriendlies(planetIdPlayer1, planetIdPlayer2, [
+          shipIdPlayer1Reinforcement,
+        ]);
+
+      const getShipsOnPlanetAfter = await shipNfts.getDefensePlanet(
+        planetIdPlayer2
+      );
+
+      expect(getShipsOnPlanetAfter.length).to.be.above(
+        getShipsOnPlanetBefore.length
+      );
+    }
   });
 
   it("registered user can create an alliance & invite members ", async function () {
@@ -714,9 +879,6 @@ describe("Game", function () {
       .connect(randomUser)
       .getPlanetAmount();
 
-    console.log("amount:");
-    console.log(planetAmount);
-
     const resolveOutmining = await shipsFacet
       .connect(randomUser)
       .resolveOutMining(1, 0);
@@ -733,7 +895,6 @@ describe("Game", function () {
     expect(aetherAfter).to.be.equal(aetherBefore);
 
     expect(metalAfter).to.be.above(metalBefore);
-    console.log(aetherAfter);
   });
 
   it("User can withdraw Aether to receive the ERC20-Tokens in their wallet", async function () {

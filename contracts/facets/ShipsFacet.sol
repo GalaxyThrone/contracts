@@ -261,6 +261,11 @@ contract ShipsFacet is Modifiers {
             "planet already terraformed!"
         );
 
+        require(
+            s.planetType[_toPlanetId] != 1,
+            "Asteroid Belts cannot be terraformed!"
+        );
+
         uint256 arrivalTime = calculateTravelTime(
             _fromPlanetId,
             _toPlanetId,
