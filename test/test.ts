@@ -14,6 +14,7 @@ import {
   Ships,
   ShipsFacet,
   FightingFacet,
+  Aether,
 } from "../typechain-types";
 import { BigNumber } from "ethers";
 import { impersonate } from "../scripts/helperFunctions";
@@ -41,6 +42,8 @@ describe("Game", function () {
   let metalToken: Metal;
   let crystalToken: Crystal;
   let antimatterToken: Antimatter;
+
+  let aetherToken: Aether;
   let buildingNfts: Buildings;
   let shipNfts: Ships;
   let fightingFacet: FightingFacet;
@@ -105,13 +108,18 @@ describe("Game", function () {
 
     crystalToken = (await ethers.getContractAt(
       "Crystal",
-      g.metalAddress
+      g.crystalAddress
     )) as Crystal;
 
     antimatterToken = (await ethers.getContractAt(
       "Antimatter",
       g.antimatterAddress
     )) as Antimatter;
+
+    aetherToken = (await ethers.getContractAt(
+      "Aether",
+      g.aetherAddress
+    )) as Aether;
 
     buildingsFacet = (await ethers.getContractAt(
       "BuildingsFacet",
@@ -726,6 +734,113 @@ describe("Game", function () {
 
     expect(metalAfter).to.be.above(metalBefore);
     console.log(aetherAfter);
+  });
+
+  it("User can withdraw Aether to receive the ERC20-Tokens in their wallet", async function () {
+    const {
+      owner,
+      randomUser,
+      randomUserTwo,
+      randomUserThree,
+      AdminUser,
+    } = await loadFixture(deployUsers);
+
+    //@notice actual register function for Tron Network
+    const registration = await vrfFacet
+      .connect(randomUser)
+      .startRegister(0);
+
+    const checkOwnershipAmountPlayer = await planetNfts.balanceOf(
+      randomUser.address
+    );
+
+    const planetId = await planetNfts.tokenOfOwnerByIndex(
+      randomUser.address,
+      0
+    );
+
+    await buildingsFacet
+      .connect(randomUser)
+      .craftBuilding(7, planetId, 1);
+
+    const blockBefore = await ethers.provider.getBlock(
+      await ethers.provider.getBlockNumber()
+    );
+
+    const timestampBefore = blockBefore.timestamp;
+
+    await ethers.provider.send("evm_mine", [timestampBefore + 1200]);
+
+    const claimBuild = await buildingsFacet
+      .connect(randomUser)
+      .claimBuilding(planetId);
+
+    await shipsFacet.connect(randomUser).craftFleet(7, planetId, 1);
+
+    let checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+      randomUser.address
+    );
+
+    expect(checkOwnershipShipsPlayer).to.equal(0);
+
+    await ethers.provider.send("evm_mine", [
+      timestampBefore + 1200 + 12000,
+    ]);
+
+    await shipsFacet.connect(randomUser).claimFleet(planetId);
+
+    checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+      randomUser.address
+    );
+
+    expect(checkOwnershipShipsPlayer).to.equal(1);
+
+    let shipIdPlayer1 = await shipNfts.tokenOfOwnerByIndex(
+      randomUser.address,
+      0
+    );
+
+    const aetherBefore = await buildingsFacet.getAetherPlayer(
+      randomUser.address
+    );
+
+    const sendOutmining = await shipsFacet
+      .connect(randomUser)
+      .startOutMining(planetId, 25, [shipIdPlayer1]);
+
+    await ethers.provider.send("evm_mine", [
+      timestampBefore + 1200 + 36000,
+    ]);
+
+    const planetType = await shipsFacet
+      .connect(randomUser)
+      .getPlanetType(1);
+
+    const resolveOutmining = await shipsFacet
+      .connect(randomUser)
+      .resolveOutMining(1, 0);
+
+    const aetherAfter = await buildingsFacet.getAetherPlayer(
+      randomUser.address
+    );
+
+    expect(aetherAfter).to.be.above(aetherBefore);
+
+    const aetherTokensWalletBefore = await aetherToken.balanceOf(
+      randomUser.address
+    );
+
+    const withdrawAetherToWallet = await buildingsFacet
+      .connect(randomUser)
+      .withdrawAether(420);
+
+    const aetherTokensWalletAfter = await aetherToken.balanceOf(
+      randomUser.address
+    );
+
+    expect(aetherTokensWalletAfter).to.be.above(
+      aetherTokensWalletBefore
+    );
   });
 
   it.skip("chainRunner can mine every 24hours for the user ", async function () {

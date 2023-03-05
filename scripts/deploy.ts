@@ -242,6 +242,7 @@ export async function deployDiamond() {
     buildingsAddress: buildings.address,
     planetsAddress: planets.address,
     shipsAddress: ships.address,
+    aetherAddress: aether.address,
   };
 }
 
