@@ -15,6 +15,7 @@ import {
   ShipsFacet,
   FightingFacet,
   Aether,
+  AllianceFacet,
 } from "../typechain-types";
 import { BigNumber } from "ethers";
 import { impersonate } from "../scripts/helperFunctions";
@@ -47,6 +48,7 @@ describe("Game", function () {
   let buildingNfts: Buildings;
   let shipNfts: Ships;
   let fightingFacet: FightingFacet;
+  let allianceFacet: AllianceFacet;
 
   async function deployUsers() {
     const [
@@ -135,6 +137,11 @@ describe("Game", function () {
       "FightingFacet",
       diamond
     )) as FightingFacet;
+
+    allianceFacet = (await ethers.getContractAt(
+      "AllianceFacet",
+      diamond
+    )) as AllianceFacet;
 
     await adminFacet.startInit(20, 1);
   });
@@ -691,6 +698,30 @@ describe("Game", function () {
       randomUserThree,
       AdminUser,
     } = await loadFixture(deployUsers);
+
+    await vrfFacet.connect(randomUser).startRegister(0);
+    await vrfFacet.connect(randomUserTwo).startRegister(0);
+
+    const planetIdPlayer1 = await planetNfts.tokenOfOwnerByIndex(
+      randomUser.address,
+      0
+    );
+
+    const planetIdPlayer2 = await planetNfts.tokenOfOwnerByIndex(
+      randomUserTwo.address,
+      0
+    );
+
+    const createAlliance = await allianceFacet
+      .connect(randomUser)
+      .createAlliance(ethers.utils.formatBytes32String("bananarama"));
+
+    const allCreatedAlliances =
+      await allianceFacet.returnAllAlliances();
+
+    expect(allCreatedAlliances[0]).to.be.equal(
+      ethers.utils.formatBytes32String("bananarama")
+    );
   });
 
   it("registered user can join  an alliance when invited", async function () {
@@ -701,6 +732,48 @@ describe("Game", function () {
       randomUserThree,
       AdminUser,
     } = await loadFixture(deployUsers);
+
+    await vrfFacet.connect(randomUser).startRegister(0);
+    await vrfFacet.connect(randomUserTwo).startRegister(0);
+
+    const planetIdPlayer1 = await planetNfts.tokenOfOwnerByIndex(
+      randomUser.address,
+      0
+    );
+
+    const planetIdPlayer2 = await planetNfts.tokenOfOwnerByIndex(
+      randomUserTwo.address,
+      0
+    );
+
+    const allianceNameBytes32 =
+      ethers.utils.formatBytes32String("bananarama");
+    const createAlliance = await allianceFacet
+      .connect(randomUser)
+      .createAlliance(allianceNameBytes32);
+
+    const allCreatedAlliances =
+      await allianceFacet.returnAllAlliances();
+
+    const invitePlayer = await allianceFacet
+      .connect(randomUser)
+      .inviteToAlliance(randomUserTwo.address);
+
+    const CreatorsAlliance =
+      await allianceFacet.getCurrentAlliancePlayer(
+        randomUser.address
+      );
+
+    const acceptInvitation = await allianceFacet
+      .connect(randomUserTwo)
+      .joinAlliance(allianceNameBytes32);
+
+    const MemberTwoAlliance =
+      await allianceFacet.getCurrentAlliancePlayer(
+        randomUserTwo.address
+      );
+
+    expect(MemberTwoAlliance).to.be.equal(CreatorsAlliance);
   });
 
   it("registered user can outmine asteroid belt and get aether", async function () {

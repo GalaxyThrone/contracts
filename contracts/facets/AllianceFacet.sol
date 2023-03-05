@@ -147,4 +147,12 @@ contract AllianceFacet is Modifiers {
 
         return s.allianceOfPlayer[currPlayerowner];
     }
+
+    function getCurrentAlliancePlayer(address _player)
+        external
+        view
+        returns (bytes32)
+    {
+        return s.allianceOfPlayer[_player];
+    }
 }
