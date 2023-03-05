@@ -28,6 +28,6 @@ describe.skip("Debug", function () {
     )) as AdminFacet;
   });
   it("debug", async function () {
-    await adminFacet.startInit(50, 0);
+    await adminFacet.startInit(50, 1);
   });
 });

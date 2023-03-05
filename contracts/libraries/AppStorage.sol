@@ -126,7 +126,7 @@ struct AppStorage {
     // heroId => vrf/reg data
     mapping(uint256 => VrfRequest) vrfRequest;
     mapping(address => bool) registrationStarted;
-    mapping(uint256 => uint8) planetType;
+    mapping(uint256 => uint256) planetType;
     uint256 totalPlanetsAmount;
     mapping(address => uint256) aetherHeldPlayer;
     //VRF

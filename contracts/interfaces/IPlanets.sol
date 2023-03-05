@@ -11,7 +11,7 @@ interface IPlanets {
         uint256 crystal;
         bool pvpEnabled;
         address owner;
-        uint8 planetType;
+        uint256 planetType;
     }
 
     function mint(Planet calldata _planet) external;

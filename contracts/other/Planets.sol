@@ -14,7 +14,7 @@ contract Planets is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         uint256 crystal;
         bool pvpEnabled;
         address owner;
-        uint8 planetType;
+        uint256 planetType;
     }
 
     struct attackStatus {

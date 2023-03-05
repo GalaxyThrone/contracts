@@ -13,7 +13,7 @@ export async function initPlanets(diamondAddress: string) {
   // await fixTx.wait();
 
   console.log("init planets");
-  const initPlanets = await adminFacet.startInit(30, 0);
+  const initPlanets = await adminFacet.startInit(30, 1);
   await initPlanets.wait();
 }
 

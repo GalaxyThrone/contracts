@@ -90,7 +90,11 @@ contract AdminFacet is Modifiers {
         s.runningAttacks[_attackId].attackSeed = _randomness;
     }
 
-    function startInit(uint256 _amount, uint8 typeOfPlanet) external onlyOwner {
+    //@notice creates planets
+    function startInit(uint256 _amount, uint256 typeOfPlanet)
+        external
+        onlyOwner
+    {
         require(!s.init, "AdminFacet: already running init");
         s.init = true;
 
@@ -114,7 +118,7 @@ contract AdminFacet is Modifiers {
     function finalizeInit(
         uint256 _amount,
         uint256[] memory _randomness,
-        uint8 typeOfPlanet
+        uint256 typeOfPlanet
     ) internal {
         for (uint256 i = 0; i < _amount; i++) {
             _randomness[0] = uint256(keccak256(abi.encode(_randomness[0], i)));
@@ -139,7 +143,8 @@ contract AdminFacet is Modifiers {
                     planetType: typeOfPlanet
                 })
             );
-            s.planetType[s.totalPlanetsAmount];
+            //@TODO we should also save the coordinates(tbh, actually everything. ) on the diamond itself
+            s.planetType[s.totalPlanetsAmount] = typeOfPlanet;
             s.totalPlanetsAmount++;
         }
         s.init = false;

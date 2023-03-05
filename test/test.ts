@@ -127,9 +127,11 @@ describe("Game", function () {
       "FightingFacet",
       diamond
     )) as FightingFacet;
+
+    await adminFacet.startInit(20, 1);
   });
   it("Mint planets", async function () {
-    await adminFacet.startInit(30, 1);
+    await adminFacet.startInit(1, 1);
   });
   it("register user and get planet NFT ", async function () {
     const {
@@ -528,7 +530,7 @@ describe("Game", function () {
     } = await loadFixture(deployUsers);
   });
 
-  it("registered user can outmine asteroid belt ", async function () {
+  it("registered user can outmine asteroid belt and get aether", async function () {
     const {
       owner,
       randomUser,
@@ -598,11 +600,15 @@ describe("Game", function () {
 
     const sendOutmining = await shipsFacet
       .connect(randomUser)
-      .startOutMining(planetId, 1, [shipIdPlayer1]);
+      .startOutMining(planetId, 25, [shipIdPlayer1]);
 
     await ethers.provider.send("evm_mine", [
       timestampBefore + 1200 + 36000,
     ]);
+
+    const planetType = await shipsFacet
+      .connect(randomUser)
+      .getPlanetType(1);
 
     const resolveOutmining = await shipsFacet
       .connect(randomUser)
@@ -613,7 +619,112 @@ describe("Game", function () {
     );
 
     expect(aetherAfter).to.be.above(aetherBefore);
+  });
 
+  it("registered user can outmine unowned planet and not get aether", async function () {
+    const {
+      owner,
+      randomUser,
+      randomUserTwo,
+      randomUserThree,
+      AdminUser,
+    } = await loadFixture(deployUsers);
+
+    //@notice actual register function for Tron Network
+    const registration = await vrfFacet
+      .connect(randomUser)
+      .startRegister(0);
+
+    const checkOwnershipAmountPlayer = await planetNfts.balanceOf(
+      randomUser.address
+    );
+
+    const planetId = await planetNfts.tokenOfOwnerByIndex(
+      randomUser.address,
+      0
+    );
+
+    await buildingsFacet
+      .connect(randomUser)
+      .craftBuilding(7, planetId, 1);
+
+    const blockBefore = await ethers.provider.getBlock(
+      await ethers.provider.getBlockNumber()
+    );
+
+    const timestampBefore = blockBefore.timestamp;
+
+    await ethers.provider.send("evm_mine", [timestampBefore + 1200]);
+
+    const claimBuild = await buildingsFacet
+      .connect(randomUser)
+      .claimBuilding(planetId);
+
+    await shipsFacet.connect(randomUser).craftFleet(7, planetId, 1);
+
+    let checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+      randomUser.address
+    );
+
+    expect(checkOwnershipShipsPlayer).to.equal(0);
+
+    await ethers.provider.send("evm_mine", [
+      timestampBefore + 1200 + 12000,
+    ]);
+
+    await shipsFacet.connect(randomUser).claimFleet(planetId);
+
+    checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+      randomUser.address
+    );
+
+    expect(checkOwnershipShipsPlayer).to.equal(1);
+
+    let shipIdPlayer1 = await shipNfts.tokenOfOwnerByIndex(
+      randomUser.address,
+      0
+    );
+
+    const aetherBefore = await buildingsFacet.getAetherPlayer(
+      randomUser.address
+    );
+
+    const metalBefore = await buildingsFacet.getPlanetResources(
+      planetId,
+      0
+    );
+
+    const sendOutmining = await shipsFacet
+      .connect(randomUser)
+      .startOutMining(planetId, 5, [shipIdPlayer1]);
+
+    await ethers.provider.send("evm_mine", [
+      timestampBefore + 1200 + 36000,
+    ]);
+
+    const planetAmount = await shipsFacet
+      .connect(randomUser)
+      .getPlanetAmount();
+
+    console.log("amount:");
+    console.log(planetAmount);
+
+    const resolveOutmining = await shipsFacet
+      .connect(randomUser)
+      .resolveOutMining(1, 0);
+
+    const aetherAfter = await buildingsFacet.getAetherPlayer(
+      randomUser.address
+    );
+
+    const metalAfter = await buildingsFacet.getPlanetResources(
+      planetId,
+      0
+    );
+
+    expect(aetherAfter).to.be.equal(aetherBefore);
+
+    expect(metalAfter).to.be.above(metalBefore);
     console.log(aetherAfter);
   });
 

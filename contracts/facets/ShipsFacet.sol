@@ -411,6 +411,7 @@ contract ShipsFacet is Modifiers {
             for (uint256 j = 0; j < 4; j++) {
                 uint256 minedAmount = calculatePercentage(cargo, 30);
 
+                //mining the resources on the diamond
                 if (j < 3) {
                     s.planetResources[s.outMining[_outMiningId].fromPlanetId][
                             j
@@ -421,16 +422,28 @@ contract ShipsFacet is Modifiers {
                         j,
                         minedAmount
                     );
-                } else {
-                    minedAmount = calculatePercentage(cargo, 5);
+                }
+                //mining aether
+                else {
+                    //PlanetType 1 is an Asteroid Belt. Only those are able to redeem aether
+                    if (
+                        this.getPlanetType(
+                            s.outMining[_outMiningId].toPlanetId
+                        ) == 1
+                    ) {
+                        minedAmount = calculatePercentage(cargo, 5);
 
-                    s.aetherHeldPlayer[
-                        IShips(s.shipsAddress).ownerOf(
-                            s.outMining[_outMiningId].shipsIds[0]
-                        )
-                    ] += minedAmount;
+                        s.aetherHeldPlayer[
+                            IShips(s.shipsAddress).ownerOf(
+                                s.outMining[_outMiningId].shipsIds[0]
+                            )
+                        ] += minedAmount;
+                    }
                 }
 
+                //@TODO minting erc20 tokens every time they are generated is wasting a ton of gas.
+                //@notice   Ideally, we would only mint them when withdrawing from the diamond
+                //mints the erc20 tokenss
                 if (j == 0) {
                     IResource(s.metalAddress).mint(address(this), minedAmount);
                 } else if (j == 1) {
@@ -455,6 +468,14 @@ contract ShipsFacet is Modifiers {
         }
 
         delete s.outMining[_outMiningId];
+    }
+
+    function getPlanetType(uint256 _planetId) external view returns (uint256) {
+        return s.planetType[_planetId];
+    }
+
+    function getPlanetAmount() external view returns (uint256) {
+        return s.totalPlanetsAmount;
     }
 
     function calculatePercentage(uint256 amount, uint256 percentage)
