@@ -499,6 +499,104 @@ describe("Game", function () {
       randomUserThree,
       AdminUser,
     } = await loadFixture(deployUsers);
+
+    await vrfFacet.connect(randomUser).startRegister(0);
+    await vrfFacet.connect(randomUserTwo).startRegister(0);
+
+    const planetIdPlayer1 = await planetNfts.tokenOfOwnerByIndex(
+      randomUser.address,
+      0
+    );
+
+    const planetIdPlayer2 = await planetNfts.tokenOfOwnerByIndex(
+      randomUserTwo.address,
+      0
+    );
+
+    const allianceNameBytes32 =
+      ethers.utils.formatBytes32String("bananarama");
+    const createAlliance = await allianceFacet
+      .connect(randomUser)
+      .createAlliance(allianceNameBytes32);
+
+    const allCreatedAlliances =
+      await allianceFacet.returnAllAlliances();
+
+    const invitePlayer = await allianceFacet
+      .connect(randomUser)
+      .inviteToAlliance(randomUserTwo.address);
+
+    const acceptInvitation = await allianceFacet
+      .connect(randomUserTwo)
+      .joinAlliance(allianceNameBytes32);
+
+    await buildingsFacet
+      .connect(randomUser)
+      .craftBuilding(7, planetIdPlayer1, 1);
+
+    let blockBefore = await ethers.provider.getBlock(
+      await ethers.provider.getBlockNumber()
+    );
+
+    let timestampBefore = blockBefore.timestamp;
+
+    await ethers.provider.send("evm_mine", [timestampBefore + 1200]);
+
+    let claimBuild = await buildingsFacet
+      .connect(randomUser)
+      .claimBuilding(planetIdPlayer1);
+
+    let shipAmountToCraft = 2;
+    await shipsFacet
+      .connect(randomUser)
+      .craftFleet(6, planetIdPlayer1, shipAmountToCraft);
+
+    let checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+      randomUser.address
+    );
+
+    expect(checkOwnershipShipsPlayer).to.equal(0);
+
+    await ethers.provider.send("evm_mine", [
+      timestampBefore + 1200 + 1200,
+    ]);
+
+    await shipsFacet.connect(randomUser).claimFleet(planetIdPlayer1);
+
+    checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+      randomUser.address
+    );
+
+    expect(checkOwnershipShipsPlayer).to.equal(shipAmountToCraft);
+
+    const player1Fleet = await shipNfts.getDefensePlanet(
+      planetIdPlayer1
+    );
+
+    const player2Fleet = await shipNfts.getDefensePlanet(
+      planetIdPlayer2
+    );
+
+    const getShipsOnPlanetBefore = await shipNfts.getDefensePlanet(
+      planetIdPlayer2
+    );
+
+    let shipIdPlayer1Reinforcement =
+      await shipNfts.tokenOfOwnerByIndex(randomUser.address, 1);
+
+    const sendReinforcementsToPlanet = await fightingFacet
+      .connect(randomUser)
+      .sendFriendlies(planetIdPlayer1, planetIdPlayer2, [
+        shipIdPlayer1Reinforcement,
+      ]);
+
+    const getShipsOnPlanetAfter = await shipNfts.getDefensePlanet(
+      planetIdPlayer2
+    );
+
+    expect(getShipsOnPlanetAfter.length).to.be.above(
+      getShipsOnPlanetBefore.length
+    );
   });
 
   it("registered user can send friendly ships to his owned planet ", async function () {
@@ -690,7 +788,7 @@ describe("Game", function () {
     }
   });
 
-  it("registered user can create an alliance & invite members ", async function () {
+  it("registered user can create an alliance ", async function () {
     const {
       owner,
       randomUser,
@@ -724,7 +822,7 @@ describe("Game", function () {
     );
   });
 
-  it("registered user can join  an alliance when invited", async function () {
+  it("Alliance Creator can invite & Invitee can join an alliance when invited", async function () {
     const {
       owner,
       randomUser,
@@ -1327,8 +1425,6 @@ describe("Game", function () {
     const currentTerraform = await shipsFacet
       .connect(randomUser)
       .showIncomingTerraformersPlanet(planetToTerraform);
-
-    console.log(currentTerraform);
 
     const blockTwo = await ethers.provider.getBlock(
       await ethers.provider.getBlockNumber()
