@@ -964,4 +964,12 @@ contract ShipsFacet is Modifiers {
 
         return currentModules;
     }
+
+    function getShipStatsDiamond(uint256 _shipId)
+        external
+        view
+        returns (ShipType memory)
+    {
+        return s.SpaceShips[_shipId];
+    }
 }
