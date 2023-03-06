@@ -31,6 +31,7 @@ contract RegisterFacet is Modifiers {
                     abi.encodePacked(
                         blockhash(block.number - i),
                         block.timestamp,
+                        msg.sender,
                         i
                     )
                 )
@@ -61,13 +62,14 @@ contract RegisterFacet is Modifiers {
     {
         uint256 totalSupply = IERC721(s.planetsAddress).totalSupply();
         for (uint256 i; i < totalSupply; i++) {
-            uint256 tokenId = uint256(
-                bytes32(abi.encodePacked(_randomness[0], i))
-            ) % totalSupply;
-
+            uint256 tokenId = (uint256(
+                keccak256(abi.encodePacked(_randomness[0], i))
+            ) % totalSupply) + 1;
             //@TODO  @Marco && !checkAsteroidBeltType(tokenId)  makes all the tests really buggy, would need help.
             //@notice I dont want users getting asteroid belts planetTypes when registering
-
+            if (checkAsteroidBeltType(tokenId)) {
+                continue;
+            }
             if (IERC721(s.planetsAddress).ownerOf(tokenId) == address(this)) {
                 IERC721(s.planetsAddress).safeTransferFrom(
                     address(this),
