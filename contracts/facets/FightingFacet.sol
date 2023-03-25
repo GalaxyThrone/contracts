@@ -418,8 +418,8 @@ contract FightingFacet is Modifiers {
                     IShips(s.shipsAddress).getShipStats(attackerShips[i]).health
                 );
 
-                if (battleResult > attackerShipHealth) {
-                    battleResult -= attackerShipHealth;
+                if (battleResult < attackerShipHealth) {
+                    battleResult += attackerShipHealth;
 
                     IShips(s.shipsAddress).burnShip(attackerShips[i]);
                     IShips(s.shipsAddress).deleteShipFromPlanet(
@@ -460,19 +460,15 @@ contract FightingFacet is Modifiers {
         delete s.runningAttacks[_attackInstanceId];
     }
 
-    function checkAlliance(address _playerToCheck)
-        public
-        view
-        returns (bytes32)
-    {
+    function checkAlliance(
+        address _playerToCheck
+    ) public view returns (bytes32) {
         return s.allianceOfPlayer[_playerToCheck];
     }
 
-    function getAttackStatus(uint256 _instanceId)
-        external
-        view
-        returns (attackStatus memory)
-    {
+    function getAttackStatus(
+        uint256 _instanceId
+    ) external view returns (attackStatus memory) {
         return s.runningAttacks[_instanceId];
     }
 
@@ -480,11 +476,10 @@ contract FightingFacet is Modifiers {
         return s.sendAttackId;
     }
 
-    function getMultipleRunningAttacks(uint256 _startRange, uint256 _endRange)
-        external
-        view
-        returns (attackStatus[] memory)
-    {
+    function getMultipleRunningAttacks(
+        uint256 _startRange,
+        uint256 _endRange
+    ) external view returns (attackStatus[] memory) {
         attackStatus[] memory queriedAttacks = new attackStatus[](
             _startRange - _endRange
         );
@@ -500,11 +495,9 @@ contract FightingFacet is Modifiers {
         return queriedAttacks;
     }
 
-    function getAllIncomingAttacksPlayer(address _player)
-        external
-        view
-        returns (attackStatus[] memory)
-    {
+    function getAllIncomingAttacksPlayer(
+        address _player
+    ) external view returns (attackStatus[] memory) {
         uint256 counter = 0;
 
         uint256 totalCount;
@@ -536,11 +529,9 @@ contract FightingFacet is Modifiers {
         return incomingAttacksPlayer;
     }
 
-    function getAllOutgoingAttacks(address _player)
-        external
-        view
-        returns (attackStatus[] memory)
-    {
+    function getAllOutgoingAttacks(
+        address _player
+    ) external view returns (attackStatus[] memory) {
         uint256 counter = 0;
         for (uint256 i = 0; i < s.sendAttackId; i++) {
             if (s.runningAttacks[i].attacker == _player) {
@@ -560,11 +551,9 @@ contract FightingFacet is Modifiers {
         return outgoingAttacks;
     }
 
-    function getAllIncomingAttacksPlanet(uint256 _planetId)
-        external
-        view
-        returns (attackStatus[] memory)
-    {
+    function getAllIncomingAttacksPlanet(
+        uint256 _planetId
+    ) external view returns (attackStatus[] memory) {
         uint256 totalCount;
         for (uint256 i = 0; i < s.sendAttackId; i++) {
             if (s.runningAttacks[i].toPlanet == _planetId) {
