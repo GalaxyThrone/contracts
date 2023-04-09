@@ -965,6 +965,16 @@ contract ShipsFacet is Modifiers {
         }
     }
 
+
+
+
+    //@notice leveling will be instant, but there will be a cooldown afterwards
+    function levelShip(uint _shipId) external {
+
+         require(IShips(s.shipsAddress).ownerOf(_shipId) == msg.sender, "not your ship!");
+    }
+
+
     function checkAvailableModuleSlots(uint256 _shipId)
         external
         view
