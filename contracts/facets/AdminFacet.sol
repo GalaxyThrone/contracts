@@ -139,7 +139,6 @@ contract AdminFacet is Modifiers {
                     metal: metal,
                     crystal: crystal,
                     pvpEnabled: false,
-                    owner: address(this),
                     planetType: typeOfPlanet
                 })
             );

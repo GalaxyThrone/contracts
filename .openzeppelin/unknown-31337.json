@@ -2,7 +2,7 @@
   "manifestVersion": "3.2",
   "admin": {
     "address": "0x0B306BF915C4d645ff596e518fAf3F9669b97016",
-    "txHash": "0x797bdd1ba8f1099d571e3b76cf96f23ec697cb4cc4096795eab4deb074c30b41"
+    "txHash": "0xdc51823a1b4cd86a52d158f881a0e47915c0cc2f8fe0887a7cbead3ac60e745e"
   },
   "proxies": [
     {
@@ -17,37 +17,37 @@
     },
     {
       "address": "0x959922bE3CAee4b8Cd9a407cc3ac1C251C2007B1",
-      "txHash": "0xb0106c703dcfd3e0c6079e94e811b62d73c6d112fcb70293ac136210ee2cf4a6",
+      "txHash": "0x0299a859485420dcc8277e63bad7441cfd1779031d4a124b359cc6975be27866",
       "kind": "transparent"
     },
     {
       "address": "0x68B1D87F95878fE05B998F19b66F4baba5De1aed",
-      "txHash": "0x46ca0dfd4d31dde652402d888176522698f33486eef04b26b4b25a4c7b1efd88",
+      "txHash": "0xa38e945f9fd2abe50073b2c3d5f83f761b656a52efb3fd599641d01830cdb904",
       "kind": "transparent"
     },
     {
       "address": "0xc6e7DF5E7b4f2A278906862b61205850344D4e7d",
-      "txHash": "0xc8026027bcc019bd5369d55fc99a29df11b19051c922dc5a5272e44b7e837019",
+      "txHash": "0x333d647ecf3e8189b3e097ca51e274e31ef1c42c82ab34540e790d15e2efa5c5",
       "kind": "transparent"
     },
     {
       "address": "0x4ed7c70F96B99c776995fB64377f0d4aB3B0e1C1",
-      "txHash": "0xd13675ac2dbf9717569aaa03b1234df99acf2e12920e1e579600e4ae6eb27ae5",
+      "txHash": "0x8d471d97690918590296d29549d1bcc59d039b95ce10442e8bd1786b42d1f173",
       "kind": "transparent"
     },
     {
       "address": "0xa85233C63b9Ee964Add6F2cffe00Fd84eb32338f",
-      "txHash": "0xab4a68a273e0bec6a1a61ccbd887380c4ec60832284d2ed0bb8682e451a9fd9a",
+      "txHash": "0xdcc7190cb23361dd9ce01403d886c496b41c17683cb8aa0f8328cdde2d8ceb10",
       "kind": "transparent"
     },
     {
       "address": "0x7a2088a1bFc9d81c55368AE168C2C02570cB814F",
-      "txHash": "0x27455cb5d8f4011495a890c7ebef7278df83c6e758638c887907490f3b36e322",
+      "txHash": "0xb9d15bd2099044a8f995685777a853cd53982cdb00e72ae0394031a76fe5af42",
       "kind": "transparent"
     },
     {
       "address": "0xc5a5C42992dECbae36851359345FE25997F5C42d",
-      "txHash": "0x94b969a5c6fa2fbd7d7098cf55929304a8a35e47bdab14b0b1190deef2b66d0e",
+      "txHash": "0x8fbcf2483186406e494be60c2e4039c55e6ee776b29bdb926e505b57b6593713",
       "kind": "transparent"
     }
   ],
@@ -350,7 +350,7 @@
     },
     "734b8db82374a8e10f4aab26d240fa1c240b2f9bcfc8379104c104ffabbe71b9": {
       "address": "0x9A676e781A523b5d0C0e43731313A708CB607508",
-      "txHash": "0x1d538b79696bcd3cf8e5c97acd4cae18650847af60a44cd3a2a33b4965972930",
+      "txHash": "0x755c9f2fadae670a26436af45da4ce7f8f1399b6e5fcaec464ed84f01db20b4e",
       "layout": {
         "solcVersion": "0.8.17",
         "storage": [
@@ -498,7 +498,7 @@
     },
     "0dabf0d9339618548005b10268df0b9b50fcf5bebb7fdc39e45d73656a55e70d": {
       "address": "0x9A9f2CCfdE556A7E9Ff0848998Aa4a0CFD8863AE",
-      "txHash": "0x0c64762386147ddc852bab58b7006ba82151b333cd67e3acfceb5d4a426886df",
+      "txHash": "0x62116945e079b47ee0986029cda58454325625d214122baf29d9f4afe9066773",
       "layout": {
         "solcVersion": "0.8.17",
         "storage": [
@@ -646,7 +646,7 @@
     },
     "ae1f249c1ca5d73565caeb0226975fb07cf1fa7b57ae13ad1eaaf901b68755c0": {
       "address": "0x09635F643e140090A9A8Dcd712eD6285858ceBef",
-      "txHash": "0xd2909d24f10a91d5a1d3147bcc59942cce78f82fc6419c9aefbc85bfbccda36e",
+      "txHash": "0xce6abdcb8a0a2fb689fa5c26639a36f58a4f65124fd1e482ae56c7c00a84ee70",
       "layout": {
         "solcVersion": "0.8.17",
         "storage": [
@@ -868,7 +868,7 @@
     },
     "4edf32cdc6794149fcd2155cf5046335cfc1f5713e56a620cda217af7174be4a": {
       "address": "0x4A679253410272dd5232B3Ff7cF5dbB88f295319",
-      "txHash": "0x280efa7e7b3b3db6734b654ba445c0499cb08ae531f6392e9824f2bbae96029b",
+      "txHash": "0xcc6053ec2bf1db3b08ab74e391d0221f3cf46ca242806b06d9a059f5814fd2c7",
       "layout": {
         "solcVersion": "0.8.17",
         "storage": [
@@ -1272,7 +1272,7 @@
     },
     "bc2195c91e585aee8dca7f704b0f7077f5bcf320f7885122000d184d62533bda": {
       "address": "0x59b670e9fA9D0A427751Af201D676719a970857b",
-      "txHash": "0x356e3523d46e4ed57ff589bf31024589630cc08e3a2fa83f969e79c7a4e96f65",
+      "txHash": "0xdf64eeedc8e84fb12c25d9fcad3914a95e85e437df8fec5b6bb59764947fd841",
       "layout": {
         "solcVersion": "0.8.17",
         "storage": [
@@ -1420,7 +1420,7 @@
     },
     "484c63bae335f405c4c94bf121b1fa88d131f1ef872c4da51a1996a8a23f2153": {
       "address": "0x3Aa5ebB10DC797CAC828524e59A333d0A371443c",
-      "txHash": "0xec8b7d13b0829798f8be264680cbb8d92aca8d9273d1b397be636b781e4c3385",
+      "txHash": "0x4d2ef2c54538b0c419163839e446611f208cfae606eecff18eb7c47912fb3216",
       "layout": {
         "solcVersion": "0.8.17",
         "storage": [
@@ -1566,9 +1566,9 @@
         }
       }
     },
-    "4d5d18e09a266dd8a7a0cfe0e6815f5bcd7f51ba6db7f7d19eb4a2c410baefdc": {
+    "65cba0c538539fcdb40ca21747b121167d153714a4459dabc825bfeb6af66f27": {
       "address": "0x322813Fd9A801c5507c9de605d63CEA4f2CE6c44",
-      "txHash": "0xcd92355418a262baea62ed83d9752dbb066ac11ad370ad3b14498437b395c7d6",
+      "txHash": "0xe6a32a29a12515c8b308ee94bfd3584693d8dcae7cf871addf79f374cf9f4f73",
       "layout": {
         "solcVersion": "0.8.17",
         "storage": [
@@ -1723,15 +1723,15 @@
             "slot": "251",
             "type": "t_address",
             "contract": "Planets",
-            "src": "contracts/other/Planets.sol:32"
+            "src": "contracts/other/Planets.sol:31"
           },
           {
             "label": "planets",
             "offset": 0,
             "slot": "252",
-            "type": "t_mapping(t_uint256,t_struct(Planet)21721_storage)",
+            "type": "t_mapping(t_uint256,t_struct(Planet)12567_storage)",
             "contract": "Planets",
-            "src": "contracts/other/Planets.sol:34"
+            "src": "contracts/other/Planets.sol:33"
           },
           {
             "label": "_uri",
@@ -1739,7 +1739,7 @@
             "slot": "253",
             "type": "t_string_storage",
             "contract": "Planets",
-            "src": "contracts/other/Planets.sol:36"
+            "src": "contracts/other/Planets.sol:35"
           }
         ],
         "types": {
@@ -1791,7 +1791,7 @@
             "label": "mapping(uint256 => address)",
             "numberOfBytes": "32"
           },
-          "t_mapping(t_uint256,t_struct(Planet)21721_storage)": {
+          "t_mapping(t_uint256,t_struct(Planet)12567_storage)": {
             "label": "mapping(uint256 => struct Planets.Planet)",
             "numberOfBytes": "32"
           },
@@ -1803,7 +1803,7 @@
             "label": "string",
             "numberOfBytes": "32"
           },
-          "t_struct(Planet)21721_storage": {
+          "t_struct(Planet)12567_storage": {
             "label": "struct Planets.Planet",
             "members": [
               {
@@ -1840,12 +1840,6 @@
                 "label": "pvpEnabled",
                 "type": "t_bool",
                 "offset": 0,
-                "slot": "5"
-              },
-              {
-                "label": "owner",
-                "type": "t_address",
-                "offset": 1,
                 "slot": "5"
               },
               {

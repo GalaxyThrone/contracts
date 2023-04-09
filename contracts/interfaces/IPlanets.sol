@@ -10,7 +10,6 @@ interface IPlanets {
         uint256 metal;
         uint256 crystal;
         bool pvpEnabled;
-        address owner;
         uint256 planetType;
     }
 

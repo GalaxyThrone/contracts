@@ -13,7 +13,6 @@ contract Planets is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         uint256 metal;
         uint256 crystal;
         bool pvpEnabled;
-        address owner;
         uint256 planetType;
     }
 
