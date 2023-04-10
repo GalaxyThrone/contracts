@@ -971,9 +971,47 @@ contract ShipsFacet is Modifiers {
     //@notice leveling will be instant, but there will be a cooldown afterwards
     function levelShip(uint _shipId) external {
 
-         require(IShips(s.shipsAddress).ownerOf(_shipId) == msg.sender, "not your ship!");
+        require(IShips(s.shipsAddress).ownerOf(_shipId) == msg.sender, "not your ship!");
+
+        //@TODO require to be stationary, not travelling
+        uint currAssignedPlanet = IShips(s.shipsAddress).checkAssignedPlanet(_shipId);
+
+        require(IERC721(s.planetsAddress).ownerOf(currAssignedPlanet) == msg.sender,"ship isnt assigned to one of your planets due to movement / friendly base");
+
+        uint shipTypeToLevel = s.SpaceShips[_shipId].shipType;
+        uint currLevel = checkCurrentLevelShip(_shipId);
+        require( currLevel < s.maxLevelShipType[shipTypeToLevel],"cannot level further!");
+        
+        
+
+        for(uint i=0; i<3; i++){
+
+                  require(
+            s.planetResources[currAssignedPlanet][i] >=
+                s.resourceCostLeveling[shipTypeToLevel][currLevel][i],
+            "ShipsFacet: not enough resource!"
+        );
+
+               s.planetResources[currAssignedPlanet][i] -= s.resourceCostLeveling[shipTypeToLevel][currLevel][i];
+               
+         
+
+        }
+
+        s.currentLevelShip[_shipId]++;
+
+        //@TODO upgrade battle stats
+        //@TODO cooldown leveling (? Design question still)
+    
+
+ 
     }
 
+
+    function checkCurrentLevelShip(uint _tokenId) internal returns(uint){
+
+        return s.currentLevelShip[_tokenId];
+    }
 
     function checkAvailableModuleSlots(uint256 _shipId)
         external

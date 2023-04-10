@@ -45,6 +45,12 @@ export async function addShipModules(diamondAddr: string) {
   }
 }
 
+
+
+//@TODO add  deploy script to initialize leveling params for every shipType
+
+
+//@TODO can this go to its own file? 
 export async function addFaction(
   diamondAddr: string,
   amountFactions: number

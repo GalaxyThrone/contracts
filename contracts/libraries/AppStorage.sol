@@ -50,7 +50,7 @@ struct attackStatus {
 
 struct ShipType {
     uint256 shipType;
-    uint256[4] price; // [metal, crystal, antimatter]
+    uint256[4] price; // [metal, crystal, antimatter,aether]
     uint256 attack;
     uint256[3] attackTypes;
     uint256[3] defenseTypes;
@@ -148,9 +148,26 @@ struct AppStorage {
     //ship categories template
     //@TODO to be removed. Its duplicated on the actual ship contract
     mapping(uint256 => ShipType) shipType;
+
+
+    //load level cost
+    mapping(uint => uint) maxLevelShipType;
+
+    mapping(uint => mapping(uint => uint[6]) ) statsUpgradeLeveling;
+
+
+    //shipType => level => resourcePrice 
+    mapping(uint =>mapping(uint => uint[3])) resourceCostLeveling;
+
+    mapping(uint => uint) currentLevelShip;
+
+
+
+
     //individual spaceShip Nfts
 
     mapping(uint256 => ShipType) SpaceShips;
+
     //shipModuleTypes
     mapping(uint256 => ShipModule) shipModuleType;
     //total shipModuleTypes that exist currently
