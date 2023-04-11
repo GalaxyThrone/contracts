@@ -61,6 +61,19 @@ contract AdminFacet is Modifiers {
         s.availableFactions = _newAmount;
     }
 
+    function addLevels(uint shipType, uint level, uint[7] memory _shipStatsToUpgrade) external onlyOwner{
+            //@TODO add levels via deploy script
+
+            s.statsUpgradeLeveling[shipType][level] = _shipStatsToUpgrade;
+
+
+
+    }
+
+ 
+
+
+
     function drawRandomAttackSeed(uint256 _attackId) external onlySelf {
         // Will revert if subscription is not set and funded.
         // uint256 requestId = VRFCoordinatorV2Interface(s.vrfCoordinator)

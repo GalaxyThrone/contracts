@@ -153,13 +153,17 @@ struct AppStorage {
     //load level cost
     mapping(uint => uint) maxLevelShipType;
 
-    mapping(uint => mapping(uint => uint[6]) ) statsUpgradeLeveling;
+
+    // shiptype => level => statsUpgrade, attackTypes(3), defenseTypes(3), HP
+    mapping(uint => mapping(uint => uint[7]) ) statsUpgradeLeveling;
 
 
     //shipType => level => resourcePrice 
     mapping(uint =>mapping(uint => uint[3])) resourceCostLeveling;
 
     mapping(uint => uint) currentLevelShip;
+
+    
 
 
 

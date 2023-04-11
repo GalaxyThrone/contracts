@@ -999,12 +999,21 @@ contract ShipsFacet is Modifiers {
         }
 
         s.currentLevelShip[_shipId]++;
-
-        //@TODO upgrade battle stats
-        //@TODO cooldown leveling (? Design question still)
+        
     
 
- 
+        //@TODO cooldown leveling (? Design question still)
+
+        //@TODO less obtuse way of upgrading
+        s.SpaceShips[_shipId].attackTypes[0] += s.statsUpgradeLeveling[shipTypeToLevel][currLevel+1][0];
+        s.SpaceShips[_shipId].attackTypes[1] += s.statsUpgradeLeveling[shipTypeToLevel][currLevel+1][1];
+        s.SpaceShips[_shipId].attackTypes[2] += s.statsUpgradeLeveling[shipTypeToLevel][currLevel+1][2];
+
+
+        s.SpaceShips[_shipId].defenseTypes[0] += s.statsUpgradeLeveling[shipTypeToLevel][currLevel+1][3];
+        s.SpaceShips[_shipId].defenseTypes[1] += s.statsUpgradeLeveling[shipTypeToLevel][currLevel+1][4];
+        s.SpaceShips[_shipId].defenseTypes[2] += s.statsUpgradeLeveling[shipTypeToLevel][currLevel+1][5];
+        s.SpaceShips[_shipId].health += s.statsUpgradeLeveling[shipTypeToLevel][currLevel+1][6];
     }
 
 
