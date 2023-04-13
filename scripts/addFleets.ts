@@ -274,35 +274,23 @@ export async function addFleets(fleetsAddress: string) {
     moduleSlots: 1,
   };
 
-  const addFleet1Tx = await fleetsContract.addShipType(1, fleet1);
-  await addFleet1Tx.wait();
-
-  const addFleet2Tx = await fleetsContract.addShipType(2, fleet2);
-  await addFleet2Tx.wait();
-
-  const addFleet3Tx = await fleetsContract.addShipType(3, fleet3);
-  await addFleet3Tx.wait();
-
-  const addFleet4Tx = await fleetsContract.addShipType(4, fleet4);
-  await addFleet4Tx.wait();
-
-  const addFleet5Tx = await fleetsContract.addShipType(5, fleet5);
-  await addFleet5Tx.wait();
-
-  const addFleet6Tx = await fleetsContract.addShipType(6, fleet6);
-  await addFleet6Tx.wait();
-
-  const addFleet7Tx = await fleetsContract.addShipType(7, fleet7);
-  await addFleet7Tx.wait();
-
-  const addFleet8Tx = await fleetsContract.addShipType(8, fleet8);
-  await addFleet8Tx.wait();
-
-  const addFleet9Tx = await fleetsContract.addShipType(9, fleet9);
-  await addFleet9Tx.wait();
-
-  const addFleet10Tx = await fleetsContract.addShipType(10, fleet10);
-  await addFleet10Tx.wait();
-
+  const fleetData = [
+    { id: 1, fleet: fleet1 },
+    { id: 2, fleet: fleet2 },
+    { id: 3, fleet: fleet3 },
+    { id: 4, fleet: fleet4 },
+    { id: 5, fleet: fleet5 },
+    { id: 6, fleet: fleet6 },
+    { id: 7, fleet: fleet7 },
+    { id: 8, fleet: fleet8 },
+    { id: 9, fleet: fleet9 },
+    { id: 10, fleet: fleet10 },
+  ];
+  
+  for (const { id, fleet } of fleetData) {
+    const addFleetTx = await fleetsContract.addShipType(id, fleet);
+    await addFleetTx.wait();
+  }
+  
 
 }
