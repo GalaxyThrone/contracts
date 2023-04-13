@@ -37,75 +37,123 @@ export async function addBuildings(buildingsAddress: string) {
     name: "Tower",
   };
 
+
   const building3: Building = {
     price: [
+      ethers.utils.parseEther("3000"),
       ethers.utils.parseEther("1000"),
-      ethers.utils.parseEther("500"),
-      ethers.utils.parseEther("200"),
+      ethers.utils.parseEther("1000"),
     ],
     boosts: [0, 0, 0],
 
     defenseTypes: [1, 10, 10],
-    health: 30,
-    craftTime: 18,
-    name: "Cannon",
+    health: 100,
+    craftTime: 72,
+    name: "Missile Silo",
   };
 
   const building4: Building = {
     price: [
-      ethers.utils.parseEther("300"),
-      ethers.utils.parseEther("200"),
-      ethers.utils.parseEther("0"),
-    ],
-    boosts: [0, 0, 200],
-
-    defenseTypes: [1, 10, 10],
-    health: 0,
-    craftTime: 36,
-    name: "Antimatter Miner",
-  };
-
-  const building5: Building = {
-    price: [
-      ethers.utils.parseEther("0"),
-      ethers.utils.parseEther("300"),
-      ethers.utils.parseEther("200"),
-    ],
-    boosts: [300, 0, 0],
-
-    defenseTypes: [1, 10, 10],
-    health: 0,
-    craftTime: 36,
-    name: "Metal Miner",
-  };
-
-  const building6: Building = {
-    price: [
-      ethers.utils.parseEther("300"),
-      ethers.utils.parseEther("0"),
-      ethers.utils.parseEther("200"),
-    ],
-    boosts: [0, 250, 0],
-
-    defenseTypes: [1, 10, 10],
-    health: 0,
-    craftTime: 36,
-    name: "Crystal Miner",
-  };
-
-  const building7: Building = {
-    price: [
+      ethers.utils.parseEther("3000"),
       ethers.utils.parseEther("1000"),
-      ethers.utils.parseEther("800"),
-      ethers.utils.parseEther("700"),
+      ethers.utils.parseEther("1000"),
     ],
     boosts: [0, 0, 0],
 
     defenseTypes: [1, 10, 10],
-    health: 0,
+    health: 100,
+    craftTime: 72,
+    name: "Defence Turret",
+  };
+
+
+  const building5: Building = {
+    price: [
+      ethers.utils.parseEther("3000"),
+      ethers.utils.parseEther("1000"),
+      ethers.utils.parseEther("1000"),
+    ],
+    boosts: [0, 0, 0],
+
+    defenseTypes: [1, 10, 10],
+    health: 100,
+    craftTime: 72,
+    name: "anti-material turret",
+  };
+
+
+  const building6: Building = {
+    price: [
+      ethers.utils.parseEther("3000"),
+      ethers.utils.parseEther("1000"),
+      ethers.utils.parseEther("1000"),
+    ],
+    boosts: [0, 0, 0],
+
+    defenseTypes: [1, 10, 10],
+    health: 100,
+    craftTime: 72,
+    name: "Ion Cannon",
+  };
+
+  const building7: Building = {
+    price: [
+      ethers.utils.parseEther("3000"),
+      ethers.utils.parseEther("1000"),
+      ethers.utils.parseEther("1000"),
+    ],
+    boosts: [0, 0, 0],
+
+    defenseTypes: [1, 10, 10],
+    health: 100,
+    craftTime: 72,
+    name: "Metal Refinery",
+  };
+
+  const building8: Building = {
+    price: [
+      ethers.utils.parseEther("3000"),
+      ethers.utils.parseEther("1000"),
+      ethers.utils.parseEther("1000"),
+    ],
+    boosts: [0, 0, 0],
+
+    defenseTypes: [1, 10, 10],
+    health: 100,
+    craftTime: 72,
+    name: "Crystal Mine",
+  };
+
+
+  const building9: Building = {
+    price: [
+      ethers.utils.parseEther("3000"),
+      ethers.utils.parseEther("1000"),
+      ethers.utils.parseEther("1000"),
+    ],
+    boosts: [0, 0, 0],
+
+    defenseTypes: [1, 10, 10],
+    health: 100,
+    craftTime: 72,
+    name: "Antimatter Collector",
+  };
+
+
+  const building10: Building = {
+    price: [
+      ethers.utils.parseEther("3000"),
+      ethers.utils.parseEther("1000"),
+      ethers.utils.parseEther("1000"),
+    ],
+    boosts: [0, 0, 0],
+
+    defenseTypes: [1, 10, 10],
+    health: 100,
     craftTime: 72,
     name: "Shipyard",
   };
+
 
   const addBuilding1Tx = await buildingsContract.addBuilding(
     1,
