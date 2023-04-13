@@ -304,9 +304,5 @@ export async function addFleets(fleetsAddress: string) {
   const addFleet10Tx = await fleetsContract.addShipType(10, fleet10);
   await addFleet10Tx.wait();
 
-  for(let i =0; i<10; i++){
 
-
-  
-}
 }
