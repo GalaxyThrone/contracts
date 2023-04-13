@@ -221,6 +221,9 @@ export async function deployDiamond() {
   await addFaction(diamond.address, 4);
 
   console.log("starting init");
+
+  //planetType 0 is undiscovered.
+  //the rest should have some meaning
   const initPlanets = await adminFacet.startInit(20, 0);
   await initPlanets.wait();
 
