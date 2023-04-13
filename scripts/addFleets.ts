@@ -1,5 +1,5 @@
 import { ethers } from "hardhat";
-import { Ships } from "../typechain-types";
+import { AdminFacet, Ships } from "../typechain-types";
 import { ship } from "../types";
 
 export async function addFleets(fleetsAddress: string) {
@@ -28,6 +28,77 @@ export async function addFleets(fleetsAddress: string) {
     moduleSlots: 1,
   };
 
+  const fleet1Lvl = {
+    shipTypeId:1,
+    maxLevel:10,
+    levelStats: [10,10,10,10,10,10,5],
+    costsLeveling:[50,50,50],
+  }
+
+  const fleet2Lvl = {
+    shipTypeId:2,
+    maxLevel:10,
+    levelStats: [10,10,10,10,10,10,5],
+    costsLeveling:[50,50,50],
+  }
+
+  const fleet3Lvl = {
+    shipTypeId:2,
+    maxLevel:10,
+    levelStats: [10,10,10,10,10,10,5],
+    costsLeveling:[50,50,50],
+  }
+
+
+  const fleet4Lvl = {
+    shipTypeId:2,
+    maxLevel:10,
+    levelStats: [10,10,10,10,10,10,5],
+    costsLeveling:[50,50,50],
+  }
+
+  const fleet5Lvl = {
+    shipTypeId:2,
+    maxLevel:10,
+    levelStats: [10,10,10,10,10,10,5],
+    costsLeveling:[50,50,50],
+  }
+
+  const fleet6Lvl = {
+    shipTypeId:2,
+    maxLevel:10,
+    levelStats: [10,10,10,10,10,10,5],
+    costsLeveling:[50,50,50],
+  }
+
+  const fleet7Lvl = {
+    shipTypeId:2,
+    maxLevel:10,
+    levelStats: [10,10,10,10,10,10,5],
+    costsLeveling:[50,50,50],
+  }
+
+  const fleet8Lvl = {
+    shipTypeId:2,
+    maxLevel:10,
+    levelStats: [10,10,10,10,10,10,5],
+    costsLeveling:[50,50,50],
+  }
+
+  const fleet9Lvl = {
+    shipTypeId:2,
+    maxLevel:10,
+    levelStats: [10,10,10,10,10,10,5],
+    costsLeveling:[50,50,50],
+  }
+
+  const fleet10Lvl = {
+    shipTypeId:2,
+    maxLevel:10,
+    levelStats: [10,10,10,10,10,10,5],
+    costsLeveling:[50,50,50],
+  }
+
   const fleet2: ship = {
     shipType: 2,
     price: [
@@ -46,6 +117,10 @@ export async function addFleets(fleetsAddress: string) {
     name: "Frigate",
     moduleSlots: 1,
   };
+
+
+
+
 
   const fleet3: ship = {
     shipType: 3,
@@ -228,4 +303,10 @@ export async function addFleets(fleetsAddress: string) {
 
   const addFleet10Tx = await fleetsContract.addShipType(10, fleet10);
   await addFleet10Tx.wait();
+
+  for(let i =0; i<10; i++){
+
+
+  
+}
 }

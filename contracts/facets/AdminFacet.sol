@@ -61,11 +61,12 @@ contract AdminFacet is Modifiers {
         s.availableFactions = _newAmount;
     }
 
-    function addLevels(uint shipType, uint level, uint[7] memory _shipStatsToUpgrade) external onlyOwner{
+    function addLevels(uint _shipType, uint _level, uint[7] memory _shipStatsToUpgrade,uint[3] memory _resourceCost, uint _maxLevel ) external onlyOwner{
             //@TODO add levels via deploy script
 
-            s.statsUpgradeLeveling[shipType][level] = _shipStatsToUpgrade;
-
+            s.statsUpgradeLeveling[_shipType][_level] = _shipStatsToUpgrade;
+            s.maxLevelShipType[_shipType] =_maxLevel;
+            s.resourceCostLeveling[_shipType][_level] = _resourceCost;
 
 
     }

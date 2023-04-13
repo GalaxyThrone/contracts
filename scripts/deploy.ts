@@ -23,6 +23,7 @@ import { addBuildings } from "./addBuildings";
 import { addFleets } from "./addFleets";
 import { addFaction, addShipModules } from "./addShipModules";
 import { initPlanets } from "./initPlanets";
+import { addLevels } from "./addLevelData";
 
 const {
   getSelectors,
@@ -216,6 +217,7 @@ export async function deployDiamond() {
   await addFleets(ships.address);
   await addFleets(diamond.address);
   await addShipModules(diamond.address);
+  await addLevels(diamond.address);
   await addFaction(diamond.address, 4);
 
   console.log("starting init");
