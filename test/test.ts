@@ -160,7 +160,7 @@ describe("Game", function () {
     //@notice actual register function for Tron Network
     const registration = await vrfFacet
       .connect(randomUser)
-      .startRegister(0);
+      .startRegister(0,2);
 
     const checkOwnershipAmountPlayer = await planetNfts.balanceOf(
       randomUser.address
@@ -181,7 +181,7 @@ describe("Game", function () {
     //@notice actual register function for Tron Network
     const registration = await vrfFacet
       .connect(randomUser)
-      .startRegister(0);
+      .startRegister(0,2);
 
     const checkOwnershipAmountPlayer = await planetNfts.balanceOf(
       randomUser.address
@@ -221,7 +221,7 @@ describe("Game", function () {
     //@notice actual register function for Tron Network
     const registration = await vrfFacet
       .connect(randomUser)
-      .startRegister(0);
+      .startRegister(0,2);
 
     const checkOwnershipAmountPlayer = await planetNfts.balanceOf(
       randomUser.address
@@ -278,7 +278,7 @@ describe("Game", function () {
     //@notice actual register function for Tron Network
     const registration = await vrfFacet
       .connect(randomUser)
-      .startRegister(0);
+      .startRegister(0,2);
 
     const checkOwnershipAmountPlayer = await planetNfts.balanceOf(
       randomUser.address
@@ -337,8 +337,8 @@ describe("Game", function () {
 
     //create two opponents
 
-    await vrfFacet.connect(randomUser).startRegister(0);
-    await vrfFacet.connect(randomUserTwo).startRegister(0);
+    await vrfFacet.connect(randomUser).startRegister(0,2);
+    await vrfFacet.connect(randomUserTwo).startRegister(0,2);
 
     const planetIdPlayer1 = await planetNfts.tokenOfOwnerByIndex(
       randomUser.address,
@@ -492,8 +492,8 @@ describe("Game", function () {
 
     //create two opponents
 
-    await vrfFacet.connect(randomUser).startRegister(0);
-    await vrfFacet.connect(randomUserTwo).startRegister(0);
+    await vrfFacet.connect(randomUser).startRegister(0,2);
+    await vrfFacet.connect(randomUserTwo).startRegister(0,2);
 
     const planetIdPlayer1 = await planetNfts.tokenOfOwnerByIndex(
       randomUser.address,
@@ -640,8 +640,8 @@ describe("Game", function () {
       AdminUser,
     } = await loadFixture(deployUsers);
 
-    await vrfFacet.connect(randomUser).startRegister(0);
-    await vrfFacet.connect(randomUserTwo).startRegister(0);
+    await vrfFacet.connect(randomUser).startRegister(0,2);
+    await vrfFacet.connect(randomUserTwo).startRegister(0,2);
 
     const planetIdPlayer1 = await planetNfts.tokenOfOwnerByIndex(
       randomUser.address,
@@ -751,8 +751,8 @@ describe("Game", function () {
 
       //create two opponents
 
-      await vrfFacet.connect(randomUser).startRegister(0);
-      await vrfFacet.connect(randomUserTwo).startRegister(0);
+      await vrfFacet.connect(randomUser).startRegister(0,2);
+      await vrfFacet.connect(randomUserTwo).startRegister(0,2);
 
       const planetIdPlayer1 = await planetNfts.tokenOfOwnerByIndex(
         randomUser.address,
@@ -937,8 +937,8 @@ describe("Game", function () {
       AdminUser,
     } = await loadFixture(deployUsers);
 
-    await vrfFacet.connect(randomUser).startRegister(0);
-    await vrfFacet.connect(randomUserTwo).startRegister(0);
+    await vrfFacet.connect(randomUser).startRegister(0,2);
+    await vrfFacet.connect(randomUserTwo).startRegister(0,2);
 
     const planetIdPlayer1 = await planetNfts.tokenOfOwnerByIndex(
       randomUser.address,
@@ -971,8 +971,8 @@ describe("Game", function () {
       AdminUser,
     } = await loadFixture(deployUsers);
 
-    await vrfFacet.connect(randomUser).startRegister(0);
-    await vrfFacet.connect(randomUserTwo).startRegister(0);
+    await vrfFacet.connect(randomUser).startRegister(0,2);
+    await vrfFacet.connect(randomUserTwo).startRegister(0,2);
 
     const planetIdPlayer1 = await planetNfts.tokenOfOwnerByIndex(
       randomUser.address,
@@ -1026,7 +1026,7 @@ describe("Game", function () {
     //@notice actual register function for Tron Network
     const registration = await vrfFacet
       .connect(randomUser)
-      .startRegister(0);
+      .startRegister(0,2);
 
     const checkOwnershipAmountPlayer = await planetNfts.balanceOf(
       randomUser.address
@@ -1117,7 +1117,7 @@ describe("Game", function () {
     //@notice actual register function for Tron Network
     const registration = await vrfFacet
       .connect(randomUser)
-      .startRegister(0);
+      .startRegister(0,2);
 
     const checkOwnershipAmountPlayer = await planetNfts.balanceOf(
       randomUser.address
@@ -1220,7 +1220,7 @@ describe("Game", function () {
     //@notice actual register function for Tron Network
     const registration = await vrfFacet
       .connect(randomUser)
-      .startRegister(0);
+      .startRegister(0,2);
 
     const checkOwnershipAmountPlayer = await planetNfts.balanceOf(
       randomUser.address
@@ -1317,7 +1317,7 @@ describe("Game", function () {
     //@notice actual register function for Tron Network
     const registration = await vrfFacet
       .connect(randomUser)
-      .startRegister(0);
+      .startRegister(0,2);
 
     const checkOwnershipAmountPlayer = await planetNfts.balanceOf(
       randomUser.address
@@ -1424,7 +1424,7 @@ describe("Game", function () {
     //@notice actual register function for Tron Network
     const registration = await vrfFacet
       .connect(randomUser)
-      .startRegister(0);
+      .startRegister(0,2);
 
     const checkOwnershipAmountPlayer = await planetNfts.balanceOf(
       randomUser.address
@@ -1505,7 +1505,7 @@ describe("Game", function () {
     //@notice actual register function for Tron Network
     const registration = await vrfFacet
       .connect(randomUser)
-      .startRegister(0);
+      .startRegister(0,2);
 
     const checkOwnershipAmountPlayer = await planetNfts.balanceOf(
       randomUser.address

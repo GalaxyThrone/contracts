@@ -10,7 +10,9 @@ import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 
 contract RegisterFacet is Modifiers {
-    function startRegister(uint256 _factionChosen) external {
+
+    
+    function startRegister(uint256 _factionChosen, uint _planetTypeChosen) external {
         require(
             !s.registrationStarted[msg.sender],
             "VRFFacet: already registering"
@@ -21,6 +23,9 @@ contract RegisterFacet is Modifiers {
             _factionChosen <= s.availableFactions,
             "Faction does not exist!"
         );
+
+        require(_planetTypeChosen > 1, "planetType not available!");
+
 
         // drawRandomNumbers(msg.sender);
         uint256[] memory _randomness = new uint256[](1);
@@ -39,7 +44,7 @@ contract RegisterFacet is Modifiers {
         }
 
         s.playersFaction[msg.sender] = _factionChosen;
-        finalizeRegister(msg.sender, _randomness);
+        finalizeRegister(msg.sender, _randomness, _planetTypeChosen);
     }
 
     function drawRandomNumbers(address _player) internal {
@@ -57,7 +62,7 @@ contract RegisterFacet is Modifiers {
         s.registrationStarted[_player] = true;
     }
 
-    function finalizeRegister(address _player, uint256[] memory _randomness)
+    function finalizeRegister(address _player, uint256[] memory _randomness, uint _planetTypeChosen)
         internal
     {
         uint256 totalSupply = IERC721(s.planetsAddress).totalSupply();
@@ -77,9 +82,15 @@ contract RegisterFacet is Modifiers {
                     tokenId
                 );
                 s.registered[msg.sender] = true;
+
+                //@TODO make dependend on planetType
                 IERC20(s.metalAddress).mint(address(this), 120000 ether);
                 IERC20(s.crystalAddress).mint(address(this), 80000 ether);
                 IERC20(s.antimatterAddress).mint(address(this), 60000 ether);
+
+                s.planetType[tokenId] = _planetTypeChosen;
+
+                //@TODO make dependend on planetType
                 s.planetResources[tokenId][0] += 120000 ether;
                 s.planetResources[tokenId][1] += 80000 ether;
                 s.planetResources[tokenId][2] += 60000 ether;
