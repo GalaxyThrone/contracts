@@ -154,46 +154,21 @@ export async function addBuildings(buildingsAddress: string) {
     name: "Shipyard",
   };
 
-
-  const addBuilding1Tx = await buildingsContract.addBuilding(
-    1,
-    building1
-  );
-  await addBuilding1Tx.wait();
-
-  const addBuilding2Tx = await buildingsContract.addBuilding(
-    2,
-    building2
-  );
-  await addBuilding2Tx.wait();
-
-  const addBuilding3Tx = await buildingsContract.addBuilding(
-    3,
-    building3
-  );
-  await addBuilding3Tx.wait();
-
-  const addBuilding4Tx = await buildingsContract.addBuilding(
-    4,
-    building4
-  );
-  await addBuilding4Tx.wait();
-
-  const addBuilding5Tx = await buildingsContract.addBuilding(
-    5,
-    building5
-  );
-  await addBuilding5Tx.wait();
-
-  const addBuilding6Tx = await buildingsContract.addBuilding(
-    6,
-    building6
-  );
-  await addBuilding6Tx.wait();
-
-  const addBuilding7Tx = await buildingsContract.addBuilding(
-    7,
-    building7
-  );
-  await addBuilding7Tx.wait();
+  const buildingsToAdd = [
+    {id: 1, building: building1},
+    {id: 2, building: building2},
+    {id: 3, building: building3},
+    {id: 4, building: building4},
+    {id: 5, building: building5},
+    {id: 6, building: building6},
+    {id: 7, building: building7},
+    {id: 8, building: building8},
+    {id: 9, building: building9},
+  ];
+  
+  for (const {id, building} of buildingsToAdd) {
+    const addBuildingTx = await buildingsContract.addBuilding(id, building);
+    await addBuildingTx.wait();
+  }
+  
 }

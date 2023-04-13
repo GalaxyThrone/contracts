@@ -868,7 +868,7 @@
     },
     "4edf32cdc6794149fcd2155cf5046335cfc1f5713e56a620cda217af7174be4a": {
       "address": "0x4A679253410272dd5232B3Ff7cF5dbB88f295319",
-      "txHash": "0x6b716bbdac8cc96a4d4abafbee49755d133b20c4c39c18dd77e1b4647d3b6882",
+      "txHash": "0xf7b69481b92e0369e46c69320b2e75a507839a5b1a30f67d3de0d9e699cc4fe1",
       "layout": {
         "solcVersion": "0.8.17",
         "storage": [
@@ -1029,7 +1029,7 @@
             "label": "SpaceShips",
             "offset": 0,
             "slot": "252",
-            "type": "t_mapping(t_uint256,t_struct(ShipType)22066_storage)",
+            "type": "t_mapping(t_uint256,t_struct(ShipType)2697_storage)",
             "contract": "Ships",
             "src": "contracts/other/Ships.sol:36"
           },
@@ -1045,7 +1045,7 @@
             "label": "shipType",
             "offset": 0,
             "slot": "254",
-            "type": "t_mapping(t_uint256,t_struct(ShipType)22066_storage)",
+            "type": "t_mapping(t_uint256,t_struct(ShipType)2697_storage)",
             "contract": "Ships",
             "src": "contracts/other/Ships.sol:42"
           },
@@ -1053,7 +1053,7 @@
             "label": "shipModuleType",
             "offset": 0,
             "slot": "255",
-            "type": "t_mapping(t_uint256,t_struct(ShipModule)22083_storage)",
+            "type": "t_mapping(t_uint256,t_struct(ShipModule)2714_storage)",
             "contract": "Ships",
             "src": "contracts/other/Ships.sol:44"
           },
@@ -1061,7 +1061,7 @@
             "label": "equippedShipModuleType",
             "offset": 0,
             "slot": "256",
-            "type": "t_mapping(t_uint256,t_mapping(t_uint256,t_struct(ShipModule)22083_storage))",
+            "type": "t_mapping(t_uint256,t_mapping(t_uint256,t_struct(ShipModule)2714_storage))",
             "contract": "Ships",
             "src": "contracts/other/Ships.sol:47"
           },
@@ -1131,15 +1131,15 @@
             "label": "mapping(uint256 => address)",
             "numberOfBytes": "32"
           },
-          "t_mapping(t_uint256,t_mapping(t_uint256,t_struct(ShipModule)22083_storage))": {
+          "t_mapping(t_uint256,t_mapping(t_uint256,t_struct(ShipModule)2714_storage))": {
             "label": "mapping(uint256 => mapping(uint256 => struct Ships.ShipModule))",
             "numberOfBytes": "32"
           },
-          "t_mapping(t_uint256,t_struct(ShipModule)22083_storage)": {
+          "t_mapping(t_uint256,t_struct(ShipModule)2714_storage)": {
             "label": "mapping(uint256 => struct Ships.ShipModule)",
             "numberOfBytes": "32"
           },
-          "t_mapping(t_uint256,t_struct(ShipType)22066_storage)": {
+          "t_mapping(t_uint256,t_struct(ShipType)2697_storage)": {
             "label": "mapping(uint256 => struct Ships.ShipType)",
             "numberOfBytes": "32"
           },
@@ -1151,7 +1151,7 @@
             "label": "string",
             "numberOfBytes": "32"
           },
-          "t_struct(ShipModule)22083_storage": {
+          "t_struct(ShipModule)2714_storage": {
             "label": "struct Ships.ShipModule",
             "members": [
               {
@@ -1187,7 +1187,7 @@
             ],
             "numberOfBytes": "352"
           },
-          "t_struct(ShipType)22066_storage": {
+          "t_struct(ShipType)2697_storage": {
             "label": "struct Ships.ShipType",
             "members": [
               {
