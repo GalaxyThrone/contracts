@@ -90,7 +90,10 @@ contract RegisterFacet is Modifiers {
 
                 s.planetType[tokenId] = _planetTypeChosen;
 
-                //@TODO make dependend on planetType
+                //@TODO make dependend on planetType, see appStorage mapping
+                //@TODO dont forget to fix terraforming of planetType 0 planets to something else (random?)
+
+                //@TODO @Marco did you fix the minimumRec issue with this?
                 s.planetResources[tokenId][0] += 120000 ether;
                 s.planetResources[tokenId][1] += 80000 ether;
                 s.planetResources[tokenId][2] += 60000 ether;
