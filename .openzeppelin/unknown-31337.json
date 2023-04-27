@@ -2,7 +2,7 @@
   "manifestVersion": "3.2",
   "admin": {
     "address": "0x0B306BF915C4d645ff596e518fAf3F9669b97016",
-    "txHash": "0xc046a6c103e54539987e22e5dc2a242d7837024aa3fd96ab928421c4bd32c469"
+    "txHash": "0x2acfe64fefc5a1c01021bd3e361fe1e6fb3c7d5aefc34a4a0eca805942465d6f"
   },
   "proxies": [
     {
@@ -542,37 +542,37 @@
     },
     {
       "address": "0x959922bE3CAee4b8Cd9a407cc3ac1C251C2007B1",
-      "txHash": "0xd3c1c86ce8c8d8fef69a5e24cba06d9e2e97648bd674cf2d3bed58455693d4f2",
+      "txHash": "0x3876fda2b263f5705b77885a0719abba66c2c2a6451a82bc382086609e60bc11",
       "kind": "transparent"
     },
     {
       "address": "0x68B1D87F95878fE05B998F19b66F4baba5De1aed",
-      "txHash": "0xed5e5c855a2616bbd696da2ef277ebc16474bd140cb71276be8e2c643f2d5b4e",
+      "txHash": "0xb54a406ddfba0546b8e1ad87ffc84ba91640a2093e5a893c8e3c0ba45d9b1a59",
       "kind": "transparent"
     },
     {
       "address": "0xc6e7DF5E7b4f2A278906862b61205850344D4e7d",
-      "txHash": "0xcabb2ffe297cdaa54dc5c49818c196c481fd376082b293091723b78d153677ef",
+      "txHash": "0x11e7db0619701c2e47b8c1feebf0beaa1d673355b29e529faebb87afc58c0e5f",
       "kind": "transparent"
     },
     {
       "address": "0x4ed7c70F96B99c776995fB64377f0d4aB3B0e1C1",
-      "txHash": "0x503ef20d2f8d3a7fd8f8b989df569f5c8309af4cc7782aff5ff996523b29b9ca",
+      "txHash": "0x89c827db4c99b313cd603a37f5528c93b5a741e0a452ce1103c64c7a323fce8a",
       "kind": "transparent"
     },
     {
       "address": "0xa85233C63b9Ee964Add6F2cffe00Fd84eb32338f",
-      "txHash": "0xe8578e7dbff2678266f084aa49b006b4835e29332d2cfdd49b77792ba990323d",
+      "txHash": "0xfd6946d5e6867fc2d8e4d700a748217617dc052899aae66b14c1a111613ec8cd",
       "kind": "transparent"
     },
     {
       "address": "0x7a2088a1bFc9d81c55368AE168C2C02570cB814F",
-      "txHash": "0x42c1a4d3b49354aeae3e0cb4e42dd813fd89a88a0d6a0ed5dd03d00957b50786",
+      "txHash": "0x6ae21213b035ec6bb25aa5d7105c5e51f1346d92d6dbba985166aeb79abcb542",
       "kind": "transparent"
     },
     {
       "address": "0xc5a5C42992dECbae36851359345FE25997F5C42d",
-      "txHash": "0xb96e81e179d62b3f99f033ceeb0e40dd035f15af2bbfda9cdaae28bda3ed6547",
+      "txHash": "0xf3c5f4f93d7c8cc0df35c1890b83a7ceaa011eae65aa8e70497c26e5d58017e9",
       "kind": "transparent"
     }
   ],
@@ -875,7 +875,7 @@
     },
     "734b8db82374a8e10f4aab26d240fa1c240b2f9bcfc8379104c104ffabbe71b9": {
       "address": "0x9A676e781A523b5d0C0e43731313A708CB607508",
-      "txHash": "0x3c2051893bf32f77802cd8ca406bbe45de4e66e27dcd4eab8d648298d3667efd",
+      "txHash": "0xfc606a8f3c41d3fa9aaa6e76189d07c5b2e62f203d13b5d25e449ee0cc8298ba",
       "layout": {
         "solcVersion": "0.8.17",
         "storage": [
@@ -1023,7 +1023,7 @@
     },
     "0dabf0d9339618548005b10268df0b9b50fcf5bebb7fdc39e45d73656a55e70d": {
       "address": "0x9A9f2CCfdE556A7E9Ff0848998Aa4a0CFD8863AE",
-      "txHash": "0xc0f7cce4886e19ac899bd4fc7e43b97262078bf90defc4ac5a9159a5751e7a91",
+      "txHash": "0x7f8e967d33ec5af5b149487e4dec1be665d742b40ba9e5cffda0099f1654c432",
       "layout": {
         "solcVersion": "0.8.17",
         "storage": [
@@ -1171,7 +1171,7 @@
     },
     "ae1f249c1ca5d73565caeb0226975fb07cf1fa7b57ae13ad1eaaf901b68755c0": {
       "address": "0x09635F643e140090A9A8Dcd712eD6285858ceBef",
-      "txHash": "0x4c4089d984083ae300c7426070c87bb68bb67e6de6804c012ece8c1a4525e5df",
+      "txHash": "0x21615af320fabcaf86429cd00cf38aae15e6533028ab6b8cf68b35a782785f3d",
       "layout": {
         "solcVersion": "0.8.17",
         "storage": [
@@ -1268,7 +1268,7 @@
             "label": "buildings",
             "offset": 0,
             "slot": "202",
-            "type": "t_mapping(t_uint256,t_struct(Building)20991_storage)",
+            "type": "t_mapping(t_uint256,t_struct(Building)15161_storage)",
             "contract": "Buildings",
             "src": "contracts/other/Buildings.sol:21"
           },
@@ -1330,7 +1330,7 @@
             "label": "mapping(uint256 => mapping(address => uint256))",
             "numberOfBytes": "32"
           },
-          "t_mapping(t_uint256,t_struct(Building)20991_storage)": {
+          "t_mapping(t_uint256,t_struct(Building)15161_storage)": {
             "label": "mapping(uint256 => struct Buildings.Building)",
             "numberOfBytes": "32"
           },
@@ -1338,7 +1338,7 @@
             "label": "string",
             "numberOfBytes": "32"
           },
-          "t_struct(Building)20991_storage": {
+          "t_struct(Building)15161_storage": {
             "label": "struct Buildings.Building",
             "members": [
               {
@@ -1393,7 +1393,7 @@
     },
     "4edf32cdc6794149fcd2155cf5046335cfc1f5713e56a620cda217af7174be4a": {
       "address": "0x4A679253410272dd5232B3Ff7cF5dbB88f295319",
-      "txHash": "0xf7b69481b92e0369e46c69320b2e75a507839a5b1a30f67d3de0d9e699cc4fe1",
+      "txHash": "0x0cdd62a071fb7f53025cff999e59a65bfa584b7e872d9b8cd6a272196cc4f69e",
       "layout": {
         "solcVersion": "0.8.17",
         "storage": [
@@ -1554,7 +1554,7 @@
             "label": "SpaceShips",
             "offset": 0,
             "slot": "252",
-            "type": "t_mapping(t_uint256,t_struct(ShipType)2697_storage)",
+            "type": "t_mapping(t_uint256,t_struct(ShipType)13541_storage)",
             "contract": "Ships",
             "src": "contracts/other/Ships.sol:36"
           },
@@ -1570,7 +1570,7 @@
             "label": "shipType",
             "offset": 0,
             "slot": "254",
-            "type": "t_mapping(t_uint256,t_struct(ShipType)2697_storage)",
+            "type": "t_mapping(t_uint256,t_struct(ShipType)13541_storage)",
             "contract": "Ships",
             "src": "contracts/other/Ships.sol:42"
           },
@@ -1578,7 +1578,7 @@
             "label": "shipModuleType",
             "offset": 0,
             "slot": "255",
-            "type": "t_mapping(t_uint256,t_struct(ShipModule)2714_storage)",
+            "type": "t_mapping(t_uint256,t_struct(ShipModule)13558_storage)",
             "contract": "Ships",
             "src": "contracts/other/Ships.sol:44"
           },
@@ -1586,7 +1586,7 @@
             "label": "equippedShipModuleType",
             "offset": 0,
             "slot": "256",
-            "type": "t_mapping(t_uint256,t_mapping(t_uint256,t_struct(ShipModule)2714_storage))",
+            "type": "t_mapping(t_uint256,t_mapping(t_uint256,t_struct(ShipModule)13558_storage))",
             "contract": "Ships",
             "src": "contracts/other/Ships.sol:47"
           },
@@ -1656,15 +1656,15 @@
             "label": "mapping(uint256 => address)",
             "numberOfBytes": "32"
           },
-          "t_mapping(t_uint256,t_mapping(t_uint256,t_struct(ShipModule)2714_storage))": {
+          "t_mapping(t_uint256,t_mapping(t_uint256,t_struct(ShipModule)13558_storage))": {
             "label": "mapping(uint256 => mapping(uint256 => struct Ships.ShipModule))",
             "numberOfBytes": "32"
           },
-          "t_mapping(t_uint256,t_struct(ShipModule)2714_storage)": {
+          "t_mapping(t_uint256,t_struct(ShipModule)13558_storage)": {
             "label": "mapping(uint256 => struct Ships.ShipModule)",
             "numberOfBytes": "32"
           },
-          "t_mapping(t_uint256,t_struct(ShipType)2697_storage)": {
+          "t_mapping(t_uint256,t_struct(ShipType)13541_storage)": {
             "label": "mapping(uint256 => struct Ships.ShipType)",
             "numberOfBytes": "32"
           },
@@ -1676,7 +1676,7 @@
             "label": "string",
             "numberOfBytes": "32"
           },
-          "t_struct(ShipModule)2714_storage": {
+          "t_struct(ShipModule)13558_storage": {
             "label": "struct Ships.ShipModule",
             "members": [
               {
@@ -1712,7 +1712,7 @@
             ],
             "numberOfBytes": "352"
           },
-          "t_struct(ShipType)2697_storage": {
+          "t_struct(ShipType)13541_storage": {
             "label": "struct Ships.ShipType",
             "members": [
               {
@@ -1797,7 +1797,7 @@
     },
     "bc2195c91e585aee8dca7f704b0f7077f5bcf320f7885122000d184d62533bda": {
       "address": "0x59b670e9fA9D0A427751Af201D676719a970857b",
-      "txHash": "0x6f9652ba01f8d63abca295850d5bfa0a6217d500fea6839e53ad4f60121f613a",
+      "txHash": "0xd73bfd0abbc0b1555e6de30d3896387b93c195fa454ddfe5545c83d9f55fb0ce",
       "layout": {
         "solcVersion": "0.8.17",
         "storage": [
@@ -1945,7 +1945,7 @@
     },
     "484c63bae335f405c4c94bf121b1fa88d131f1ef872c4da51a1996a8a23f2153": {
       "address": "0x3Aa5ebB10DC797CAC828524e59A333d0A371443c",
-      "txHash": "0x4d2c924807ab0cf7123b1854df446b485eb767ecc3ef013b242f364a6c7be723",
+      "txHash": "0xc8bc0bd3ca9aed524f1c2d5455eb161ea97258db3f6d26223d44f79d544afa23",
       "layout": {
         "solcVersion": "0.8.17",
         "storage": [
@@ -2093,7 +2093,7 @@
     },
     "65cba0c538539fcdb40ca21747b121167d153714a4459dabc825bfeb6af66f27": {
       "address": "0x322813Fd9A801c5507c9de605d63CEA4f2CE6c44",
-      "txHash": "0xd22301ef2f3686a2e4564e18290461d274d130ef0482a15f0111befade9ae219",
+      "txHash": "0x005fa689a77c5d88895877f71f3d158ee9e41e0b97f79d4e0add6326696e7ecd",
       "layout": {
         "solcVersion": "0.8.17",
         "storage": [
@@ -2254,7 +2254,7 @@
             "label": "planets",
             "offset": 0,
             "slot": "252",
-            "type": "t_mapping(t_uint256,t_struct(Planet)12567_storage)",
+            "type": "t_mapping(t_uint256,t_struct(Planet)13196_storage)",
             "contract": "Planets",
             "src": "contracts/other/Planets.sol:33"
           },
@@ -2316,7 +2316,7 @@
             "label": "mapping(uint256 => address)",
             "numberOfBytes": "32"
           },
-          "t_mapping(t_uint256,t_struct(Planet)12567_storage)": {
+          "t_mapping(t_uint256,t_struct(Planet)13196_storage)": {
             "label": "mapping(uint256 => struct Planets.Planet)",
             "numberOfBytes": "32"
           },
@@ -2328,7 +2328,7 @@
             "label": "string",
             "numberOfBytes": "32"
           },
-          "t_struct(Planet)12567_storage": {
+          "t_struct(Planet)13196_storage": {
             "label": "struct Planets.Planet",
             "members": [
               {

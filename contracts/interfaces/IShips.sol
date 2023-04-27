@@ -2,14 +2,14 @@
 pragma solidity 0.8.17;
 
 interface IShips {
-    function mint(address _account, uint256 _shipTypeId)
-        external
-        returns (uint256);
+    function mint(
+        address _account,
+        uint256 _shipTypeId
+    ) external returns (uint256);
 
-    function getPrice(uint256 _fleetId)
-        external
-        view
-        returns (uint256[4] memory);
+    function getPrice(
+        uint256 _fleetId
+    ) external view returns (uint256[4] memory);
 
     struct ShipType {
         uint256 shipType;
@@ -45,20 +45,23 @@ interface IShips {
 
     function deleteShipFromPlanet(uint256 _shipId) external;
 
-    function getShipStats(uint256 _shipId)
-        external
-        view
-        returns (ShipType memory);
+    function getShipStats(
+        uint256 _shipId
+    ) external view returns (ShipType memory);
 
-    function checkAssignedPlanet(uint256 _shipId)
-        external
-        view
-        returns (uint256);
+    function checkAssignedPlanet(
+        uint256 _shipId
+    ) external view returns (uint256);
 
-    function getDefensePlanet(uint256 _planetId)
-        external
-        view
-        returns (uint256[] memory);
+    function getDefensePlanet(
+        uint256 _planetId
+    ) external view returns (uint256[] memory);
 
     function ownerOf(uint256 _tokenId) external view returns (address);
+
+    function getDefensePlanetDetailed(
+        uint256 _planetId
+    ) external view returns (uint256[] memory, ShipType[] memory);
+
+    function totalSupply() external view returns (uint256);
 }

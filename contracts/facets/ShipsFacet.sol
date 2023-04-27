@@ -94,10 +94,9 @@ contract ShipsFacet is Modifiers {
         IERC20(s.aetherAddress).burnFrom(address(this), price[3] * _amount);
     }
 
-    function claimFleet(uint256 _planetId)
-        external
-        onlyPlanetOwnerOrChainRunner(_planetId)
-    {
+    function claimFleet(
+        uint256 _planetId
+    ) external onlyPlanetOwnerOrChainRunner(_planetId) {
         require(
             block.timestamp >= s.craftFleets[_planetId].readyTimestamp,
             "ShipsFacet: not ready yet"
@@ -153,6 +152,8 @@ contract ShipsFacet is Modifiers {
 
             IShips(s.shipsAddress).assignShipToPlanet(shipId, _planetId);
 
+            s.assignedPlanet[shipId] = _planetId;
+
             s.availableModuleSlots[shipId] += s
                 .shipType[s.craftFleets[_planetId].itemId]
                 .moduleSlots;
@@ -164,19 +165,15 @@ contract ShipsFacet is Modifiers {
         IPlanets(s.planetsAddress).enablePVP(_planetId);
     }
 
-    function getCraftFleets(uint256 _planetId)
-        external
-        view
-        returns (CraftItem memory)
-    {
+    function getCraftFleets(
+        uint256 _planetId
+    ) external view returns (CraftItem memory) {
         return (s.craftFleets[_planetId]);
     }
 
-    function getAllCraftShipsPlayer(address _player)
-        external
-        view
-        returns (CraftItem[] memory)
-    {
+    function getAllCraftShipsPlayer(
+        address _player
+    ) external view returns (CraftItem[] memory) {
         uint256 totalCount = IERC721(s.planetsAddress).balanceOf(_player);
 
         uint256 counter;
@@ -314,11 +311,10 @@ contract ShipsFacet is Modifiers {
         delete s.sendTerraform[_sendTerraformId];
     }
 
-    function compareStrings(string memory a, string memory b)
-        internal
-        pure
-        returns (bool)
-    {
+    function compareStrings(
+        string memory a,
+        string memory b
+    ) internal pure returns (bool) {
         return (keccak256(abi.encodePacked((a))) ==
             keccak256(abi.encodePacked((b))));
     }
@@ -418,8 +414,8 @@ contract ShipsFacet is Modifiers {
                 //mining the resources on the diamond
                 if (j < 3) {
                     s.planetResources[s.outMining[_outMiningId].fromPlanetId][
-                            j
-                        ] += minedAmount;
+                        j
+                    ] += minedAmount;
 
                     IPlanets(s.planetsAddress).mineResource(
                         s.outMining[_outMiningId].toPlanetId,
@@ -482,10 +478,10 @@ contract ShipsFacet is Modifiers {
         return s.totalPlanetsAmount;
     }
 
-    function calculatePercentage(uint256 amount, uint256 percentage)
-        public
-        returns (uint256)
-    {
+    function calculatePercentage(
+        uint256 amount,
+        uint256 percentage
+    ) public returns (uint256) {
         return (amount * percentage * 100) / 1e4;
     }
 
@@ -583,11 +579,9 @@ contract ShipsFacet is Modifiers {
         );
     }
 
-    function checkShippingCapacities(uint256 _planetId)
-        external
-        view
-        returns (uint256)
-    {
+    function checkShippingCapacities(
+        uint256 _planetId
+    ) external view returns (uint256) {
         uint256 totalShippingCapacity;
         address _player = IERC721(s.planetsAddress).ownerOf(_planetId);
         uint256 totalCount = IERC721(s.shipsAddress).balanceOf(_player);
@@ -623,11 +617,9 @@ contract ShipsFacet is Modifiers {
 
     //@TODO  to be refactored to backend/frontend nft selection. its a waste of gas imho
 
-    function checkShippingCapacitiesInternal(uint256 _planetId)
-        internal
-        view
-        returns (uint256)
-    {
+    function checkShippingCapacitiesInternal(
+        uint256 _planetId
+    ) internal view returns (uint256) {
         uint256 totalShippingCapacity;
         address _player = IERC721(s.planetsAddress).ownerOf(_planetId);
         uint256 totalCount = IERC721(s.shipsAddress).balanceOf(_player);
@@ -662,15 +654,9 @@ contract ShipsFacet is Modifiers {
         return currShipCargo;
     }
 
-    function getCargoShipsPlanet(uint256 _planetId)
-        internal
-        view
-        returns (
-            uint256,
-            uint256[] memory,
-            uint256[] memory
-        )
-    {
+    function getCargoShipsPlanet(
+        uint256 _planetId
+    ) internal view returns (uint256, uint256[] memory, uint256[] memory) {
         address _player = IERC721(s.planetsAddress).ownerOf(_planetId);
         uint256 totalCount = IERC721(s.shipsAddress).balanceOf(_player);
         uint256 counter;
@@ -722,14 +708,14 @@ contract ShipsFacet is Modifiers {
 
         //fulfill delivery
         s.planetResources[s.transferResource[_transferResourceId].toPlanetId][
-                0
-            ] += s.transferResource[_transferResourceId].sentResources[0];
+            0
+        ] += s.transferResource[_transferResourceId].sentResources[0];
         s.planetResources[s.transferResource[_transferResourceId].toPlanetId][
-                1
-            ] += s.transferResource[_transferResourceId].sentResources[1];
+            1
+        ] += s.transferResource[_transferResourceId].sentResources[1];
         s.planetResources[s.transferResource[_transferResourceId].toPlanetId][
-                2
-            ] += s.transferResource[_transferResourceId].sentResources[2];
+            2
+        ] += s.transferResource[_transferResourceId].sentResources[2];
 
         for (
             uint256 i;
@@ -746,11 +732,9 @@ contract ShipsFacet is Modifiers {
         delete s.transferResource[_transferResourceId];
     }
 
-    function checkAlliance(address _playerToCheck)
-        internal
-        view
-        returns (bytes32)
-    {
+    function checkAlliance(
+        address _playerToCheck
+    ) internal view returns (bytes32) {
         return s.allianceOfPlayer[_playerToCheck];
     }
 
@@ -777,11 +761,9 @@ contract ShipsFacet is Modifiers {
 
     //@notice should multiple terraformings be possible? counterplay?
 
-    function showIncomingTerraformersPlanet2(uint256 _planetId)
-        external
-        view
-        returns (SendTerraform memory)
-    {
+    function showIncomingTerraformersPlanet2(
+        uint256 _planetId
+    ) external view returns (SendTerraform memory) {
         uint256 totalCount;
         for (uint256 i = 0; i < s.sendTerraformId; i++) {
             if (s.sendTerraform[i].toPlanetId == _planetId) {
@@ -790,11 +772,9 @@ contract ShipsFacet is Modifiers {
         }
     }
 
-    function showIncomingTerraformersPlanet(uint256 _planetId)
-        external
-        view
-        returns (SendTerraform[] memory)
-    {
+    function showIncomingTerraformersPlanet(
+        uint256 _planetId
+    ) external view returns (SendTerraform[] memory) {
         uint256 totalCount;
         for (uint256 i = 0; i < s.sendTerraformId; i++) {
             if (s.sendTerraform[i].toPlanetId == _planetId) {
@@ -818,19 +798,15 @@ contract ShipsFacet is Modifiers {
         return incomingTerraformers;
     }
 
-    function showTerraformingInstance(uint256 _idToCheck)
-        external
-        view
-        returns (SendTerraform memory)
-    {
+    function showTerraformingInstance(
+        uint256 _idToCheck
+    ) external view returns (SendTerraform memory) {
         return s.sendTerraform[_idToCheck];
     }
 
-    function getAllOutMining(uint256 _planetId)
-        external
-        view
-        returns (OutMining[] memory)
-    {
+    function getAllOutMining(
+        uint256 _planetId
+    ) external view returns (OutMining[] memory) {
         uint256 totalCount;
         for (uint256 i = 0; i <= s.outMiningId; i++) {
             if (s.outMining[i].fromPlanetId == _planetId) {
@@ -852,11 +828,9 @@ contract ShipsFacet is Modifiers {
         return allOutMinings;
     }
 
-    function getAllSendResources(uint256 _planetId)
-        external
-        view
-        returns (TransferResource[] memory)
-    {
+    function getAllSendResources(
+        uint256 _planetId
+    ) external view returns (TransferResource[] memory) {
         uint256 totalCount;
         for (uint256 i = 0; i <= s.transferResourceId; i++) {
             if (s.transferResource[i].fromPlanetId == _planetId) {
@@ -965,76 +939,84 @@ contract ShipsFacet is Modifiers {
         }
     }
 
-
-
-
     //@notice leveling will be instant, but there will be a cooldown afterwards
     function levelShip(uint _shipId) external {
-
-        require(IShips(s.shipsAddress).ownerOf(_shipId) == msg.sender, "not your ship!");
+        require(
+            IShips(s.shipsAddress).ownerOf(_shipId) == msg.sender,
+            "not your ship!"
+        );
 
         //@TODO require to be stationary, not travelling
-        uint currAssignedPlanet = IShips(s.shipsAddress).checkAssignedPlanet(_shipId);
+        uint currAssignedPlanet = IShips(s.shipsAddress).checkAssignedPlanet(
+            _shipId
+        );
 
-        require(IERC721(s.planetsAddress).ownerOf(currAssignedPlanet) == msg.sender,"ship isnt assigned to one of your planets due to movement / friendly base");
+        require(
+            IERC721(s.planetsAddress).ownerOf(currAssignedPlanet) == msg.sender,
+            "ship isnt assigned to one of your planets due to movement / friendly base"
+        );
 
         uint shipTypeToLevel = s.SpaceShips[_shipId].shipType;
         uint currLevel = checkCurrentLevelShip(_shipId);
-        require( currLevel < s.maxLevelShipType[shipTypeToLevel],"cannot level further!");
-        
-        
-
-        for(uint i=0; i<3; i++){
-
-                  require(
-            s.planetResources[currAssignedPlanet][i] >=
-                s.resourceCostLeveling[shipTypeToLevel][currLevel][i],
-            "ShipsFacet: not enough resource!"
+        require(
+            currLevel < s.maxLevelShipType[shipTypeToLevel],
+            "cannot level further!"
         );
 
-               s.planetResources[currAssignedPlanet][i] -= s.resourceCostLeveling[shipTypeToLevel][currLevel][i];
-               
-         
+        for (uint i = 0; i < 3; i++) {
+            require(
+                s.planetResources[currAssignedPlanet][i] >=
+                    s.resourceCostLeveling[shipTypeToLevel][currLevel][i],
+                "ShipsFacet: not enough resource!"
+            );
 
+            s.planetResources[currAssignedPlanet][i] -= s.resourceCostLeveling[
+                shipTypeToLevel
+            ][currLevel][i];
         }
 
         s.currentLevelShip[_shipId]++;
-        
-    
 
         //@TODO cooldown leveling (? Design question still)
 
         //@TODO less obtuse way of upgrading
-        s.SpaceShips[_shipId].attackTypes[0] += s.statsUpgradeLeveling[shipTypeToLevel][currLevel+1][0];
-        s.SpaceShips[_shipId].attackTypes[1] += s.statsUpgradeLeveling[shipTypeToLevel][currLevel+1][1];
-        s.SpaceShips[_shipId].attackTypes[2] += s.statsUpgradeLeveling[shipTypeToLevel][currLevel+1][2];
+        s.SpaceShips[_shipId].attackTypes[0] += s.statsUpgradeLeveling[
+            shipTypeToLevel
+        ][currLevel + 1][0];
+        s.SpaceShips[_shipId].attackTypes[1] += s.statsUpgradeLeveling[
+            shipTypeToLevel
+        ][currLevel + 1][1];
+        s.SpaceShips[_shipId].attackTypes[2] += s.statsUpgradeLeveling[
+            shipTypeToLevel
+        ][currLevel + 1][2];
 
-
-        s.SpaceShips[_shipId].defenseTypes[0] += s.statsUpgradeLeveling[shipTypeToLevel][currLevel+1][3];
-        s.SpaceShips[_shipId].defenseTypes[1] += s.statsUpgradeLeveling[shipTypeToLevel][currLevel+1][4];
-        s.SpaceShips[_shipId].defenseTypes[2] += s.statsUpgradeLeveling[shipTypeToLevel][currLevel+1][5];
-        s.SpaceShips[_shipId].health += s.statsUpgradeLeveling[shipTypeToLevel][currLevel+1][6];
+        s.SpaceShips[_shipId].defenseTypes[0] += s.statsUpgradeLeveling[
+            shipTypeToLevel
+        ][currLevel + 1][3];
+        s.SpaceShips[_shipId].defenseTypes[1] += s.statsUpgradeLeveling[
+            shipTypeToLevel
+        ][currLevel + 1][4];
+        s.SpaceShips[_shipId].defenseTypes[2] += s.statsUpgradeLeveling[
+            shipTypeToLevel
+        ][currLevel + 1][5];
+        s.SpaceShips[_shipId].health += s.statsUpgradeLeveling[shipTypeToLevel][
+            currLevel + 1
+        ][6];
     }
 
-
-    function checkCurrentLevelShip(uint _tokenId) internal returns(uint){
-
+    function checkCurrentLevelShip(uint _tokenId) internal returns (uint) {
         return s.currentLevelShip[_tokenId];
     }
 
-    function checkAvailableModuleSlots(uint256 _shipId)
-        external
-        view
-        returns (uint256)
-    {
+    function checkAvailableModuleSlots(
+        uint256 _shipId
+    ) external view returns (uint256) {
         return s.availableModuleSlots[_shipId];
     }
 
-    function returnEquippedModuleSlots(uint256 _shipId)
-        external
-        view
-        returns (ShipModule[] memory)
-    {
+    function returnEquippedModuleSlots(
+        uint256 _shipId
+    ) external view returns (ShipModule[] memory) {
         uint256 maxModules = s.SpaceShips[_shipId].moduleSlots;
         ShipModule[] memory currentModules = new ShipModule[](maxModules);
         for (uint256 i = 0; i < s.SpaceShips[_shipId].moduleSlots; i++) {
@@ -1044,11 +1026,39 @@ contract ShipsFacet is Modifiers {
         return currentModules;
     }
 
-    function getShipStatsDiamond(uint256 _shipId)
-        external
-        view
-        returns (ShipType memory)
-    {
+    function getShipStatsDiamond(
+        uint256 _shipId
+    ) external view returns (ShipType memory) {
         return s.SpaceShips[_shipId];
+    }
+
+    function getDefensePlanetDetailed(
+        uint256 _planetId
+    ) external view returns (uint256[] memory, ShipType[] memory) {
+        //@TODO to be refactored / removed / fixed / solved differently
+        uint256 totalFleetSize;
+        for (uint256 i = 0; i < IShips(s.shipsAddress).totalSupply() + 1; i++) {
+            if (s.assignedPlanet[i] == _planetId) {
+                totalFleetSize += 1;
+            }
+        }
+        uint256[] memory defenseFleetToReturn = new uint256[](totalFleetSize);
+        ShipType[] memory defenseFleetShipTypesToReturn = new ShipType[](
+            totalFleetSize
+        );
+        for (uint256 i = 0; i < IShips(s.shipsAddress).totalSupply() + 1; i++) {
+            if (s.assignedPlanet[i] == _planetId) {
+                defenseFleetToReturn[totalFleetSize - 1] = i;
+                totalFleetSize--;
+            }
+        }
+
+        for (uint256 j = 0; j < defenseFleetToReturn.length; j++) {
+            defenseFleetShipTypesToReturn[j] = s.SpaceShips[
+                defenseFleetToReturn[j]
+            ];
+        }
+
+        return (defenseFleetToReturn, defenseFleetShipTypesToReturn);
     }
 }

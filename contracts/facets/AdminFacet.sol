@@ -42,10 +42,10 @@ contract AdminFacet is Modifiers {
         s.vrfRequest[requestId].kind = 0;
     }
 
-    function addShipType(uint256 _id, ShipType calldata _newShipType)
-        external
-        onlyOwner
-    {
+    function addShipType(
+        uint256 _id,
+        ShipType calldata _newShipType
+    ) external onlyOwner {
         s.shipType[_id] = _newShipType;
     }
 
@@ -61,19 +61,19 @@ contract AdminFacet is Modifiers {
         s.availableFactions = _newAmount;
     }
 
-    function addLevels(uint _shipType, uint _level, uint[7] memory _shipStatsToUpgrade,uint[3] memory _resourceCost, uint _maxLevel ) external onlyOwner{
-            //@TODO add levels via deploy script
+    function addLevels(
+        uint _shipType,
+        uint _level,
+        uint[7] memory _shipStatsToUpgrade,
+        uint[3] memory _resourceCost,
+        uint _maxLevel
+    ) external onlyOwner {
+        //@TODO add levels via deploy script
 
-            s.statsUpgradeLeveling[_shipType][_level] = _shipStatsToUpgrade;
-            s.maxLevelShipType[_shipType] =_maxLevel;
-            s.resourceCostLeveling[_shipType][_level] = _resourceCost;
-
-
+        s.statsUpgradeLeveling[_shipType][_level] = _shipStatsToUpgrade;
+        s.maxLevelShipType[_shipType] = _maxLevel;
+        s.resourceCostLeveling[_shipType][_level] = _resourceCost;
     }
-
- 
-
-
 
     function drawRandomAttackSeed(uint256 _attackId) external onlySelf {
         // Will revert if subscription is not set and funded.
@@ -105,10 +105,10 @@ contract AdminFacet is Modifiers {
     }
 
     //@notice creates planets
-    function startInit(uint256 _amount, uint256 typeOfPlanet)
-        external
-        onlyOwner
-    {
+    function startInit(
+        uint256 _amount,
+        uint256 typeOfPlanet
+    ) external onlyOwner {
         require(!s.init, "AdminFacet: already running init");
         s.init = true;
 
@@ -142,9 +142,12 @@ contract AdminFacet is Modifiers {
             _randomness[4] = uint256(keccak256(abi.encode(_randomness[0], i)));
             uint256 coordinateX = _randomness[0] % 10000;
             uint256 coordinateY = _randomness[1] % 10000;
-            uint256 antimatter = (_randomness[2] % 100000) * 1e18;
-            uint256 metal = (_randomness[3] % 100000) * 1e18;
-            uint256 crystal = (_randomness[4] % 100000) * 1e18;
+            uint256 antimatter = ((_randomness[2] % 100000) * 1e18) +
+                (50000 * 1e18);
+            uint256 metal = ((_randomness[3] % 100000)) * 1e18 + (50000 * 1e18);
+            uint256 crystal = ((_randomness[4] % 100000)) *
+                1e18 +
+                (50000 * 1e18);
             IPlanets(s.planetsAddress).mint(
                 IPlanets.Planet({
                     coordinateX: coordinateX,
