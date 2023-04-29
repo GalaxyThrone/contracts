@@ -23,7 +23,7 @@ export async function addFleets(fleetsAddress: string) {
     health: 20,
     cargo: 30,
     craftTime: 18,
-    craftedFrom: 7,
+    craftedFrom: 10,
     name: "Fighter",
     moduleSlots: 1,
   };
@@ -41,14 +41,10 @@ export async function addFleets(fleetsAddress: string) {
     health: 300,
     cargo: 30,
     craftTime: 72,
-    craftedFrom: 7,
+    craftedFrom: 10,
     name: "Frigate",
     moduleSlots: 1,
   };
-
-
-
-
 
   const fleet3: ship = {
     shipType: 3,
@@ -64,7 +60,7 @@ export async function addFleets(fleetsAddress: string) {
     health: 600,
     cargo: 30,
     craftTime: 144,
-    craftedFrom: 7,
+    craftedFrom: 10,
     name: "Cruiser",
     moduleSlots: 1,
   };
@@ -83,7 +79,7 @@ export async function addFleets(fleetsAddress: string) {
     health: 100,
     cargo: 30,
     craftTime: 36,
-    craftedFrom: 7,
+    craftedFrom: 10,
     name: "Raider",
     moduleSlots: 1,
   };
@@ -102,7 +98,7 @@ export async function addFleets(fleetsAddress: string) {
     health: 300,
     cargo: 30,
     craftTime: 72,
-    craftedFrom: 7,
+    craftedFrom: 10,
     name: "Warship",
     moduleSlots: 1,
   };
@@ -121,7 +117,7 @@ export async function addFleets(fleetsAddress: string) {
     health: 100,
     cargo: 50,
     craftTime: 72,
-    craftedFrom: 7,
+    craftedFrom: 10,
     name: "Bomber",
     moduleSlots: 1,
   };
@@ -140,7 +136,7 @@ export async function addFleets(fleetsAddress: string) {
     health: 100,
     cargo: 10000,
     craftTime: 18,
-    craftedFrom: 7,
+    craftedFrom: 10,
     name: "Miner Ship",
     moduleSlots: 1,
   };
@@ -159,7 +155,7 @@ export async function addFleets(fleetsAddress: string) {
     health: 30,
     cargo: 300,
     craftTime: 9,
-    craftedFrom: 7,
+    craftedFrom: 10,
     name: "Courier",
     moduleSlots: 1,
   };
@@ -178,7 +174,7 @@ export async function addFleets(fleetsAddress: string) {
     health: 500,
     cargo: 30,
     craftTime: 180,
-    craftedFrom: 7,
+    craftedFrom: 10,
     name: "Terraformer",
     moduleSlots: 1,
   };
@@ -197,7 +193,7 @@ export async function addFleets(fleetsAddress: string) {
     health: 30,
     cargo: 500,
     craftTime: 9,
-    craftedFrom: 7,
+    craftedFrom: 10,
     name: "Capital-Class Destroyer",
     moduleSlots: 1,
   };
@@ -214,11 +210,9 @@ export async function addFleets(fleetsAddress: string) {
     { id: 9, fleet: fleet9 },
     { id: 10, fleet: fleet10 },
   ];
-  
+
   for (const { id, fleet } of fleetData) {
     const addFleetTx = await fleetsContract.addShipType(id, fleet);
     await addFleetTx.wait();
   }
-  
-
 }
