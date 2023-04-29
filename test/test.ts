@@ -1089,7 +1089,7 @@ describe("Game", function () {
 
     const sendOutmining = await shipsFacet
       .connect(randomUser)
-      .startOutMining(planetId, 25, [shipIdPlayer1]);
+      .startOutMining(planetId, 215, [shipIdPlayer1]);
 
     await ethers.provider.send("evm_mine", [
       timestampBefore + 1200 + 36000,
@@ -1097,8 +1097,9 @@ describe("Game", function () {
 
     const planetType = await shipsFacet
       .connect(randomUser)
-      .getPlanetType(1);
+      .getPlanetType(215);
 
+    console.log(planetType);
     const resolveOutmining = await shipsFacet
       .connect(randomUser)
       .resolveOutMining(1, 0);
@@ -1279,7 +1280,7 @@ describe("Game", function () {
 
     const sendOutmining = await shipsFacet
       .connect(randomUser)
-      .startOutMining(planetId, 25, [shipIdPlayer1]);
+      .startOutMining(planetId, 215, [shipIdPlayer1]);
 
     await ethers.provider.send("evm_mine", [
       timestampBefore + 1200 + 36000,
@@ -1376,7 +1377,7 @@ describe("Game", function () {
 
     const sendOutmining = await shipsFacet
       .connect(randomUser)
-      .startOutMining(planetId, 25, [shipIdPlayer1]);
+      .startOutMining(planetId, 215, [shipIdPlayer1]);
 
     await ethers.provider.send("evm_mine", [
       timestampBefore + 1200 + 36000,
