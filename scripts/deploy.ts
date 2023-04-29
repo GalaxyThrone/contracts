@@ -25,10 +25,7 @@ import { addFaction, addShipModules } from "./addShipModules";
 import { initPlanets } from "./initPlanets";
 import { addLevels } from "./addLevelData";
 
-const {
-  getSelectors,
-  FacetCutAction,
-} = require("./libraries/diamond");
+const { getSelectors, FacetCutAction } = require("./libraries/diamond");
 
 // const gasPrice = 35000000000;
 
@@ -38,9 +35,7 @@ export async function deployDiamond() {
   const deployerAddress = await deployer.getAddress();
   console.log("Deployer:", deployerAddress);
   // deploy DiamondCutFacet
-  const DiamondCutFacet = await ethers.getContractFactory(
-    "DiamondCutFacet"
-  );
+  const DiamondCutFacet = await ethers.getContractFactory("DiamondCutFacet");
   const diamondCutFacet = await DiamondCutFacet.deploy();
   await diamondCutFacet.deployed();
   console.log("DiamondCutFacet deployed:", diamondCutFacet.address);
@@ -98,8 +93,7 @@ export async function deployDiamond() {
   )) as DiamondCutFacet;
 
   // call to init function
-  const functionCall =
-    diamondInit.interface.encodeFunctionData("init");
+  const functionCall = diamondInit.interface.encodeFunctionData("init");
   const tx = await diamondCut.diamondCut(
     cut,
     diamondInit.address,
@@ -127,9 +121,7 @@ export async function deployDiamond() {
 
   console.log("deploying Metal");
   const Metal = await ethers.getContractFactory("Metal");
-  const metal = (await upgrades.deployProxy(Metal, [
-    diamond.address,
-  ])) as Metal;
+  const metal = (await upgrades.deployProxy(Metal, [diamond.address])) as Metal;
   await metal.deployed();
 
   console.log("deploying Crystal");
@@ -163,9 +155,7 @@ export async function deployDiamond() {
   //@notice deploy ships contract instead of Ships
   console.log("deploying ships");
   const Ships = await ethers.getContractFactory("Ships");
-  const ships = (await upgrades.deployProxy(Ships, [
-    diamond.address,
-  ])) as Ships;
+  const ships = (await upgrades.deployProxy(Ships, [diamond.address])) as Ships;
   await ships.deployed();
 
   console.log("deploying Buildings");
@@ -224,8 +214,14 @@ export async function deployDiamond() {
 
   //planetType 0 is undiscovered.
   //the rest should have some meaning
-  const initPlanets = await adminFacet.startInit(20, 0);
-  await initPlanets.wait();
+  for (let i = 0; i < 10; i++) {
+    const initPlanets = await adminFacet.startInit(20, 0);
+    if (Math.random() < 0.05) {
+      const initBelts = await adminFacet.startInit(3, 1);
+      await initBelts.wait();
+    }
+    await initPlanets.wait();
+  }
 
   console.log("ALL DONE");
 
