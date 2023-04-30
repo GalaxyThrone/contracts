@@ -45,8 +45,19 @@ const config: HardhatUserConfig = {
     mumbai: {
       url: process.env.MUMBAI_URL || "",
       accounts:
-        process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+        process.env.PRIVATE_KEY !== undefined
+          ? [process.env.PRIVATE_KEY]
+          : [],
       blockGasLimit: 20000000,
+    },
+
+    BTTC: {
+      url: process.env.BTTC_URL || "",
+      accounts:
+        process.env.PRIVATE_KEY !== undefined
+          ? [process.env.PRIVATE_KEY]
+          : [],
+      blockGasLimit: 90000000,
     },
   },
   gasReporter: {
