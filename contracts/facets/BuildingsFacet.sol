@@ -65,10 +65,9 @@ contract BuildingsFacet is Modifiers {
         IERC20(s.antimatterAddress).burnFrom(address(this), price[2] * _amount);
     }
 
-    function claimBuilding(uint256 _planetId)
-        external
-        onlyPlanetOwnerOrChainRunner(_planetId)
-    {
+    function claimBuilding(
+        uint256 _planetId
+    ) external onlyPlanetOwnerOrChainRunner(_planetId) {
         require(
             block.timestamp >= s.craftBuildings[_planetId].readyTimestamp,
             "BuildingsFacet: not ready yet"
@@ -104,10 +103,9 @@ contract BuildingsFacet is Modifiers {
 
     //@notice
     //replaces mineMetal, mineCrystal, mineAntimatter
-    function mineResources(uint256 _planetId)
-        external
-        onlyPlanetOwnerOrChainRunner(_planetId)
-    {
+    function mineResources(
+        uint256 _planetId
+    ) external onlyPlanetOwnerOrChainRunner(_planetId) {
         uint256 lastClaimed = s.lastClaimed[_planetId];
 
         require(
@@ -172,20 +170,16 @@ contract BuildingsFacet is Modifiers {
     }
 
     //@notice see all running craftbuildings for a planet
-    function getCraftBuildings(uint256 _planetId)
-        external
-        view
-        returns (CraftItem memory)
-    {
+    function getCraftBuildings(
+        uint256 _planetId
+    ) external view returns (CraftItem memory) {
         return (s.craftBuildings[_planetId]);
     }
 
     //@notice see all running craftbuildings for a planet
-    function getAllCraftBuildingsPlayer(address _player)
-        external
-        view
-        returns (CraftItem[] memory)
-    {
+    function getAllCraftBuildingsPlayer(
+        address _player
+    ) external view returns (CraftItem[] memory) {
         uint256 totalCount = IERC721(s.planetsAddress).balanceOf(_player);
 
         uint256 counter;
@@ -216,19 +210,17 @@ contract BuildingsFacet is Modifiers {
         return currentlyCraftedBuildings;
     }
 
-    function getBuildings(uint256 _planetId, uint256 _buildingId)
-        external
-        view
-        returns (uint256)
-    {
+    function getBuildings(
+        uint256 _planetId,
+        uint256 _buildingId
+    ) external view returns (uint256) {
         return s.buildings[_planetId][_buildingId];
     }
 
-    function getAllBuildings(uint256 _planetId, uint256 _totalBuildingTypeCount)
-        external
-        view
-        returns (uint256[] memory)
-    {
+    function getAllBuildings(
+        uint256 _planetId,
+        uint256 _totalBuildingTypeCount
+    ) external view returns (uint256[] memory) {
         uint256[] memory buildingsCount = new uint256[](
             _totalBuildingTypeCount
         );
@@ -239,27 +231,21 @@ contract BuildingsFacet is Modifiers {
         return buildingsCount;
     }
 
-    function getLastClaimed(uint256 _planetId, uint256 _resourceId)
-        external
-        view
-        returns (uint256)
-    {
+    function getLastClaimed(uint256 _planetId) external view returns (uint256) {
         return s.lastClaimed[_planetId];
     }
 
-    function getBoost(uint256 _planetId, uint256 _resourceId)
-        external
-        view
-        returns (uint256)
-    {
+    function getBoost(
+        uint256 _planetId,
+        uint256 _resourceId
+    ) external view returns (uint256) {
         return s.boosts[_planetId][_resourceId];
     }
 
-    function getPlanetResources(uint256 _planetId, uint256 _resourceId)
-        external
-        view
-        returns (uint256)
-    {
+    function getPlanetResources(
+        uint256 _planetId,
+        uint256 _resourceId
+    ) external view returns (uint256) {
         return s.planetResources[_planetId][_resourceId];
     }
 
