@@ -281,7 +281,9 @@ contract ShipsFacet is Modifiers {
         s.sendTerraform[s.sendTerraformId] = newSendTerraform;
 
         //unassign ship from home planet & substract amount
+        // todo remove duplicate storage of assignedPlanet
         IShips(s.shipsAddress).deleteShipFromPlanet(_shipId);
+        delete s.assignedPlanet[_shipId];
         unAssignNewShipTypeIdAmount(_fromPlanetId, _shipId);
         emit SendTerraformer(_toPlanetId, arrivalTime, s.sendTerraformId);
         s.sendTerraformId++;
@@ -307,6 +309,17 @@ contract ShipsFacet is Modifiers {
         IShips(s.shipsAddress).burnShip(
             s.sendTerraform[_sendTerraformId].fleetId
         );
+
+        uint256 random = uint256(
+            keccak256(
+                abi.encodePacked(
+                    blockhash(block.number - 1),
+                    block.timestamp,
+                    _sendTerraformId
+                )
+            )
+        );
+        s.planetType[s.sendTerraform[_sendTerraformId].toPlanetId] = random % 6;
 
         delete s.sendTerraform[_sendTerraformId];
     }

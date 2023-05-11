@@ -6,12 +6,21 @@ import {
 } from "../tasks/deployUpgrade";
 
 export async function upgrade() {
-  const diamondUpgrader = "0x296903b6049161bebEc75F6f391a930bdDBDbbFc";
-  const diamondAddress = "0xB701E11C49802D07FA200A8b61b18CfF8b574a66";
+  const diamondUpgrader = "0x9Fdd6069b4DBb60cE882066dF7E11F0f12B7aFC7";
+  const diamondAddress = "0x1669b179dE0b3Ae36170F9922211e08FadEbd775";
 
   const facets: FacetsAndAddSelectors[] = [
+    // {
+    //   facetName: "BuildingsFacet",
+    //   addSelectors: [
+    //     "function getLastClaimed(uint256 _planetId) external view returns (uint256)",
+    //   ],
+    //   removeSelectors: [
+    //     "function getLastClaimed(uint256 _planetId, uint256 _resourceId) external view returns (uint256)",
+    //   ],
+    // },
     {
-      facetName: "RegisterFacet",
+      facetName: "ShipsFacet",
       addSelectors: [],
       removeSelectors: [],
     },
@@ -73,7 +82,7 @@ export async function upgrade() {
   await run("deployUpgrade", args);
 }
 export async function upgradeTestVersion(diamondAddr: any) {
-  const diamondUpgrader = "0x296903b6049161bebEc75F6f391a930bdDBDbbFc";
+  const diamondUpgrader = "0x9Fdd6069b4DBb60cE882066dF7E11F0f12B7aFC7";
   const diamondAddress = diamondAddr;
 
   const facets: FacetsAndAddSelectors[] = [
@@ -82,11 +91,27 @@ export async function upgradeTestVersion(diamondAddr: any) {
       addSelectors: [
         // "function getRegistered(address _account) external view returns (bool)",
         // "function getCraftBuildings(uint256 _planetId) external view returns (uint256, uint256)",
+        "function getLastClaimed(uint256 _planetId) external view returns (uint256)",
       ],
       removeSelectors: [
         // "function getBatchUnitShieldEndTimestamp(uint256[] calldata _unitTokenIds) external view returns (uint256[200] memory batch_)",
         // "function setAddresses(address _goldAddress, address _lumberAddress, address _manaAddress, address _buildingsAddress, address _landsAddress, address _unitsAddress, address _heroesAddress) external",
         // "function startShield(uint256 _heroId, uint256[] calldata _unitTokenIds, uint256 _hours) external",
+        "function getLastClaimed(uint256 _planetId, uint256 _resourceId) external view returns (uint256)",
+      ],
+    },
+    {
+      facetName: "BuildingsFacet",
+      addSelectors: [
+        // "function getRegistered(address _account) external view returns (bool)",
+        // "function getCraftBuildings(uint256 _planetId) external view returns (uint256, uint256)",
+        "function getLastClaimed(uint256 _planetId) external view returns (uint256)",
+      ],
+      removeSelectors: [
+        // "function getBatchUnitShieldEndTimestamp(uint256[] calldata _unitTokenIds) external view returns (uint256[200] memory batch_)",
+        // "function setAddresses(address _goldAddress, address _lumberAddress, address _manaAddress, address _buildingsAddress, address _landsAddress, address _unitsAddress, address _heroesAddress) external",
+        // "function startShield(uint256 _heroId, uint256[] calldata _unitTokenIds, uint256 _hours) external",
+        "function getLastClaimed(uint256 _planetId, uint256 _resourceId) external view returns (uint256)",
       ],
     },
     // {
