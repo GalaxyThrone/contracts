@@ -817,7 +817,7 @@ contract ShipsFacet is Modifiers {
         return s.sendTerraform[_idToCheck];
     }
 
-    function getAllOutMining(
+    function getAllOutMiningPlanet(
         uint256 _planetId
     ) external view returns (OutMining[] memory) {
         uint256 totalCount;
@@ -833,6 +833,38 @@ contract ShipsFacet is Modifiers {
 
         for (uint256 i = 0; i <= s.outMiningId; i++) {
             if (s.outMining[i].fromPlanetId == _planetId) {
+                allOutMinings[counter] = s.outMining[i];
+                counter++;
+            }
+        }
+
+        return allOutMinings;
+    }
+
+    function getAllOutMiningPlayer(
+        address _player
+    ) external view returns (OutMining[] memory) {
+        uint256 totalCount;
+        for (uint256 i = 0; i <= s.outMiningId; i++) {
+            if (
+                IERC721(s.planetsAddress).ownerOf(
+                    s.outMining[i].fromPlanetId
+                ) == msg.sender
+            ) {
+                totalCount++;
+            }
+        }
+
+        OutMining[] memory allOutMinings = new OutMining[](totalCount);
+
+        uint256 counter = 0;
+
+        for (uint256 i = 0; i <= s.outMiningId; i++) {
+            if (
+                IERC721(s.planetsAddress).ownerOf(
+                    s.outMining[i].fromPlanetId
+                ) == msg.sender
+            ) {
                 allOutMinings[counter] = s.outMining[i];
                 counter++;
             }
