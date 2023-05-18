@@ -501,7 +501,7 @@ contract FightingFacet is Modifiers {
         uint256 counter = 0;
 
         uint256 totalCount;
-        for (uint256 i = 0; i < s.sendAttackId; i++) {
+        for (uint256 i = 0; i < s.sendAttackId + 1; i++) {
             if (
                 IERC721(s.planetsAddress).ownerOf(
                     s.runningAttacks[i].toPlanet
@@ -515,14 +515,16 @@ contract FightingFacet is Modifiers {
             counter
         );
 
-        for (uint256 i = 0; i < s.sendAttackId; i++) {
+        uint256 insertIndex = 0;
+
+        for (uint256 i = 0; i < s.sendAttackId + 1; i++) {
             if (
                 IERC721(s.planetsAddress).ownerOf(
                     s.runningAttacks[i].toPlanet
                 ) == _player
             ) {
-                incomingAttacksPlayer[counter] = s.runningAttacks[i];
-                counter++;
+                incomingAttacksPlayer[insertIndex] = s.runningAttacks[i];
+                insertIndex++;
             }
         }
 
@@ -533,7 +535,8 @@ contract FightingFacet is Modifiers {
         address _player
     ) external view returns (attackStatus[] memory) {
         uint256 counter = 0;
-        for (uint256 i = 0; i < s.sendAttackId; i++) {
+
+        for (uint256 i = 0; i < s.sendAttackId + 1; i++) {
             if (s.runningAttacks[i].attacker == _player) {
                 counter++;
             }
@@ -541,10 +544,11 @@ contract FightingFacet is Modifiers {
 
         attackStatus[] memory outgoingAttacks = new attackStatus[](counter);
 
-        for (uint256 i = 0; i < s.sendAttackId; i++) {
+        uint256 insertIndex = 0;
+        for (uint256 i = 0; i < s.sendAttackId + 1; i++) {
             if (s.runningAttacks[i].attacker == _player) {
-                outgoingAttacks[counter] = s.runningAttacks[i];
-                counter++;
+                outgoingAttacks[insertIndex] = s.runningAttacks[i];
+                insertIndex++;
             }
         }
 
@@ -554,21 +558,21 @@ contract FightingFacet is Modifiers {
     function getAllIncomingAttacksPlanet(
         uint256 _planetId
     ) external view returns (attackStatus[] memory) {
-        uint256 totalCount;
-        for (uint256 i = 0; i < s.sendAttackId; i++) {
+        uint256 counter = 0;
+        for (uint256 i = 0; i < s.sendAttackId + 1; i++) {
             if (s.runningAttacks[i].toPlanet == _planetId) {
-                totalCount++;
+                counter++;
             }
         }
 
-        attackStatus[] memory incomingAttacks = new attackStatus[](totalCount);
+        attackStatus[] memory incomingAttacks = new attackStatus[](counter);
 
-        uint256 counter = 0;
+        uint256 insertIndex = 0;
 
-        for (uint256 i = 0; i < s.sendAttackId; i++) {
+        for (uint256 i = 0; i < s.sendAttackId + 1; i++) {
             if (s.runningAttacks[i].toPlanet == _planetId) {
-                incomingAttacks[counter] = s.runningAttacks[i];
-                counter++;
+                incomingAttacks[insertIndex] = s.runningAttacks[i];
+                insertIndex++;
             }
         }
 

@@ -127,11 +127,8 @@ struct AppStorage {
     mapping(uint256 => VrfRequest) vrfRequest;
     mapping(address => bool) registrationStarted;
     mapping(uint256 => uint256) planetType;
-    
     mapping(uint => uint[2][3]) planetTypeResourceData;
-
     uint totalAvailablePlanetTypes;
-    
     uint256 totalPlanetsAmount;
     mapping(address => uint256) aetherHeldPlayer;
     //VRF
@@ -153,30 +150,16 @@ struct AppStorage {
     //ship categories template
     //@TODO to be removed. Its duplicated on the actual ship contract
     mapping(uint256 => ShipType) shipType;
-
-
     //load level cost
     mapping(uint => uint) maxLevelShipType;
-
-
     // shiptype => level => statsUpgrade, attackTypes(3), defenseTypes(3), HP
-    mapping(uint => mapping(uint => uint[7]) ) statsUpgradeLeveling;
-
-
-    //shipType => level => resourcePrice 
-    mapping(uint =>mapping(uint => uint[3])) resourceCostLeveling;
-
+    mapping(uint => mapping(uint => uint[7])) statsUpgradeLeveling;
+    //shipType => level => resourcePrice
+    mapping(uint => mapping(uint => uint[3])) resourceCostLeveling;
     mapping(uint => uint) currentLevelShip;
-
-    
-
-
-
-
     //individual spaceShip Nfts
 
     mapping(uint256 => ShipType) SpaceShips;
-
     //shipModuleTypes
     mapping(uint256 => ShipModule) shipModuleType;
     //total shipModuleTypes that exist currently
