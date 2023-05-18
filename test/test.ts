@@ -385,7 +385,6 @@ describe("Game", function () {
     const test = await shipsFacet.getDefensePlanetDetailed(
       planetIdPlayer1
     );
-    console.log(test);
 
     checkOwnershipShipsPlayer = await shipNfts.balanceOf(
       randomUser.address
@@ -1099,7 +1098,6 @@ describe("Game", function () {
       .connect(randomUser)
       .getPlanetType(215);
 
-    console.log(planetType);
     const resolveOutmining = await shipsFacet
       .connect(randomUser)
       .resolveOutMining(1, 0);
@@ -1617,5 +1615,142 @@ describe("Game", function () {
     );
 
     await buildingsFacet.mineResources(16);
+  });
+
+  it("check attack view functions ", async function () {
+    const {
+      owner,
+      randomUser,
+      randomUserTwo,
+      randomUserThree,
+      AdminUser,
+    } = await loadFixture(deployUsers);
+
+    //create two opponents
+
+    await vrfFacet.connect(randomUser).startRegister(0, 2);
+    await vrfFacet.connect(randomUserTwo).startRegister(0, 2);
+
+    const planetIdPlayer1 = await planetNfts.tokenOfOwnerByIndex(
+      randomUser.address,
+      0
+    );
+
+    const planetIdPlayer2 = await planetNfts.tokenOfOwnerByIndex(
+      randomUserTwo.address,
+      0
+    );
+
+    await buildingsFacet
+      .connect(randomUser)
+      .craftBuilding(10, planetIdPlayer1, 1);
+
+    let blockBefore = await ethers.provider.getBlock(
+      await ethers.provider.getBlockNumber()
+    );
+
+    let timestampBefore = blockBefore.timestamp;
+
+    await ethers.provider.send("evm_mine", [timestampBefore + 1200]);
+
+    let claimBuild = await buildingsFacet
+      .connect(randomUser)
+      .claimBuilding(planetIdPlayer1);
+
+    await shipsFacet
+      .connect(randomUser)
+      .craftFleet(6, planetIdPlayer1, 1);
+
+    let checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+      randomUser.address
+    );
+
+    expect(checkOwnershipShipsPlayer).to.equal(0);
+
+    await ethers.provider.send("evm_mine", [
+      timestampBefore + 1200 + 1200,
+    ]);
+
+    await shipsFacet.connect(randomUser).claimFleet(planetIdPlayer1);
+
+    const test = await shipsFacet.getDefensePlanetDetailed(
+      planetIdPlayer1
+    );
+
+    checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+      randomUser.address
+    );
+
+    expect(checkOwnershipShipsPlayer).to.equal(1);
+
+    //@notice player two
+    await buildingsFacet
+      .connect(randomUserTwo)
+      .craftBuilding(10, planetIdPlayer2, 1);
+
+    blockBefore = await ethers.provider.getBlock(
+      await ethers.provider.getBlockNumber()
+    );
+
+    timestampBefore = blockBefore.timestamp;
+
+    await ethers.provider.send("evm_mine", [timestampBefore + 1200]);
+
+    claimBuild = await buildingsFacet
+      .connect(randomUserTwo)
+      .claimBuilding(planetIdPlayer2);
+
+    await shipsFacet
+      .connect(randomUserTwo)
+      .craftFleet(1, planetIdPlayer2, 1);
+
+    checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+      randomUserTwo.address
+    );
+
+    expect(checkOwnershipShipsPlayer).to.equal(0);
+
+    await ethers.provider.send("evm_mine", [
+      timestampBefore + 1200 + 1200,
+    ]);
+
+    await shipsFacet
+      .connect(randomUserTwo)
+      .claimFleet(planetIdPlayer2);
+
+    checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+      randomUserTwo.address
+    );
+
+    expect(checkOwnershipShipsPlayer).to.equal(1);
+
+    const player1Fleet = await shipNfts.getDefensePlanet(
+      planetIdPlayer1
+    );
+
+    const player2Fleet = await shipNfts.getDefensePlanet(
+      planetIdPlayer2
+    );
+
+    //@user1 attacks user2
+
+    let shipIdPlayer1 = await shipNfts.tokenOfOwnerByIndex(
+      randomUser.address,
+      0
+    );
+
+    await fightingFacet
+      .connect(randomUser)
+      .sendAttack(planetIdPlayer1, planetIdPlayer2, [shipIdPlayer1]);
+
+    await ethers.provider.send("evm_mine", [timestampBefore + 48000]);
+
+    // //@notice we get the instance Id from the event on the planet contract (attackInitated);
+
+    const outgoingAtks = await fightingFacet.getAllOutgoingAttacks(
+      randomUser.address
+    );
+
+    expect(outgoingAtks).to.not.be.empty;
   });
 });
