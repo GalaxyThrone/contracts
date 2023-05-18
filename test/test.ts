@@ -1739,6 +1739,11 @@ describe("Game", function () {
       0
     );
 
+    const outgoingAtksEmpty =
+      await fightingFacet.getAllOutgoingAttacks(randomUser.address);
+
+    expect(outgoingAtksEmpty).to.be.empty;
+
     await fightingFacet
       .connect(randomUser)
       .sendAttack(planetIdPlayer1, planetIdPlayer2, [shipIdPlayer1]);
@@ -1752,5 +1757,19 @@ describe("Game", function () {
     );
 
     expect(outgoingAtks).to.not.be.empty;
+
+    const incomingAtks =
+      await fightingFacet.getAllIncomingAttacksPlanet(
+        planetIdPlayer2
+      );
+
+    expect(incomingAtks).to.not.be.empty;
+
+    const incomingAtksPlayer =
+      await fightingFacet.getAllIncomingAttacksPlanet(
+        randomUserTwo.address
+      );
+
+    expect(incomingAtks).to.not.be.empty;
   });
 });

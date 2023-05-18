@@ -55,9 +55,7 @@ contract ShipsFacet is Modifiers {
 
         //Hivemind  Craft-Time Buff.
         if (s.playersFaction[msg.sender] == 3) {
-            readyTimestamp -=
-                ((block.timestamp + (craftTime * _amount)) * 20) /
-                100;
+            readyTimestamp -= ((craftTime * _amount) * 20) / 100;
         }
         CraftItem memory newFleet = CraftItem(
             _amount,

@@ -500,8 +500,7 @@ contract FightingFacet is Modifiers {
     ) external view returns (attackStatus[] memory) {
         uint256 counter = 0;
 
-        uint256 totalCount;
-        for (uint256 i = 0; i < s.sendAttackId + 1; i++) {
+        for (uint256 i = 1; i < s.sendAttackId + 1; i++) {
             if (
                 IERC721(s.planetsAddress).ownerOf(
                     s.runningAttacks[i].toPlanet
@@ -517,7 +516,7 @@ contract FightingFacet is Modifiers {
 
         uint256 insertIndex = 0;
 
-        for (uint256 i = 0; i < s.sendAttackId + 1; i++) {
+        for (uint256 i = 1; i < s.sendAttackId + 1; i++) {
             if (
                 IERC721(s.planetsAddress).ownerOf(
                     s.runningAttacks[i].toPlanet
