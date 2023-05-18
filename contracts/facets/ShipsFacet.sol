@@ -148,8 +148,6 @@ contract ShipsFacet is Modifiers {
 
             s.fleets[_planetId][shipTypeId] += 1;
 
-            IShips(s.shipsAddress).assignShipToPlanet(shipId, _planetId);
-
             s.assignedPlanet[shipId] = _planetId;
 
             s.availableModuleSlots[shipId] += s
@@ -280,7 +278,7 @@ contract ShipsFacet is Modifiers {
 
         //unassign ship from home planet & substract amount
         // todo remove duplicate storage of assignedPlanet
-        IShips(s.shipsAddress).deleteShipFromPlanet(_shipId);
+
         delete s.assignedPlanet[_shipId];
         unAssignNewShipTypeIdAmount(_fromPlanetId, _shipId);
         emit SendTerraformer(_toPlanetId, arrivalTime, s.sendTerraformId);
@@ -317,7 +315,9 @@ contract ShipsFacet is Modifiers {
                 )
             )
         );
-        s.planetType[s.sendTerraform[_sendTerraformId].toPlanetId] = random % 6;
+        s.planetType[s.sendTerraform[_sendTerraformId].toPlanetId] =
+            (random % 4) +
+            2;
 
         delete s.sendTerraform[_sendTerraformId];
     }
@@ -347,8 +347,7 @@ contract ShipsFacet is Modifiers {
 
         for (uint256 i; i < _shipIds.length; i++) {
             require(
-                IShips(s.shipsAddress).checkAssignedPlanet(_shipIds[i]) ==
-                    _fromPlanetId,
+                s.assignedPlanet[_shipIds[i]] == _fromPlanetId,
                 "ship is not assigned to this planet!"
             );
 
@@ -362,8 +361,7 @@ contract ShipsFacet is Modifiers {
                 .shipType;
 
             require(shipType == 7, "only minerShip!");
-
-            IShips(s.shipsAddress).deleteShipFromPlanet(_shipIds[i]);
+            s.assignedPlanet[_shipIds[i]];
         }
 
         uint256 arrivalTime = calculateTravelTime(
@@ -472,13 +470,39 @@ contract ShipsFacet is Modifiers {
                 }
             }
 
-            IShips(s.shipsAddress).assignShipToPlanet(
-                s.outMining[_outMiningId].shipsIds[i],
-                s.outMining[_outMiningId].fromPlanetId
-            );
+            s.assignedPlanet[s.outMining[_outMiningId].shipsIds[i]] = s
+                .outMining[_outMiningId]
+                .fromPlanetId;
         }
 
         delete s.outMining[_outMiningId];
+    }
+
+    function calculateMinedResourceAmount(
+        uint256 cargo,
+        bool isAsteroidbelt
+    ) external view returns (uint256[] memory) {
+        uint256[] memory minedAmounts = new uint256[](4); // Array to store mined amounts for each resource
+
+        for (uint256 j = 0; j < 4; j++) {
+            uint256 minedAmount = 0;
+
+            // Mining the resources on the diamond
+            if (j < 3) {
+                minedAmount = calculatePercentage(cargo, 30);
+            }
+            // Mining aether
+            else {
+                // PlanetType 1 is an Asteroid Belt. Only those are able to redeem aether
+                if (isAsteroidbelt) {
+                    minedAmount = calculatePercentage(cargo, 5);
+                }
+            }
+
+            minedAmounts[j] = minedAmount;
+        }
+
+        return minedAmounts;
     }
 
     function getPlanetType(uint256 _planetId) external view returns (uint256) {
@@ -492,7 +516,7 @@ contract ShipsFacet is Modifiers {
     function calculatePercentage(
         uint256 amount,
         uint256 percentage
-    ) public returns (uint256) {
+    ) public pure returns (uint256) {
         return (amount * percentage * 100) / 1e4;
     }
 
@@ -556,7 +580,7 @@ contract ShipsFacet is Modifiers {
 
             carriedAmount += CargoCapacitiesShips[i];
 
-            IShips(s.shipsAddress).deleteShipFromPlanet(cargoShipIds[i]);
+            delete s.assignedPlanet[cargoShipIds[i]];
 
             if (carriedAmount >= totalAmount) {
                 for (uint256 j = 0; j + i < cargoShipIds.length; j++) {
@@ -614,10 +638,7 @@ contract ShipsFacet is Modifiers {
             currShipCargo = IShips(s.shipsAddress).getCargo(ownedShips[i]);
 
             if (currShipType == 8) {
-                if (
-                    IShips(s.shipsAddress).checkAssignedPlanet(ownedShips[i]) ==
-                    _planetId
-                ) {
+                if (s.assignedPlanet[ownedShips[i]] == _planetId) {
                     totalShippingCapacity += currShipCargo;
                 }
             }
@@ -653,10 +674,7 @@ contract ShipsFacet is Modifiers {
             currShipCargo = IShips(s.shipsAddress).getCargo(ownedShips[i]);
 
             if (currShipType == 8) {
-                if (
-                    IShips(s.shipsAddress).checkAssignedPlanet(ownedShips[i]) ==
-                    _planetId
-                ) {
+                if (s.assignedPlanet[ownedShips[i]] == _planetId) {
                     totalShippingCapacity += currShipCargo;
                 }
             }
@@ -688,10 +706,7 @@ contract ShipsFacet is Modifiers {
 
         for (uint256 i = 0; i < totalCount; i++) {
             if (currShipType == 8) {
-                if (
-                    IShips(s.shipsAddress).checkAssignedPlanet(ownedShips[i]) ==
-                    _planetId
-                ) {
+                if (s.assignedPlanet[ownedShips[i]] == _planetId) {
                     currShipCargo = IShips(s.shipsAddress).getCargo(
                         ownedShips[i]
                     );
@@ -734,10 +749,10 @@ contract ShipsFacet is Modifiers {
             i++
         ) {
             //@TODO can create new function that batch-assigns ships to save gas
-            IShips(s.shipsAddress).assignShipToPlanet(
-                s.transferResource[_transferResourceId].shipsIds[i],
-                s.transferResource[_transferResourceId].fromPlanetId
-            );
+
+            s.assignedPlanet[
+                s.transferResource[_transferResourceId].shipsIds[i]
+            ] = s.transferResource[_transferResourceId].fromPlanetId;
         }
 
         delete s.transferResource[_transferResourceId];
@@ -910,9 +925,7 @@ contract ShipsFacet is Modifiers {
             "not your ship!"
         );
 
-        uint256 currAssignedPlanet = IShips(s.shipsAddress).checkAssignedPlanet(
-            _shipId
-        );
+        uint256 currAssignedPlanet = s.assignedPlanet[_shipId];
 
         require(
             IERC721(s.planetsAddress).ownerOf(currAssignedPlanet) == msg.sender,
@@ -1089,6 +1102,7 @@ contract ShipsFacet is Modifiers {
         ShipType[] memory defenseFleetShipTypesToReturn = new ShipType[](
             totalFleetSize
         );
+
         for (uint256 i = 0; i < IShips(s.shipsAddress).totalSupply() + 1; i++) {
             if (s.assignedPlanet[i] == _planetId) {
                 defenseFleetToReturn[totalFleetSize - 1] = i;
@@ -1103,5 +1117,36 @@ contract ShipsFacet is Modifiers {
         }
 
         return (defenseFleetToReturn, defenseFleetShipTypesToReturn);
+    }
+
+    function getDefensePlanetDetailedIds(
+        uint256 _planetId
+    ) external view returns (uint256[] memory) {
+        //@TODO to be refactored / removed / fixed / solved differently
+        uint256 totalFleetSize;
+        for (uint256 i = 0; i < IShips(s.shipsAddress).totalSupply() + 1; i++) {
+            if (s.assignedPlanet[i] == _planetId) {
+                totalFleetSize += 1;
+            }
+        }
+        uint256[] memory defenseFleetToReturn = new uint256[](totalFleetSize);
+        ShipType[] memory defenseFleetShipTypesToReturn = new ShipType[](
+            totalFleetSize
+        );
+
+        for (uint256 i = 0; i < IShips(s.shipsAddress).totalSupply() + 1; i++) {
+            if (s.assignedPlanet[i] == _planetId) {
+                defenseFleetToReturn[totalFleetSize - 1] = i;
+                totalFleetSize--;
+            }
+        }
+
+        for (uint256 j = 0; j < defenseFleetToReturn.length; j++) {
+            defenseFleetShipTypesToReturn[j] = s.SpaceShips[
+                defenseFleetToReturn[j]
+            ];
+        }
+
+        return (defenseFleetToReturn);
     }
 }

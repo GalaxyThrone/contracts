@@ -721,9 +721,8 @@ describe("Game", function () {
       planetIdPlayer2
     );
 
-    const getShipsOnPlanetBefore = await shipNfts.getDefensePlanet(
-      planetIdPlayer2
-    );
+    const getShipsOnPlanetBefore =
+      await shipsFacet.getDefensePlanetDetailedIds(planetIdPlayer2);
 
     let shipIdPlayer1Reinforcement =
       await shipNfts.tokenOfOwnerByIndex(randomUser.address, 1);
@@ -734,9 +733,8 @@ describe("Game", function () {
         shipIdPlayer1Reinforcement,
       ]);
 
-    const getShipsOnPlanetAfter = await shipNfts.getDefensePlanet(
-      planetIdPlayer2
-    );
+    const getShipsOnPlanetAfter =
+      await shipsFacet.getDefensePlanetDetailedIds(planetIdPlayer2);
 
     expect(getShipsOnPlanetAfter.length).to.be.above(
       getShipsOnPlanetBefore.length
@@ -912,9 +910,8 @@ describe("Game", function () {
 
       expect(planetsOwnedPlayer1).to.equal(2);
 
-      const getShipsOnPlanetBefore = await shipNfts.getDefensePlanet(
-        planetIdPlayer2
-      );
+      const getShipsOnPlanetBefore =
+        await shipsFacet.getDefensePlanetDetailedIds(planetIdPlayer2);
 
       const sendReinforcementsToPlanet = await fightingFacet
         .connect(randomUser)
@@ -922,9 +919,8 @@ describe("Game", function () {
           shipIdPlayer1Reinforcement,
         ]);
 
-      const getShipsOnPlanetAfter = await shipNfts.getDefensePlanet(
-        planetIdPlayer2
-      );
+      const getShipsOnPlanetAfter =
+        await shipsFacet.getDefensePlanetDetailedIds(planetIdPlayer2);
 
       expect(getShipsOnPlanetAfter.length).to.be.above(
         getShipsOnPlanetBefore.length
