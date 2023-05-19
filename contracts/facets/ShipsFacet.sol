@@ -858,7 +858,7 @@ contract ShipsFacet is Modifiers {
         address _player
     ) external view returns (OutMining[] memory) {
         uint256 totalCount;
-        for (uint256 i = 0; i <= s.outMiningId + 1; i++) {
+        for (uint256 i = 1; i <= s.outMiningId + 1; i++) {
             if (
                 IERC721(s.planetsAddress).ownerOf(
                     s.outMining[i].fromPlanetId
@@ -872,7 +872,7 @@ contract ShipsFacet is Modifiers {
 
         uint256 counter = 0;
 
-        for (uint256 i = 0; i <= s.outMiningId + 1; i++) {
+        for (uint256 i = 1; i <= s.outMiningId + 1; i++) {
             if (
                 IERC721(s.planetsAddress).ownerOf(
                     s.outMining[i].fromPlanetId
@@ -890,7 +890,7 @@ contract ShipsFacet is Modifiers {
         uint256 _planetId
     ) external view returns (TransferResource[] memory) {
         uint256 totalCount;
-        for (uint256 i = 0; i <= s.transferResourceId + 1; i++) {
+        for (uint256 i = 1; i <= s.transferResourceId + 1; i++) {
             if (s.transferResource[i].fromPlanetId == _planetId) {
                 totalCount++;
             }
@@ -902,7 +902,7 @@ contract ShipsFacet is Modifiers {
 
         uint256 counter = 0;
 
-        for (uint256 i = 0; i <= s.transferResourceId + 1; i++) {
+        for (uint256 i = 1; i <= s.transferResourceId + 1; i++) {
             if (s.transferResource[i].fromPlanetId == _planetId) {
                 allSendResources[counter] = s.transferResource[i];
                 counter++;
