@@ -489,6 +489,10 @@ contract FightingFacet is Modifiers {
         uint256 counter = 0;
 
         for (uint256 i = 1; i < s.sendAttackId + 1; i++) {
+            if (s.runningAttacks[i].toPlanet == 0) {
+                break;
+            }
+
             if (
                 IERC721(s.planetsAddress).ownerOf(
                     s.runningAttacks[i].toPlanet
@@ -505,6 +509,10 @@ contract FightingFacet is Modifiers {
         uint256 insertIndex = 0;
 
         for (uint256 i = 1; i < s.sendAttackId + 1; i++) {
+            if (s.runningAttacks[i].toPlanet == 0) {
+                break;
+            }
+
             if (
                 IERC721(s.planetsAddress).ownerOf(
                     s.runningAttacks[i].toPlanet

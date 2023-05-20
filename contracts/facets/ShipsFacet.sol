@@ -859,6 +859,10 @@ contract ShipsFacet is Modifiers {
     ) external view returns (OutMining[] memory) {
         uint256 totalCount;
         for (uint256 i = 1; i <= s.outMiningId + 1; i++) {
+            if (s.outMining[i].fromPlanetId == 0) {
+                break;
+            }
+
             if (
                 IERC721(s.planetsAddress).ownerOf(
                     s.outMining[i].fromPlanetId
@@ -873,6 +877,10 @@ contract ShipsFacet is Modifiers {
         uint256 counter = 0;
 
         for (uint256 i = 1; i <= s.outMiningId + 1; i++) {
+            if (s.outMining[i].fromPlanetId == 0) {
+                break;
+            }
+
             if (
                 IERC721(s.planetsAddress).ownerOf(
                     s.outMining[i].fromPlanetId
