@@ -232,22 +232,8 @@ contract ShipsFacet is Modifiers {
     function sendTerraform(
         uint256 _fromPlanetId,
         uint256 _toPlanetId,
-        uint256 _shipId
+        uint256[] calldata _shipIds
     ) external onlyPlanetOwner(_fromPlanetId) {
-        require(
-            IShips(s.shipsAddress).ownerOf(_shipId) == msg.sender,
-            "not your ship!"
-        );
-
-        //@TODO replace with simple ID check to save gas.
-        require(
-            compareStrings(
-                IShips(s.shipsAddress).getShipStats(_shipId).name,
-                "Terraformer"
-            ),
-            "only terraform-capital ships can transform uninhabitated planets!"
-        );
-
         //@notice: require an unowned planet
         require(
             IERC721(s.planetsAddress).ownerOf(_toPlanetId) == address(this),
@@ -269,7 +255,7 @@ contract ShipsFacet is Modifiers {
             s.sendTerraformId,
             _fromPlanetId,
             _toPlanetId,
-            _shipId,
+            _shipIds,
             block.timestamp,
             arrivalTime
         );
@@ -279,8 +265,32 @@ contract ShipsFacet is Modifiers {
         //unassign ship from home planet & substract amount
         // todo remove duplicate storage of assignedPlanet
 
-        delete s.assignedPlanet[_shipId];
-        unAssignNewShipTypeIdAmount(_fromPlanetId, _shipId);
+        for (uint256 i = 0; i < _shipIds.length; i++) {
+            require(
+                IShips(s.shipsAddress).ownerOf(_shipIds[i]) == msg.sender,
+                "not your ship!"
+            );
+
+            bool includeTerraform;
+
+            //@TODO replace with simple ID check to save gas.
+            if (
+                (IShips(s.shipsAddress).getShipStats(_shipIds[i]).shipType == 9)
+            ) {
+                includeTerraform = true;
+            }
+
+            require(
+                includeTerraform,
+                "only terraform-capital ships can transform uninhabitated planets!"
+            );
+
+            delete s.assignedPlanet[_shipIds[i]];
+
+            unAssignNewShipTypeIdAmount(_fromPlanetId, _shipIds[i]);
+
+            //@TODO check that ships are on _fromPlanetId
+        }
         emit SendTerraformer(_toPlanetId, arrivalTime, s.sendTerraformId);
         s.sendTerraformId++;
     }
@@ -292,19 +302,31 @@ contract ShipsFacet is Modifiers {
             "ShipsFacet: not ready yet"
         );
 
+        uint256 terraformerId;
+
+        for (
+            uint256 i = 0;
+            i < s.sendTerraform[_sendTerraformId].shipIds.length;
+            i++
+        ) {
+            if (
+                IShips(s.shipsAddress)
+                    .getShipStats(s.sendTerraform[_sendTerraformId].shipIds[i])
+                    .shipType == 9
+            ) {
+                terraformerId = s.sendTerraform[_sendTerraformId].shipIds[i];
+            }
+        }
+
         //@notice transferring planet to terraformer owner. Event on Planet contract
         IPlanets(s.planetsAddress).planetTerraform(
             s.sendTerraform[_sendTerraformId].toPlanetId,
-            IShips(s.shipsAddress).ownerOf(
-                s.sendTerraform[_sendTerraformId].fleetId
-            )
+            IShips(s.shipsAddress).ownerOf(terraformerId)
         );
 
         //@notice burn terraformer ship from owner
 
-        IShips(s.shipsAddress).burnShip(
-            s.sendTerraform[_sendTerraformId].fleetId
-        );
+        IShips(s.shipsAddress).burnShip(terraformerId);
 
         uint256 random = uint256(
             keccak256(
@@ -320,14 +342,6 @@ contract ShipsFacet is Modifiers {
             2;
 
         delete s.sendTerraform[_sendTerraformId];
-    }
-
-    function compareStrings(
-        string memory a,
-        string memory b
-    ) internal pure returns (bool) {
-        return (keccak256(abi.encodePacked((a))) ==
-            keccak256(abi.encodePacked((b))));
     }
 
     function startOutMining(

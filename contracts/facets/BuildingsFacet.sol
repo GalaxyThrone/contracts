@@ -83,22 +83,22 @@ contract BuildingsFacet is Modifiers {
             );
 
             s.buildings[_planetId][buildingId] += 1;
+
+            uint256[3] memory boosts = IBuildings(s.buildingsAddress).getBoosts(
+                buildingId
+            );
+            if (boosts[0] > 0) {
+                s.boosts[_planetId][0] += boosts[0];
+            }
+            if (boosts[1] > 0) {
+                s.boosts[_planetId][1] += boosts[1];
+            }
+            if (boosts[2] > 0) {
+                s.boosts[_planetId][2] += boosts[2];
+            }
         }
 
         delete s.craftBuildings[_planetId];
-
-        uint256[3] memory boosts = IBuildings(s.buildingsAddress).getBoosts(
-            buildingId
-        );
-        if (boosts[0] > 0) {
-            s.boosts[_planetId][0] += boosts[0];
-        }
-        if (boosts[1] > 0) {
-            s.boosts[_planetId][1] += boosts[1];
-        }
-        if (boosts[2] > 0) {
-            s.boosts[_planetId][2] += boosts[2];
-        }
     }
 
     //@notice
