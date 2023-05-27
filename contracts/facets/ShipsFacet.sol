@@ -265,13 +265,13 @@ contract ShipsFacet is Modifiers {
         //unassign ship from home planet & substract amount
         // todo remove duplicate storage of assignedPlanet
 
+        bool includeTerraform;
+
         for (uint256 i = 0; i < _shipIds.length; i++) {
             require(
                 IShips(s.shipsAddress).ownerOf(_shipIds[i]) == msg.sender,
                 "not your ship!"
             );
-
-            bool includeTerraform;
 
             //@TODO replace with simple ID check to save gas.
             if (
@@ -280,17 +280,17 @@ contract ShipsFacet is Modifiers {
                 includeTerraform = true;
             }
 
-            require(
-                includeTerraform,
-                "only terraform-capital ships can transform uninhabitated planets!"
-            );
-
             delete s.assignedPlanet[_shipIds[i]];
 
             unAssignNewShipTypeIdAmount(_fromPlanetId, _shipIds[i]);
 
             //@TODO check that ships are on _fromPlanetId
         }
+
+        require(
+            includeTerraform,
+            "only terraform-capital ships can transform uninhabitated planets!"
+        );
         emit SendTerraformer(_toPlanetId, arrivalTime, s.sendTerraformId);
         s.sendTerraformId++;
     }
@@ -384,14 +384,17 @@ contract ShipsFacet is Modifiers {
             s.playersFaction[msg.sender]
         );
 
+        s.outMiningId++;
+
         OutMining memory newOutMining = OutMining(
+            s.outMiningId,
             _fromPlanetId,
             _toPlanetId,
             _shipIds,
             block.timestamp,
             arrivalTime
         );
-        s.outMiningId++;
+
         s.outMining[s.outMiningId] = newOutMining;
         emit StartOutMining(
             _fromPlanetId,

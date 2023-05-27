@@ -12,6 +12,7 @@ struct CraftItem {
 }
 
 struct OutMining {
+    uint256 instanceId;
     uint256 fromPlanetId;
     uint256 toPlanetId;
     uint256[] shipsIds;
