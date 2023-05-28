@@ -375,7 +375,7 @@ contract ShipsFacet is Modifiers {
                 .shipType;
 
             require(shipType == 7, "only minerShip!");
-            s.assignedPlanet[_shipIds[i]];
+            delete s.assignedPlanet[_shipIds[i]];
         }
 
         uint256 arrivalTime = calculateTravelTime(
@@ -833,6 +833,9 @@ contract ShipsFacet is Modifiers {
     ) external view returns (SendTerraform[] memory) {
         uint256 totalCount;
         for (uint256 i = 0; i < s.sendTerraformId; i++) {
+            if (s.sendTerraform[i].toPlanetId == 0) {
+                continue;
+            }
             if (
                 IShips(s.shipsAddress).ownerOf(s.sendTerraform[i].shipIds[0]) ==
                 _playerToCheck
@@ -848,6 +851,10 @@ contract ShipsFacet is Modifiers {
         uint256 counter = 0;
 
         for (uint256 i = 0; i < s.sendTerraformId; i++) {
+            if (s.sendTerraform[i].toPlanetId == 0) {
+                continue;
+            }
+
             if (
                 IShips(s.shipsAddress).ownerOf(s.sendTerraform[i].shipIds[0]) ==
                 _playerToCheck
@@ -871,7 +878,7 @@ contract ShipsFacet is Modifiers {
     ) external view returns (OutMining[] memory) {
         uint256 totalCount;
         for (uint256 i = 0; i <= s.outMiningId + 1; i++) {
-            if (s.outMining[i].fromPlanetId == _planetId) {
+            if (s.outMining[i].toPlanetId == _planetId) {
                 totalCount++;
             }
         }
@@ -881,7 +888,7 @@ contract ShipsFacet is Modifiers {
         uint256 counter = 0;
 
         for (uint256 i = 0; i <= s.outMiningId + 1; i++) {
-            if (s.outMining[i].fromPlanetId == _planetId) {
+            if (s.outMining[i].toPlanetId == _planetId) {
                 allOutMinings[counter] = s.outMining[i];
                 counter++;
             }
@@ -894,9 +901,9 @@ contract ShipsFacet is Modifiers {
         address _player
     ) external view returns (OutMining[] memory) {
         uint256 totalCount;
-        for (uint256 i = 1; i <= s.outMiningId + 1; i++) {
+        for (uint256 i = 0; i <= s.outMiningId + 1; i++) {
             if (s.outMining[i].fromPlanetId == 0) {
-                break;
+                continue;
             }
 
             if (
@@ -912,9 +919,9 @@ contract ShipsFacet is Modifiers {
 
         uint256 counter = 0;
 
-        for (uint256 i = 1; i <= s.outMiningId + 1; i++) {
+        for (uint256 i = 0; i <= s.outMiningId + 1; i++) {
             if (s.outMining[i].fromPlanetId == 0) {
-                break;
+                continue;
             }
 
             if (

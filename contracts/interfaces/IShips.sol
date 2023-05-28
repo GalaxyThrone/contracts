@@ -45,6 +45,8 @@ interface IShips {
 
     function deleteShipFromPlanet(uint256 _shipId) external;
 
+    function exists(uint256 tokenId) external view returns (bool);
+
     function getShipStats(
         uint256 _shipId
     ) external view returns (ShipType memory);

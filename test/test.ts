@@ -1208,6 +1208,118 @@ describe("Game", function () {
     expect(metalAfter).to.be.above(metalBefore);
   });
 
+  it("outmining view functions testing.", async function () {
+    const {
+      owner,
+      randomUser,
+      randomUserTwo,
+      randomUserThree,
+      AdminUser,
+    } = await loadFixture(deployUsers);
+
+    //@notice actual register function for Tron Network
+    const registration = await vrfFacet
+      .connect(randomUser)
+      .startRegister(0, 2);
+
+    const checkOwnershipAmountPlayer = await planetNfts.balanceOf(
+      randomUser.address
+    );
+
+    const planetId = await planetNfts.tokenOfOwnerByIndex(
+      randomUser.address,
+      0
+    );
+
+    await buildingsFacet
+      .connect(randomUser)
+      .craftBuilding(10, planetId, 1);
+
+    const blockBefore = await ethers.provider.getBlock(
+      await ethers.provider.getBlockNumber()
+    );
+
+    const timestampBefore = blockBefore.timestamp;
+
+    await ethers.provider.send("evm_mine", [timestampBefore + 1200]);
+
+    const claimBuild = await buildingsFacet
+      .connect(randomUser)
+      .claimBuilding(planetId);
+
+    await shipsFacet.connect(randomUser).craftFleet(7, planetId, 1);
+
+    let checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+      randomUser.address
+    );
+
+    expect(checkOwnershipShipsPlayer).to.equal(0);
+
+    await ethers.provider.send("evm_mine", [
+      timestampBefore + 1200 + 12000,
+    ]);
+
+    await shipsFacet.connect(randomUser).claimFleet(planetId);
+
+    checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+      randomUser.address
+    );
+
+    expect(checkOwnershipShipsPlayer).to.equal(1);
+
+    let shipIdPlayer1 = await shipNfts.tokenOfOwnerByIndex(
+      randomUser.address,
+      0
+    );
+
+    const aetherBefore = await buildingsFacet.getAetherPlayer(
+      randomUser.address
+    );
+
+    const metalBefore = await buildingsFacet.getPlanetResources(
+      planetId,
+      0
+    );
+
+    const sendOutmining = await shipsFacet
+      .connect(randomUser)
+      .startOutMining(planetId, 5, [shipIdPlayer1]);
+
+    await ethers.provider.send("evm_mine", [
+      timestampBefore + 1200 + 36000,
+    ]);
+
+    const allOutminingPlayer = await shipsFacet.getAllOutMiningPlayer(
+      randomUser.address
+    );
+
+    const allOutminingPlanet = await shipsFacet.getAllOutMiningPlanet(
+      5
+    );
+
+    expect(allOutminingPlayer).to.deep.equal(allOutminingPlanet);
+
+    const planetAmount = await shipsFacet
+      .connect(randomUser)
+      .getPlanetAmount();
+
+    const resolveOutmining = await shipsFacet
+      .connect(randomUser)
+      .resolveOutMining(1, 0);
+
+    const aetherAfter = await buildingsFacet.getAetherPlayer(
+      randomUser.address
+    );
+
+    const metalAfter = await buildingsFacet.getPlanetResources(
+      planetId,
+      0
+    );
+
+    expect(aetherAfter).to.be.equal(aetherBefore);
+
+    expect(metalAfter).to.be.above(metalBefore);
+  });
   it("User can withdraw Aether to receive the ERC20-Tokens in their wallet", async function () {
     const {
       owner,
@@ -1938,5 +2050,11 @@ describe("Game", function () {
     );
     //player should have two planets now.
     expect(planetsOwnedPlayer1).to.equal(2);
+
+    const terraformingInstancesPlayerAfterwards = await shipsFacet
+      .connect(randomUser)
+      .getAllTerraformingPlayer(randomUser.address);
+
+    expect(terraformingInstancesPlayerAfterwards).to.be.empty;
   });
 });

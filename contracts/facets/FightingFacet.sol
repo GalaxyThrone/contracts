@@ -490,7 +490,7 @@ contract FightingFacet is Modifiers {
 
         for (uint256 i = 1; i < s.sendAttackId + 1; i++) {
             if (s.runningAttacks[i].toPlanet == 0) {
-                break;
+                continue;
             }
 
             if (
@@ -510,7 +510,7 @@ contract FightingFacet is Modifiers {
 
         for (uint256 i = 1; i < s.sendAttackId + 1; i++) {
             if (s.runningAttacks[i].toPlanet == 0) {
-                break;
+                continue;
             }
 
             if (
