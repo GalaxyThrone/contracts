@@ -198,37 +198,6 @@ contract ShipsFacet is Modifiers {
         return currentlyCraftedBuildings;
     }
 
-    function assignNewShipTypeAmount(
-        uint256 _toPlanetId,
-        uint256[] memory _shipsTokenIds
-    ) internal {
-        for (uint256 i = 0; i < _shipsTokenIds.length; i++) {
-            s.fleets[_toPlanetId][
-                IShips(s.shipsAddress).getShipStats(_shipsTokenIds[i]).shipType
-            ] += 1;
-        }
-    }
-
-    function unAssignNewShipTypeAmount(
-        uint256 _toPlanetId,
-        uint256[] memory _shipsTokenIds
-    ) internal {
-        for (uint256 i = 0; i < _shipsTokenIds.length; i++) {
-            s.fleets[_toPlanetId][
-                IShips(s.shipsAddress).getShipStats(_shipsTokenIds[i]).shipType
-            ] -= 1;
-        }
-    }
-
-    function unAssignNewShipTypeIdAmount(
-        uint256 _toPlanetId,
-        uint256 _shipsTokenIds
-    ) internal {
-        s.fleets[_toPlanetId][
-            IShips(s.shipsAddress).getShipStats(_shipsTokenIds).shipType
-        ] -= 1;
-    }
-
     function sendTerraform(
         uint256 _fromPlanetId,
         uint256 _toPlanetId,
@@ -282,8 +251,6 @@ contract ShipsFacet is Modifiers {
 
             delete s.assignedPlanet[_shipIds[i]];
 
-            unAssignNewShipTypeIdAmount(_fromPlanetId, _shipIds[i]);
-
             //@TODO check that ships are on _fromPlanetId
         }
 
@@ -297,6 +264,21 @@ contract ShipsFacet is Modifiers {
 
     //@notice resolve arrival of terraformer
     function endTerraform(uint256 _sendTerraformId) external {
+        //@notice retreat path when the planet isnt uninhabited anymore.
+        if (
+            IERC721(s.planetsAddress).ownerOf(
+                s.sendTerraform[_sendTerraformId].toPlanetId
+            ) != address(this)
+        ) {
+            returnShipsToHome(
+                s.sendTerraform[_sendTerraformId].fromPlanetId,
+                s.sendTerraform[_sendTerraformId].shipsIds
+            );
+
+            delete s.sendTerraform[_sendTerraformId];
+            return;
+        }
+
         require(
             block.timestamp >= s.sendTerraform[_sendTerraformId].arrivalTime,
             "ShipsFacet: not ready yet"
@@ -306,15 +288,15 @@ contract ShipsFacet is Modifiers {
 
         for (
             uint256 i = 0;
-            i < s.sendTerraform[_sendTerraformId].shipIds.length;
+            i < s.sendTerraform[_sendTerraformId].shipsIds.length;
             i++
         ) {
             if (
                 IShips(s.shipsAddress)
-                    .getShipStats(s.sendTerraform[_sendTerraformId].shipIds[i])
+                    .getShipStats(s.sendTerraform[_sendTerraformId].shipsIds[i])
                     .shipType == 9
             ) {
-                terraformerId = s.sendTerraform[_sendTerraformId].shipIds[i];
+                terraformerId = s.sendTerraform[_sendTerraformId].shipsIds[i];
             }
         }
 
@@ -409,21 +391,26 @@ contract ShipsFacet is Modifiers {
         return s.SpaceShips[_shipId].cargo;
     }
 
-    function returnCargo(uint256 _shipId) external view returns (uint256) {
-        return getCargo(_shipId);
-    }
+    function resolveOutMining(uint256 _outMiningId) external {
+        if (
+            IERC721(s.planetsAddress).ownerOf(
+                s.outMining[_outMiningId].toPlanetId
+            ) != address(this)
+        ) {
+            returnShipsToHome(
+                s.outMining[_outMiningId].fromPlanetId,
+                s.outMining[_outMiningId].shipsIds
+            );
 
-    function resolveOutMining(
-        uint256 _outMiningId,
-        uint256 _optionalReturnPlanet
-    ) external {
-        //if the from Planet is conquered,we need an alternate return planet. default for 0 for now.
-        require(_optionalReturnPlanet == 0, "WIP PATH");
+            delete s.outMining[_outMiningId];
+            return;
+        }
 
         require(
             block.timestamp >= s.outMining[_outMiningId].arrivalTime,
             "ShipsFacet: not ready yet"
         );
+
         for (uint256 i; i < s.outMining[_outMiningId].shipsIds.length; i++) {
             uint256 shipType = IShips(s.shipsAddress)
                 .getShipStats(s.outMining[_outMiningId].shipsIds[i])
@@ -493,6 +480,35 @@ contract ShipsFacet is Modifiers {
         }
 
         delete s.outMining[_outMiningId];
+    }
+
+    function returnShipsToHome(
+        uint _fromPlanet,
+        uint256[] memory _shipIds
+    ) internal {
+        //origin planet is still owned by the shipOwner Player
+
+        address shipOwner = IERC721(s.shipsAddress).ownerOf(_shipIds[0]);
+        if (shipOwner == IERC721(s.planetsAddress).ownerOf(_fromPlanet)) {
+            for (uint256 i = 0; i < _shipIds.length; i++) {
+                s.assignedPlanet[_shipIds[i]] = _fromPlanet;
+            }
+        }
+        //player doesnt own any planets anymore, ships go to a tradehub ( curr always planet #42)
+        else if (IERC721(s.planetsAddress).balanceOf(shipOwner) == 0) {
+            uint tradeHubPlanet = 42;
+
+            for (uint256 i = 0; i < _shipIds.length; i++) {
+                s.assignedPlanet[_shipIds[i]] = tradeHubPlanet;
+            }
+        } else {
+            uint256 alternativeHomePlanet = IERC721(s.planetsAddress)
+                .tokenOfOwnerByIndex(shipOwner, 0);
+
+            for (uint256 i = 0; i < _shipIds.length; i++) {
+                s.assignedPlanet[_shipIds[i]] = alternativeHomePlanet;
+            }
+        }
     }
 
     function calculateMinedResourceAmount(
@@ -736,12 +752,31 @@ contract ShipsFacet is Modifiers {
         return (totalShippingCapacity, cargoShips, cargoCapacity);
     }
 
-    function resolveSendResources(
-        uint256 _transferResourceId,
-        uint256 _optionalReturnPlanet
-    ) external {
-        //if the from Planet is conquered,we need an alternate return planet. default for 0 for now.
-        require(_optionalReturnPlanet == 0, "WIP PATH");
+    function resolveSendResources(uint256 _transferResourceId) external {
+        address shipsOwner = IERC721(s.shipsAddress).ownerOf(
+            s.transferResource[_transferResourceId].shipsIds[0]
+        );
+
+        if (
+            checkAlliance(
+                IERC721(s.planetsAddress).ownerOf(
+                    s.transferResource[_transferResourceId].toPlanetId
+                )
+            ) ==
+            checkAlliance(msg.sender) ||
+            msg.sender ==
+            IERC721(s.planetsAddress).ownerOf(
+                s.transferResource[_transferResourceId].toPlanetId
+            )
+        ) {
+            returnShipsToHome(
+                s.transferResource[_transferResourceId].fromPlanetId,
+                s.transferResource[_transferResourceId].shipsIds
+            );
+
+            delete s.transferResource[_transferResourceId];
+            return;
+        }
 
         require(
             block.timestamp >=
@@ -837,8 +872,9 @@ contract ShipsFacet is Modifiers {
                 continue;
             }
             if (
-                IShips(s.shipsAddress).ownerOf(s.sendTerraform[i].shipIds[0]) ==
-                _playerToCheck
+                IShips(s.shipsAddress).ownerOf(
+                    s.sendTerraform[i].shipsIds[0]
+                ) == _playerToCheck
             ) {
                 totalCount++;
             }
@@ -856,8 +892,9 @@ contract ShipsFacet is Modifiers {
             }
 
             if (
-                IShips(s.shipsAddress).ownerOf(s.sendTerraform[i].shipIds[0]) ==
-                _playerToCheck
+                IShips(s.shipsAddress).ownerOf(
+                    s.sendTerraform[i].shipsIds[0]
+                ) == _playerToCheck
             ) {
                 outgoingTerraformersPlayer[counter] = s.sendTerraform[i];
                 counter++;
@@ -982,68 +1019,54 @@ contract ShipsFacet is Modifiers {
             IERC721(s.planetsAddress).ownerOf(currAssignedPlanet) == msg.sender,
             "ship is not on an owned planet!"
         );
-
         require(s.availableModuleSlots[_shipId] > 0, "all Module slots taken!");
 
-        //currently there is a flat resource price per module. Simple
-
-        require(
-            s.planetResources[currAssignedPlanet][0] >=
-                s.shipModuleType[_moduleToEquip].price[0],
-            "ShipsFacet: not enough metal"
-        );
-        require(
-            s.planetResources[currAssignedPlanet][1] >=
-                s.shipModuleType[_moduleToEquip].price[1],
-            "ShipsFacet: not enough crystal"
-        );
-        require(
-            s.planetResources[currAssignedPlanet][2] >=
-                s.shipModuleType[_moduleToEquip].price[2],
-            "ShipsFacet: not enough antimatter"
-        );
-
-        s.planetResources[currAssignedPlanet][0] -= s
-            .shipModuleType[_moduleToEquip]
-            .price[0];
-        s.planetResources[currAssignedPlanet][1] -= s
-            .shipModuleType[_moduleToEquip]
-            .price[1];
-        s.planetResources[currAssignedPlanet][2] -= s
-            .shipModuleType[_moduleToEquip]
-            .price[2];
-        IERC20(s.metalAddress).burnFrom(
-            address(this),
-            s.shipModuleType[_moduleToEquip].price[0]
-        );
-        IERC20(s.crystalAddress).burnFrom(
-            address(this),
-            s.shipModuleType[_moduleToEquip].price[1]
-        );
-        IERC20(s.antimatterAddress).burnFrom(
-            address(this),
-            s.shipModuleType[_moduleToEquip].price[2]
-        );
+        for (uint256 i = 0; i < 3; i++) {
+            require(
+                s.planetResources[currAssignedPlanet][i] >=
+                    s.shipModuleType[_moduleToEquip].price[i],
+                "ShipsFacet: not enough resources"
+            );
+            s.planetResources[currAssignedPlanet][i] -= s
+                .shipModuleType[_moduleToEquip]
+                .price[i];
+            burnResource(i, s.shipModuleType[_moduleToEquip].price[i]);
+        }
 
         s.equippedShipModuleType[_shipId][
             s.availableModuleSlots[_shipId] - 1
         ] = s.shipModuleType[_moduleToEquip];
-
         s.availableModuleSlots[_shipId] -= 1;
-
         s.SpaceShips[_shipId].health += s
             .shipModuleType[_moduleToEquip]
             .healthBoostStat;
 
         for (uint256 i = 0; i < 3; i++) {
-            s.SpaceShips[_shipId].attackTypes[i] += s
-                .shipModuleType[_moduleToEquip]
-                .attackBoostStat[i];
-
-            s.SpaceShips[_shipId].attackTypes[i] += s
-                .shipModuleType[_moduleToEquip]
-                .defenseBoostStat[i];
+            modifyShipStats(i, _shipId, _moduleToEquip);
         }
+    }
+
+    function burnResource(uint256 i, uint256 amount) internal {
+        if (i == 0) {
+            IERC20(s.metalAddress).burnFrom(address(this), amount);
+        } else if (i == 1) {
+            IERC20(s.crystalAddress).burnFrom(address(this), amount);
+        } else {
+            IERC20(s.antimatterAddress).burnFrom(address(this), amount);
+        }
+    }
+
+    function modifyShipStats(
+        uint256 i,
+        uint256 _shipId,
+        uint256 _moduleToEquip
+    ) internal {
+        s.SpaceShips[_shipId].attackTypes[i] += s
+            .shipModuleType[_moduleToEquip]
+            .attackBoostStat[i];
+        s.SpaceShips[_shipId].attackTypes[i] += s
+            .shipModuleType[_moduleToEquip]
+            .defenseBoostStat[i];
     }
 
     //@notice leveling will be instant, but there will be a cooldown afterwards
@@ -1076,7 +1099,6 @@ contract ShipsFacet is Modifiers {
                     s.resourceCostLeveling[shipTypeToLevel][currLevel][i],
                 "ShipsFacet: not enough resource!"
             );
-
             s.planetResources[currAssignedPlanet][i] -= s.resourceCostLeveling[
                 shipTypeToLevel
             ][currLevel][i];
@@ -1087,28 +1109,28 @@ contract ShipsFacet is Modifiers {
         //@TODO cooldown leveling (? Design question still)
 
         //@TODO less obtuse way of upgrading
-        s.SpaceShips[_shipId].attackTypes[0] += s.statsUpgradeLeveling[
-            shipTypeToLevel
-        ][currLevel + 1][0];
-        s.SpaceShips[_shipId].attackTypes[1] += s.statsUpgradeLeveling[
-            shipTypeToLevel
-        ][currLevel + 1][1];
-        s.SpaceShips[_shipId].attackTypes[2] += s.statsUpgradeLeveling[
-            shipTypeToLevel
-        ][currLevel + 1][2];
+        for (uint i = 0; i < 3; i++) {
+            upgradeShipStats(i, _shipId, shipTypeToLevel, currLevel);
+        }
+    }
 
-        s.SpaceShips[_shipId].defenseTypes[0] += s.statsUpgradeLeveling[
+    function upgradeShipStats(
+        uint i,
+        uint _shipId,
+        uint shipTypeToLevel,
+        uint currLevel
+    ) internal {
+        s.SpaceShips[_shipId].attackTypes[i] += s.statsUpgradeLeveling[
             shipTypeToLevel
-        ][currLevel + 1][3];
-        s.SpaceShips[_shipId].defenseTypes[1] += s.statsUpgradeLeveling[
+        ][currLevel + 1][i];
+        s.SpaceShips[_shipId].defenseTypes[i] += s.statsUpgradeLeveling[
             shipTypeToLevel
-        ][currLevel + 1][4];
-        s.SpaceShips[_shipId].defenseTypes[2] += s.statsUpgradeLeveling[
-            shipTypeToLevel
-        ][currLevel + 1][5];
-        s.SpaceShips[_shipId].health += s.statsUpgradeLeveling[shipTypeToLevel][
-            currLevel + 1
-        ][6];
+        ][currLevel + 1][i + 3];
+        if (i == 0) {
+            s.SpaceShips[_shipId].health += s.statsUpgradeLeveling[
+                shipTypeToLevel
+            ][currLevel + 1][6];
+        }
     }
 
     function checkCurrentLevelShip(uint _tokenId) internal returns (uint) {

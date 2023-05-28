@@ -1096,7 +1096,7 @@ describe("Game", function () {
 
     const resolveOutmining = await shipsFacet
       .connect(randomUser)
-      .resolveOutMining(1, 0);
+      .resolveOutMining(1);
 
     const aetherAfter = await buildingsFacet.getAetherPlayer(
       randomUser.address
@@ -1192,7 +1192,7 @@ describe("Game", function () {
 
     const resolveOutmining = await shipsFacet
       .connect(randomUser)
-      .resolveOutMining(1, 0);
+      .resolveOutMining(1);
 
     const aetherAfter = await buildingsFacet.getAetherPlayer(
       randomUser.address
@@ -1305,7 +1305,7 @@ describe("Game", function () {
 
     const resolveOutmining = await shipsFacet
       .connect(randomUser)
-      .resolveOutMining(1, 0);
+      .resolveOutMining(1);
 
     const aetherAfter = await buildingsFacet.getAetherPlayer(
       randomUser.address
@@ -1398,7 +1398,7 @@ describe("Game", function () {
 
     const resolveOutmining = await shipsFacet
       .connect(randomUser)
-      .resolveOutMining(1, 0);
+      .resolveOutMining(1);
 
     const aetherTokensWalletBefore = await aetherToken.balanceOf(
       randomUser.address
@@ -1495,7 +1495,7 @@ describe("Game", function () {
 
     const resolveOutmining = await shipsFacet
       .connect(randomUser)
-      .resolveOutMining(1, 0);
+      .resolveOutMining(1);
 
     const withdrawAetherToWallet = await buildingsFacet
       .connect(randomUser)

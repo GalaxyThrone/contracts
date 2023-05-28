@@ -24,7 +24,7 @@ struct SendTerraform {
     uint256 instanceId;
     uint256 fromPlanetId;
     uint256 toPlanetId;
-    uint256[] shipIds;
+    uint256[] shipsIds;
     uint256 timestamp;
     uint256 arrivalTime;
 }

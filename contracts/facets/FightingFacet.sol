@@ -62,8 +62,6 @@ contract FightingFacet is Modifiers {
             );
             delete s.assignedPlanet[_shipIds[i]];
         }
-        //unassign ships during attack
-        unAssignNewShipTypeAmount(_fromPlanetId, _shipIds);
 
         //to be deleted later @TODO
         uint256 distance = 420;
@@ -103,7 +101,7 @@ contract FightingFacet is Modifiers {
         uint256 _fromPlanetId,
         uint256 _toPlanetId,
         uint256[] memory _shipIds
-    ) external onlyPlanetOwner(_fromPlanetId) {
+    ) external {
         //check if ships are assigned to the planet
 
         require(
@@ -127,46 +125,9 @@ contract FightingFacet is Modifiers {
             delete s.assignedPlanet[_shipIds[i]];
         }
 
-        //@notice can be removed, it overcomplicates things for small improvements in the frontend UX
-        //@notice this can be replaced
-        unAssignNewShipTypeAmount(_fromPlanetId, _shipIds);
-
-        assignNewShipTypeAmount(_toPlanetId, _shipIds);
-
         for (uint256 i = 0; i < _shipIds.length; i++) {
             s.assignedPlanet[_shipIds[i]] = _toPlanetId;
         }
-    }
-
-    function assignNewShipTypeAmount(
-        uint256 _toPlanetId,
-        uint256[] memory _shipsTokenIds
-    ) internal {
-        for (uint256 i = 0; i < _shipsTokenIds.length; i++) {
-            s.fleets[_toPlanetId][
-                IShips(s.shipsAddress).getShipStats(_shipsTokenIds[i]).shipType
-            ] += 1;
-        }
-    }
-
-    function unAssignNewShipTypeAmount(
-        uint256 _toPlanetId,
-        uint256[] memory _shipsTokenIds
-    ) internal {
-        for (uint256 i = 0; i < _shipsTokenIds.length; i++) {
-            s.fleets[_toPlanetId][
-                IShips(s.shipsAddress).getShipStats(_shipsTokenIds[i]).shipType
-            ] -= 1;
-        }
-    }
-
-    function unAssignNewShipTypeIdAmount(
-        uint256 _toPlanetId,
-        uint256 _shipsTokenIds
-    ) internal {
-        s.fleets[_toPlanetId][
-            IShips(s.shipsAddress).getShipStats(_shipsTokenIds).shipType
-        ] -= 1;
     }
 
     function calculateAttackBattleStats(
@@ -257,10 +218,63 @@ contract FightingFacet is Modifiers {
 
     function calculateRandomnessBattle() internal {}
 
+    function returnShipsToHome(
+        uint _fromPlanet,
+        uint256[] memory _shipIds
+    ) internal {
+        //origin planet is still owned by the shipOwner Player
+
+        address shipOwner = IERC721(s.shipsAddress).ownerOf(_shipIds[0]);
+        if (shipOwner == IERC721(s.planetsAddress).ownerOf(_fromPlanet)) {
+            for (uint256 i = 0; i < _shipIds.length; i++) {
+                s.assignedPlanet[_shipIds[i]] = _fromPlanet;
+            }
+        }
+        //player doesnt own any planets anymore, ships go to a tradehub ( curr always planet #42)
+        else if (IERC721(s.planetsAddress).balanceOf(shipOwner) == 0) {
+            uint tradeHubPlanet = 42;
+
+            for (uint256 i = 0; i < _shipIds.length; i++) {
+                s.assignedPlanet[_shipIds[i]] = tradeHubPlanet;
+            }
+        } else {
+            uint256 alternativeHomePlanet = IERC721(s.planetsAddress)
+                .tokenOfOwnerByIndex(shipOwner, 0);
+
+            for (uint256 i = 0; i < _shipIds.length; i++) {
+                s.assignedPlanet[_shipIds[i]] = alternativeHomePlanet;
+            }
+        }
+    }
+
     function resolveAttack(uint256 _attackInstanceId) external {
         attackStatus memory attackToResolve = s.runningAttacks[
             _attackInstanceId
         ];
+
+        //@Retreat Path.
+
+        //@notice if the attacked Planet isnt eligible to be attacked on the resolve time, retreat ships
+
+        address attackerShipsOwner = IERC721(s.shipsAddress).ownerOf(
+            attackToResolve.attackerShipsIds[0]
+        );
+
+        if (
+            attackerShipsOwner ==
+            IERC721(s.planetsAddress).ownerOf(attackToResolve.toPlanet) ||
+            IERC721(s.planetsAddress).ownerOf(attackToResolve.toPlanet) ==
+            address(this)
+        ) {
+            returnShipsToHome(
+                attackToResolve.fromPlanet,
+                attackToResolve.attackerShipsIds
+            );
+
+            delete s.runningAttacks[_attackInstanceId];
+
+            return;
+        }
 
         require(
             block.timestamp >= attackToResolve.timeToBeResolved,
@@ -341,18 +355,6 @@ contract FightingFacet is Modifiers {
                     attackToResolve.attackInstanceId
                 );
 
-                //damage to attackerForce, random? @TODO
-
-                //assign attacker ships to new planet
-                unAssignNewShipTypeAmount(
-                    attackToResolve.toPlanet,
-                    defenderShips
-                );
-                assignNewShipTypeAmount(
-                    attackToResolve.toPlanet,
-                    attackerShips
-                );
-
                 for (uint256 i = 0; i < attackerShips.length; i++) {
                     s.assignedPlanet[attackerShips[i]] = attackToResolve
                         .toPlanet;
@@ -387,15 +389,7 @@ contract FightingFacet is Modifiers {
 
                 //sending ships home
 
-                assignNewShipTypeAmount(
-                    attackToResolve.fromPlanet,
-                    attackerShips
-                );
-
-                for (uint256 i = 0; i < attackerShips.length; i++) {
-                    s.assignedPlanet[attackerShips[i]] = attackToResolve
-                        .fromPlanet;
-                }
+                returnShipsToHome(attackToResolve.fromPlanet, attackerShips);
 
                 emit attackLost(
                     attackToResolve.toPlanet,
@@ -423,25 +417,15 @@ contract FightingFacet is Modifiers {
                 }
             }
 
-            //sending ships home
-
-            assignNewShipTypeAmount(attackToResolve.fromPlanet, attackerShips);
-
-            for (uint256 i = 0; i < attackerShips.length; i++) {
-                s.assignedPlanet[attackerShips[i]] = attackToResolve.fromPlanet;
-            }
+            returnShipsToHome(attackToResolve.fromPlanet, attackerShips);
 
             emit attackLost(attackToResolve.toPlanet, attackToResolve.attacker);
         }
 
         //draw -> currently leads to zero losses, only a retreat
         if (battleResult == 0) {
-            for (uint256 i = 0; i < attackerShips.length; i++) {
-                s.assignedPlanet[attackerShips[i]] = attackToResolve.fromPlanet;
-            }
+            returnShipsToHome(attackToResolve.fromPlanet, attackerShips);
 
-            //sending ships home
-            assignNewShipTypeAmount(attackToResolve.fromPlanet, attackerShips);
             emit attackLost(attackToResolve.toPlanet, attackToResolve.attacker);
         }
 
