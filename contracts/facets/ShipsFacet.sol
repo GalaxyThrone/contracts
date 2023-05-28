@@ -802,19 +802,6 @@ contract ShipsFacet is Modifiers {
         return arrivalTime;
     }
 
-    //@notice should multiple terraformings be possible? counterplay?
-
-    function showIncomingTerraformersPlanet2(
-        uint256 _planetId
-    ) external view returns (SendTerraform memory) {
-        uint256 totalCount;
-        for (uint256 i = 0; i < s.sendTerraformId; i++) {
-            if (s.sendTerraform[i].toPlanetId == _planetId) {
-                return s.sendTerraform[i];
-            }
-        }
-    }
-
     function showIncomingTerraformersPlanet(
         uint256 _planetId
     ) external view returns (SendTerraform[] memory) {
@@ -839,6 +826,38 @@ contract ShipsFacet is Modifiers {
         }
 
         return incomingTerraformers;
+    }
+
+    function getAllTerraformingPlayer(
+        address _playerToCheck
+    ) external view returns (SendTerraform[] memory) {
+        uint256 totalCount;
+        for (uint256 i = 0; i < s.sendTerraformId; i++) {
+            if (
+                IShips(s.shipsAddress).ownerOf(s.sendTerraform[i].shipIds[0]) ==
+                _playerToCheck
+            ) {
+                totalCount++;
+            }
+        }
+
+        SendTerraform[] memory outgoingTerraformersPlayer = new SendTerraform[](
+            totalCount
+        );
+
+        uint256 counter = 0;
+
+        for (uint256 i = 0; i < s.sendTerraformId; i++) {
+            if (
+                IShips(s.shipsAddress).ownerOf(s.sendTerraform[i].shipIds[0]) ==
+                _playerToCheck
+            ) {
+                outgoingTerraformersPlayer[counter] = s.sendTerraform[i];
+                counter++;
+            }
+        }
+
+        return outgoingTerraformersPlayer;
     }
 
     function showTerraformingInstance(
@@ -883,7 +902,7 @@ contract ShipsFacet is Modifiers {
             if (
                 IERC721(s.planetsAddress).ownerOf(
                     s.outMining[i].fromPlanetId
-                ) == msg.sender
+                ) == _player
             ) {
                 totalCount++;
             }
@@ -901,7 +920,7 @@ contract ShipsFacet is Modifiers {
             if (
                 IERC721(s.planetsAddress).ownerOf(
                     s.outMining[i].fromPlanetId
-                ) == msg.sender
+                ) == _player
             ) {
                 allOutMinings[counter] = s.outMining[i];
                 counter++;

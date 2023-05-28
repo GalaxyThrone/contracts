@@ -1797,4 +1797,146 @@ describe("Game", function () {
 
     expect(incomingAtks).to.not.be.empty;
   });
+
+  it("check terraform viewing functions", async function () {
+    const {
+      owner,
+      randomUser,
+      randomUserTwo,
+      randomUserThree,
+      AdminUser,
+    } = await loadFixture(deployUsers);
+
+    //@notice actual register function for Tron Network
+    const registration = await vrfFacet
+      .connect(randomUser)
+      .startRegister(0, 2);
+
+    const checkOwnershipAmountPlayer = await planetNfts.balanceOf(
+      randomUser.address
+    );
+
+    const planetId = await planetNfts.tokenOfOwnerByIndex(
+      randomUser.address,
+      0
+    );
+
+    await buildingsFacet
+      .connect(randomUser)
+      .craftBuilding(10, planetId, 1);
+
+    const blockBefore = await ethers.provider.getBlock(
+      await ethers.provider.getBlockNumber()
+    );
+
+    const timestampBefore = blockBefore.timestamp;
+
+    await ethers.provider.send("evm_mine", [timestampBefore + 1200]);
+
+    const claimBuild = await buildingsFacet
+      .connect(randomUser)
+      .claimBuilding(planetId);
+
+    await shipsFacet.connect(randomUser).craftFleet(9, planetId, 1);
+
+    let checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+      randomUser.address
+    );
+
+    expect(checkOwnershipShipsPlayer).to.equal(0);
+
+    await ethers.provider.send("evm_mine", [
+      timestampBefore + 1200 + 12000,
+    ]);
+
+    await shipsFacet.connect(randomUser).claimFleet(planetId);
+
+    checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+      randomUser.address
+    );
+
+    await shipsFacet.connect(randomUser).craftFleet(6, planetId, 2);
+
+    await ethers.provider.send("evm_mine", [
+      timestampBefore + 1200 + 24000,
+    ]);
+
+    await shipsFacet.connect(randomUser).claimFleet(planetId);
+
+    checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+      randomUser.address
+    );
+
+    expect(checkOwnershipShipsPlayer).to.equal(3);
+
+    let shipId1Player1 = await shipNfts.tokenOfOwnerByIndex(
+      randomUser.address,
+      0
+    );
+
+    let shipId2Player1 = await shipNfts.tokenOfOwnerByIndex(
+      randomUser.address,
+      1
+    );
+
+    let shipId3Player1 = await shipNfts.tokenOfOwnerByIndex(
+      randomUser.address,
+      2
+    );
+
+    const planetToTerraform = 14;
+    await shipsFacet
+      .connect(randomUser)
+      .sendTerraform(planetId, planetToTerraform, [
+        shipId1Player1,
+        shipId2Player1,
+        shipId3Player1,
+      ]);
+
+    await shipsFacet
+      .connect(randomUser)
+      .showIncomingTerraformersPlanet(planetToTerraform);
+
+    const blockTwo = await ethers.provider.getBlock(
+      await ethers.provider.getBlockNumber()
+    );
+
+    const terraformingInstancesPlayer = await shipsFacet
+      .connect(randomUser)
+      .getAllTerraformingPlayer(randomUser.address);
+
+    const terraformingInstancesPlanet = await shipsFacet
+      .connect(randomUser)
+      .showIncomingTerraformersPlanet(planetToTerraform);
+
+    expect(terraformingInstancesPlayer).to.not.be.null;
+
+    //console.log(terraformingInstancesPlayer);
+
+    //console.log(terraformingInstancesPlanet);
+
+    expect(terraformingInstancesPlanet).to.deep.equal(
+      terraformingInstancesPlayer
+    );
+
+    const blockTwoTime = blockTwo.timestamp;
+
+    await ethers.provider.send("evm_mine", [
+      blockTwoTime + 1200 + 220000,
+    ]);
+
+    checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+      randomUser.address
+    );
+
+    expect(checkOwnershipShipsPlayer).to.equal(3);
+
+    await shipsFacet.connect(randomUser).endTerraform(0);
+
+    const planetsOwnedPlayer1 = await planetNfts.balanceOf(
+      randomUser.address
+    );
+    //player should have two planets now.
+    expect(planetsOwnedPlayer1).to.equal(2);
+  });
 });
