@@ -10,9 +10,12 @@ import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 
 contract RegisterFacet is Modifiers {
+    event playerRegistered(address indexed playerAddress, uint indexed faction);
 
-    
-    function startRegister(uint256 _factionChosen, uint _planetTypeChosen) external {
+    function startRegister(
+        uint256 _factionChosen,
+        uint _planetTypeChosen
+    ) external {
         require(
             !s.registrationStarted[msg.sender],
             "VRFFacet: already registering"
@@ -25,7 +28,6 @@ contract RegisterFacet is Modifiers {
         );
 
         require(_planetTypeChosen > 1, "planetType not available!");
-
 
         // drawRandomNumbers(msg.sender);
         uint256[] memory _randomness = new uint256[](1);
@@ -44,6 +46,8 @@ contract RegisterFacet is Modifiers {
         }
 
         s.playersFaction[msg.sender] = _factionChosen;
+
+        emit playerRegistered(msg.sender, _factionChosen);
         finalizeRegister(msg.sender, _randomness, _planetTypeChosen);
     }
 
@@ -62,9 +66,11 @@ contract RegisterFacet is Modifiers {
         s.registrationStarted[_player] = true;
     }
 
-    function finalizeRegister(address _player, uint256[] memory _randomness, uint _planetTypeChosen)
-        internal
-    {
+    function finalizeRegister(
+        address _player,
+        uint256[] memory _randomness,
+        uint _planetTypeChosen
+    ) internal {
         uint256 totalSupply = IERC721(s.planetsAddress).totalSupply();
         for (uint256 i; i < totalSupply; i++) {
             uint256 tokenId = (uint256(
@@ -106,11 +112,9 @@ contract RegisterFacet is Modifiers {
         }
     }
 
-    function checkAsteroidBeltType(uint256 _planetId)
-        internal
-        view
-        returns (bool)
-    {
+    function checkAsteroidBeltType(
+        uint256 _planetId
+    ) internal view returns (bool) {
         if (s.planetType[_planetId] == 1) {
             return true;
         }
@@ -122,11 +126,9 @@ contract RegisterFacet is Modifiers {
         return s.registered[_account];
     }
 
-    function getPlayersFaction(address _account)
-        external
-        view
-        returns (uint256)
-    {
+    function getPlayersFaction(
+        address _account
+    ) external view returns (uint256) {
         return s.playersFaction[_account];
     }
 }
