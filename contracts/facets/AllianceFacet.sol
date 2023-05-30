@@ -45,6 +45,10 @@ contract AllianceFacet is Modifiers {
 
     function createAlliance(bytes32 _allianceNameToCreate) external {
         require(
+            !s.hasCreatedAlliance[msg.sender],
+            "You can only create one alliance!"
+        );
+        require(
             s.allianceOwner[_allianceNameToCreate] == address(0),
             "alliance name is already taken!"
         );
@@ -64,7 +68,7 @@ contract AllianceFacet is Modifiers {
 
         s.registeredAlliances[s.totalAllianceCount] = _allianceNameToCreate;
         s.totalAllianceCount += 1;
-
+        s.hasCreatedAlliance[msg.sender] = true;
         emit allianceCreated(
             _allianceNameToCreate,
             msg.sender,

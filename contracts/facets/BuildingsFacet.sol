@@ -113,7 +113,7 @@ contract BuildingsFacet is Modifiers {
 
         for (uint256 i = 0; i < 3; i++) {
             uint256 boost = s.boosts[_planetId][i];
-            uint256 amountMined = 500 ether + (boost * 1e18);
+            uint256 amountMined = 2000 ether + (boost * 1e18);
             IPlanets(s.planetsAddress).mineResource(_planetId, i, amountMined);
 
             //I know its hacky, but loading the resource contract addresses in an array is more gas intensive
