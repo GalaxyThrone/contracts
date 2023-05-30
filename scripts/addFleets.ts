@@ -27,6 +27,7 @@ export async function addFleets(fleetsAddress: string) {
     name: "Fighter",
     moduleSlots: 1,
   };
+
   const fleet2: ship = {
     shipType: 2,
     price: [
@@ -38,7 +39,7 @@ export async function addFleets(fleetsAddress: string) {
     attack: 200,
     attackTypes: [100, 10, 10],
     defenseTypes: [100, 10, 10],
-    health: 300,
+    health: 500,
     cargo: 30,
     craftTime: 72,
     craftedFrom: 10,
@@ -73,7 +74,7 @@ export async function addFleets(fleetsAddress: string) {
       ethers.utils.parseEther("150"),
       ethers.utils.parseEther("0"),
     ],
-    attack: 80,
+    attack: 60,
     attackTypes: [300, 50, 50],
     defenseTypes: [20, 5, 5],
     health: 100,
@@ -102,7 +103,6 @@ export async function addFleets(fleetsAddress: string) {
     name: "Warship",
     moduleSlots: 1,
   };
-
   const fleet6: ship = {
     shipType: 6,
     price: [
@@ -114,7 +114,7 @@ export async function addFleets(fleetsAddress: string) {
     attack: 600,
     attackTypes: [600, 400, 200],
     defenseTypes: [5, 5, 5],
-    health: 100,
+    health: 150,
     cargo: 50,
     craftTime: 72,
     craftedFrom: 10,
@@ -130,7 +130,7 @@ export async function addFleets(fleetsAddress: string) {
       ethers.utils.parseEther("200"),
       ethers.utils.parseEther("0"),
     ],
-    attack: 10,
+    attack: 0,
     attackTypes: [100, 10, 10],
     defenseTypes: [100, 10, 10],
     health: 100,
@@ -163,12 +163,12 @@ export async function addFleets(fleetsAddress: string) {
   const fleet9: ship = {
     shipType: 9,
     price: [
-      ethers.utils.parseEther("20000"),
-      ethers.utils.parseEther("13000"),
-      ethers.utils.parseEther("11000"),
+      ethers.utils.parseEther("8000"),
+      ethers.utils.parseEther("5000"),
+      ethers.utils.parseEther("3000"),
       ethers.utils.parseEther("0"),
     ],
-    attack: 100,
+    attack: 50,
     attackTypes: [10, 10, 10],
     defenseTypes: [20, 10, 10],
     health: 500,
@@ -182,14 +182,14 @@ export async function addFleets(fleetsAddress: string) {
   const fleet10: ship = {
     shipType: 10,
     price: [
-      ethers.utils.parseEther("200"),
-      ethers.utils.parseEther("150"),
-      ethers.utils.parseEther("50"),
+      ethers.utils.parseEther("10000"),
+      ethers.utils.parseEther("8000"),
+      ethers.utils.parseEther("5000"),
       ethers.utils.parseEther("1000"),
     ],
-    attack: 0,
-    attackTypes: [50000, 50000, 50000],
-    defenseTypes: [30000, 30000, 30000],
+    attack: 1000,
+    attackTypes: [1000, 1000, 1000],
+    defenseTypes: [1000, 1000, 1000],
     health: 30,
     cargo: 500,
     craftTime: 9,

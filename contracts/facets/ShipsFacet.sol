@@ -388,7 +388,7 @@ contract ShipsFacet is Modifiers {
     }
 
     function getCargo(uint256 _shipId) internal view returns (uint256) {
-        return s.SpaceShips[_shipId].cargo;
+        return s.SpaceShips[_shipId].cargo * 1e18;
     }
 
     function resolveOutMining(uint256 _outMiningId) external {
@@ -412,9 +412,6 @@ contract ShipsFacet is Modifiers {
         );
 
         for (uint256 i; i < s.outMining[_outMiningId].shipsIds.length; i++) {
-            uint256 shipType = IShips(s.shipsAddress)
-                .getShipStats(s.outMining[_outMiningId].shipsIds[i])
-                .shipType;
             uint256 cargo = getCargo(s.outMining[_outMiningId].shipsIds[i]);
             // cargo metal
 

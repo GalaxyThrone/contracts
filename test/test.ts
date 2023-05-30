@@ -1000,6 +1000,84 @@ describe("Game", function () {
     expect(MemberTwoAlliance).to.be.equal(CreatorsAlliance);
   });
 
+  it("User can leave an alliance", async function () {
+    const {
+      owner,
+      randomUser,
+      randomUserTwo,
+      randomUserThree,
+      AdminUser,
+    } = await loadFixture(deployUsers);
+
+    await vrfFacet.connect(randomUser).startRegister(0, 2);
+    await vrfFacet.connect(randomUserTwo).startRegister(0, 2);
+
+    const allianceNameBytes32 =
+      ethers.utils.formatBytes32String("bananarama");
+    await allianceFacet
+      .connect(randomUser)
+      .createAlliance(allianceNameBytes32);
+
+    await allianceFacet
+      .connect(randomUser)
+      .inviteToAlliance(randomUserTwo.address);
+
+    await allianceFacet
+      .connect(randomUserTwo)
+      .joinAlliance(allianceNameBytes32);
+
+    await allianceFacet.connect(randomUserTwo).leaveAlliance();
+
+    const allianceOfPlayerTwo =
+      await allianceFacet.getCurrentAlliancePlayer(
+        randomUserTwo.address
+      );
+
+    expect(allianceOfPlayerTwo).to.be.equal(
+      ethers.utils.formatBytes32String("")
+    );
+  });
+
+  it("Alliance owner can kick a member", async function () {
+    const {
+      owner,
+      randomUser,
+      randomUserTwo,
+      randomUserThree,
+      AdminUser,
+    } = await loadFixture(deployUsers);
+
+    await vrfFacet.connect(randomUser).startRegister(0, 2);
+    await vrfFacet.connect(randomUserTwo).startRegister(0, 2);
+
+    const allianceNameBytes32 =
+      ethers.utils.formatBytes32String("bananarama");
+    await allianceFacet
+      .connect(randomUser)
+      .createAlliance(allianceNameBytes32);
+
+    await allianceFacet
+      .connect(randomUser)
+      .inviteToAlliance(randomUserTwo.address);
+
+    await allianceFacet
+      .connect(randomUserTwo)
+      .joinAlliance(allianceNameBytes32);
+
+    await allianceFacet
+      .connect(randomUser)
+      .kickAllianceMember(randomUserTwo.address);
+
+    const allianceOfPlayerTwo =
+      await allianceFacet.getCurrentAlliancePlayer(
+        randomUserTwo.address
+      );
+
+    expect(allianceOfPlayerTwo).to.be.equal(
+      ethers.utils.formatBytes32String("")
+    );
+  });
+
   it("registered user can outmine asteroid belt and get aether", async function () {
     const {
       owner,
@@ -1089,6 +1167,101 @@ describe("Game", function () {
     );
 
     expect(aetherAfter).to.be.above(aetherBefore);
+  });
+
+  it("should return all members of an alliance", async function () {
+    const {
+      owner,
+      randomUser,
+      randomUserTwo,
+      randomUserThree,
+      AdminUser,
+    } = await loadFixture(deployUsers);
+
+    await vrfFacet.connect(randomUser).startRegister(0, 2);
+    await vrfFacet.connect(randomUserTwo).startRegister(0, 2);
+    await vrfFacet.connect(randomUserThree).startRegister(0, 2);
+
+    const allianceNameBytes32 =
+      ethers.utils.formatBytes32String("bananarama");
+    await allianceFacet
+      .connect(randomUser)
+      .createAlliance(allianceNameBytes32);
+
+    await allianceFacet
+      .connect(randomUser)
+      .inviteToAlliance(randomUserTwo.address);
+
+    await allianceFacet
+      .connect(randomUserTwo)
+      .joinAlliance(allianceNameBytes32);
+
+    await allianceFacet
+      .connect(randomUser)
+      .inviteToAlliance(randomUserThree.address);
+
+    await allianceFacet
+      .connect(randomUserThree)
+      .joinAlliance(allianceNameBytes32);
+
+    const allianceMembers =
+      await allianceFacet.viewAllAlliancesMembers(
+        allianceNameBytes32
+      );
+
+    expect(allianceMembers.length).to.equal(3);
+    expect(allianceMembers).to.include.members([
+      randomUser.address,
+      randomUserTwo.address,
+      randomUserThree.address,
+    ]);
+  });
+
+  it("getOutstandingInvitations returns all outstanding invitations for a member", async function () {
+    const {
+      owner,
+      randomUser,
+      randomUserTwo,
+      randomUserThree,
+      AdminUser,
+    } = await loadFixture(deployUsers);
+
+    await vrfFacet.connect(randomUser).startRegister(0, 2);
+    await vrfFacet.connect(randomUserTwo).startRegister(0, 2);
+    await vrfFacet.connect(randomUserThree).startRegister(0, 2);
+
+    const allianceNameBytes32 =
+      ethers.utils.formatBytes32String("bananarama");
+    const allianceNameBytes32Second =
+      ethers.utils.formatBytes32String("secondAlliance");
+
+    // Create two alliances
+    await allianceFacet
+      .connect(randomUser)
+      .createAlliance(allianceNameBytes32);
+    await allianceFacet
+      .connect(randomUserThree)
+      .createAlliance(allianceNameBytes32Second);
+
+    // Invite the same player to both alliances
+    await allianceFacet
+      .connect(randomUser)
+      .inviteToAlliance(randomUserTwo.address);
+    await allianceFacet
+      .connect(randomUserThree)
+      .inviteToAlliance(randomUserTwo.address);
+
+    const outstandingInvitations =
+      await allianceFacet.getOutstandingInvitations(
+        randomUserTwo.address
+      );
+
+    // Expect to have two outstanding invitations
+    expect(outstandingInvitations.length).to.equal(2);
+    expect(outstandingInvitations).to.include(allianceNameBytes32);
+    expect(outstandingInvitations).to.include(
+      allianceNameBytes32Second
+    );
   });
 
   it("registered user can outmine unowned planet and not get aether", async function () {

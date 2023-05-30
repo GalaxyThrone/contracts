@@ -117,6 +117,8 @@ struct AppStorage {
     mapping(bytes32 => address) allianceOwner;
     mapping(address => bytes32) allianceOfPlayer;
     mapping(bytes32 => uint256) allianceMemberCount;
+    mapping(bytes32 => mapping(uint => address)) membersAlliance;
+    mapping(address => bytes32[]) outstandingInvitations;
     mapping(uint256 => bytes32) registeredAlliances;
     mapping(uint256 => attackStatus) runningAttacks;
     uint256 sendAttackId;

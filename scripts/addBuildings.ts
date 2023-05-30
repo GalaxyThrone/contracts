@@ -163,7 +163,10 @@ export async function addBuildings(buildingsAddress: string) {
   ];
 
   for (const { id, building } of buildingsToAdd) {
-    const addBuildingTx = await buildingsContract.addBuilding(id, building);
+    const addBuildingTx = await buildingsContract.addBuilding(
+      id,
+      building
+    );
     await addBuildingTx.wait();
   }
 }
