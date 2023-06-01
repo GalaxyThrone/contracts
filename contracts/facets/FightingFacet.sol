@@ -320,7 +320,7 @@ contract FightingFacet is Modifiers {
             //weakness modifier by, 15% if the difference between the two is 30% in favour of the attacker
             if (attackStrength[i] * 7 > defenseStrength[i] * 10) {
                 battleResult += attackStrength[i] - defenseStrength[i];
-                battleResult += ((attackStrength[i] * 15) / 100);
+                battleResult -= ((attackStrength[i] * 15) / 100);
             } else {
                 battleResult += attackStrength[i] - defenseStrength[i];
             }
@@ -476,13 +476,12 @@ contract FightingFacet is Modifiers {
             if (s.runningAttacks[i].toPlanet == 0) {
                 continue;
             }
-
             if (
                 IERC721(s.planetsAddress).ownerOf(
                     s.runningAttacks[i].toPlanet
                 ) == _player
             ) {
-                counter += 1;
+                counter++;
             }
         }
 
@@ -496,7 +495,6 @@ contract FightingFacet is Modifiers {
             if (s.runningAttacks[i].toPlanet == 0) {
                 continue;
             }
-
             if (
                 IERC721(s.planetsAddress).ownerOf(
                     s.runningAttacks[i].toPlanet
@@ -515,7 +513,7 @@ contract FightingFacet is Modifiers {
     ) external view returns (attackStatus[] memory) {
         uint256 counter = 0;
 
-        for (uint256 i = 0; i < s.sendAttackId + 1; i++) {
+        for (uint256 i = 1; i <= s.sendAttackId + 1; i++) {
             if (s.runningAttacks[i].attacker == _player) {
                 counter++;
             }
@@ -524,7 +522,7 @@ contract FightingFacet is Modifiers {
         attackStatus[] memory outgoingAttacks = new attackStatus[](counter);
 
         uint256 insertIndex = 0;
-        for (uint256 i = 0; i < s.sendAttackId + 1; i++) {
+        for (uint256 i = 1; i <= s.sendAttackId + 1; i++) {
             if (s.runningAttacks[i].attacker == _player) {
                 outgoingAttacks[insertIndex] = s.runningAttacks[i];
                 insertIndex++;
@@ -538,7 +536,7 @@ contract FightingFacet is Modifiers {
         uint256 _planetId
     ) external view returns (attackStatus[] memory) {
         uint256 counter = 0;
-        for (uint256 i = 0; i < s.sendAttackId + 1; i++) {
+        for (uint256 i = 1; i < s.sendAttackId + 1; i++) {
             if (s.runningAttacks[i].toPlanet == _planetId) {
                 counter++;
             }
@@ -548,7 +546,7 @@ contract FightingFacet is Modifiers {
 
         uint256 insertIndex = 0;
 
-        for (uint256 i = 0; i < s.sendAttackId + 1; i++) {
+        for (uint256 i = 1; i < s.sendAttackId + 1; i++) {
             if (s.runningAttacks[i].toPlanet == _planetId) {
                 incomingAttacks[insertIndex] = s.runningAttacks[i];
                 insertIndex++;

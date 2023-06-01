@@ -2002,7 +2002,7 @@ describe("Game", function () {
 
     await shipsFacet
       .connect(randomUser)
-      .craftFleet(6, planetIdPlayer1, 1);
+      .craftFleet(6, planetIdPlayer1, 3);
 
     let checkOwnershipShipsPlayer = await shipNfts.balanceOf(
       randomUser.address
@@ -2024,7 +2024,7 @@ describe("Game", function () {
       randomUser.address
     );
 
-    expect(checkOwnershipShipsPlayer).to.equal(1);
+    expect(checkOwnershipShipsPlayer).to.equal(3);
 
     //@notice player two
     await buildingsFacet
@@ -2038,7 +2038,7 @@ describe("Game", function () {
     timestampBefore = blockBefore.timestamp;
 
     await ethers.provider.send("evm_mine", [
-      timestampBefore + 444444444444444444,
+      timestampBefore + 444444 + 444444 + 444444,
     ]);
 
     claimBuild = await buildingsFacet
@@ -2047,7 +2047,7 @@ describe("Game", function () {
 
     await shipsFacet
       .connect(randomUserTwo)
-      .craftFleet(1, planetIdPlayer2, 1);
+      .craftFleet(2, planetIdPlayer2, 2);
 
     checkOwnershipShipsPlayer = await shipNfts.balanceOf(
       randomUserTwo.address
@@ -2056,7 +2056,7 @@ describe("Game", function () {
     expect(checkOwnershipShipsPlayer).to.equal(0);
 
     await ethers.provider.send("evm_mine", [
-      timestampBefore + 444444444444444444 + 444444444444444444,
+      timestampBefore + 444444 + 444444 + 444444 + 444444,
     ]);
 
     await shipsFacet
@@ -2067,7 +2067,7 @@ describe("Game", function () {
       randomUserTwo.address
     );
 
-    expect(checkOwnershipShipsPlayer).to.equal(1);
+    expect(checkOwnershipShipsPlayer).to.equal(2);
 
     const player1Fleet = await shipNfts.getDefensePlanet(
       planetIdPlayer1
@@ -2084,6 +2084,11 @@ describe("Game", function () {
       0
     );
 
+    let shipIdPlayer1Second = await shipNfts.tokenOfOwnerByIndex(
+      randomUser.address,
+      1
+    );
+
     const outgoingAtksEmpty =
       await fightingFacet.getAllOutgoingAttacks(randomUser.address);
 
@@ -2093,9 +2098,20 @@ describe("Game", function () {
       .connect(randomUser)
       .sendAttack(planetIdPlayer1, planetIdPlayer2, [shipIdPlayer1]);
 
+    await fightingFacet
+      .connect(randomUser)
+      .sendAttack(planetIdPlayer1, planetIdPlayer2, [
+        shipIdPlayer1Second,
+      ]);
+
     await ethers.provider.send("evm_mine", [
       timestampBefore +
-        444444444444444444444444444444444444444444444444444444,
+        +444444 +
+        444444 +
+        444444 +
+        444444 +
+        444444 +
+        444444,
     ]);
 
     // //@notice we get the instance Id from the event on the planet contract (attackInitated);
@@ -2106,19 +2122,24 @@ describe("Game", function () {
 
     expect(outgoingAtks).to.not.be.empty;
 
-    const incomingAtks =
+    const incomingAtksPlanet =
       await fightingFacet.getAllIncomingAttacksPlanet(
         planetIdPlayer2
       );
 
-    expect(incomingAtks).to.not.be.empty;
-
     const incomingAtksPlayer =
-      await fightingFacet.getAllIncomingAttacksPlanet(
+      await fightingFacet.getAllIncomingAttacksPlayer(
         randomUserTwo.address
       );
 
-    expect(incomingAtks).to.not.be.empty;
+    const outgoingAtksPlayer =
+      await fightingFacet.getAllOutgoingAttacks(randomUser.address);
+
+    expect(incomingAtksPlanet.length).to.equal(2);
+
+    expect(incomingAtksPlayer.length).to.equal(2);
+
+    expect(outgoingAtksPlayer.length).to.equal(2);
   });
 
   it("check terraform viewing functions", async function () {
