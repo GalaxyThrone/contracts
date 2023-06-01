@@ -36,6 +36,22 @@ contract BuildingsFacet is Modifiers {
             readyTimestamp -= ((craftTime * _amount) * 20) / 100;
         }
 
+        // new player crafting buff
+        uint256[] memory buildingsPlanetCount = BuildingsFacet(address(this))
+            .getAllBuildings(
+                _planetId,
+                IBuildings(s.buildingsAddress).getTotalBuildingTypes()
+            );
+
+        uint256 totalBuildings = 0;
+        for (uint256 i = 0; i < buildingsPlanetCount.length; i++) {
+            totalBuildings += buildingsPlanetCount[i];
+        }
+
+        if (totalBuildings < 10) {
+            readyTimestamp -= ((craftTime * _amount) * 80) / 100;
+        }
+
         CraftItem memory newBuilding = CraftItem(
             _amount,
             _planetId,
