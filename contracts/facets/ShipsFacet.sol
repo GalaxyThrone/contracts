@@ -249,6 +249,11 @@ contract ShipsFacet is Modifiers {
                 includeTerraform = true;
             }
 
+            require(
+                s.assignedPlanet[_shipIds[i]] == _fromPlanetId,
+                "ship is not assigned to this planet!"
+            );
+
             delete s.assignedPlanet[_shipIds[i]];
 
             //@TODO check that ships are on _fromPlanetId
@@ -263,6 +268,7 @@ contract ShipsFacet is Modifiers {
     }
 
     //@notice resolve arrival of terraformer
+    //@TODO rename it to resolveTerraform. endTerraform is a bad name for it.
     function endTerraform(uint256 _sendTerraformId) external {
         //@notice retreat path when the planet isnt uninhabited anymore.
         if (
@@ -297,6 +303,10 @@ contract ShipsFacet is Modifiers {
                     .shipType == 9
             ) {
                 terraformerId = s.sendTerraform[_sendTerraformId].shipsIds[i];
+            } else {
+                s.assignedPlanet[
+                    s.sendTerraform[_sendTerraformId].shipsIds[i]
+                ] = s.sendTerraform[_sendTerraformId].toPlanetId;
             }
         }
 
@@ -826,7 +836,8 @@ contract ShipsFacet is Modifiers {
         uint256 xDist = fromX > toX ? fromX - toX : toX - fromX;
         uint256 yDist = fromY > toY ? fromY - toY : toY - fromY;
 
-        uint256 arrivalTime = xDist + yDist + block.timestamp;
+        //hardcoded for alpha
+        uint256 arrivalTime = xDist + yDist + 600 + block.timestamp;
         if (factionOfPlayer == 2) {
             arrivalTime -= (((xDist + yDist) * 30) / 100);
         }

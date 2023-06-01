@@ -102,6 +102,11 @@ contract AllianceFacet is Modifiers {
             "You are not invited to this alliance!"
         );
 
+        require(
+            s.allianceOwner[s.allianceOfPlayer[msg.sender]] == address(0),
+            "You are already an alliance owner!"
+        );
+
         s.allianceOfPlayer[msg.sender] = _allianceToJoin;
         delete s.isInvitedToAlliance[msg.sender];
 

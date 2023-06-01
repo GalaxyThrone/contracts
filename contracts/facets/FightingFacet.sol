@@ -43,12 +43,12 @@ contract FightingFacet is Modifiers {
         );
 
         //@notice PVP is always enabled for alpha
-        /*
+
         require(
-            IPlanets(s.planets).getPVPStatus(_toPlanetId),
+            IPlanets(s.planetsAddress).getPVPStatus(_toPlanetId),
             "Planet is invulnerable!"
         );
-        */
+
         //check if ships are assigned to the planet
         for (uint256 i = 0; i < _shipIds.length; i++) {
             require(

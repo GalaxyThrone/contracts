@@ -19,21 +19,21 @@ export async function addBuildings(buildingsAddress: string) {
 
     defenseTypes: [100, 100, 100],
     health: 600,
-    craftTime: 108,
+    craftTime: 108 * 20,
     name: "Space Station",
   };
 
   const building2: Building = {
     price: [
-      ethers.utils.parseEther("2000"),
       ethers.utils.parseEther("1000"),
-      ethers.utils.parseEther("1000"),
+      ethers.utils.parseEther("500"),
+      ethers.utils.parseEther("500"),
     ],
     boosts: [0, 0, 0],
 
     defenseTypes: [20, 20, 20],
     health: 100,
-    craftTime: 72,
+    craftTime: 72 * 20,
     name: "Tower",
   };
 
@@ -47,7 +47,7 @@ export async function addBuildings(buildingsAddress: string) {
 
     defenseTypes: [10, 300, 10],
     health: 100,
-    craftTime: 72,
+    craftTime: 72 * 20,
     name: "Missile Silo",
   };
 
@@ -61,7 +61,7 @@ export async function addBuildings(buildingsAddress: string) {
 
     defenseTypes: [50, 50, 50],
     health: 200,
-    craftTime: 72,
+    craftTime: 72 * 20,
     name: "Defense Turret",
   };
 
@@ -75,7 +75,7 @@ export async function addBuildings(buildingsAddress: string) {
 
     defenseTypes: [150, 150, 0],
     health: 100,
-    craftTime: 72,
+    craftTime: 72 * 20,
     name: "anti-material turret",
   };
 
@@ -89,7 +89,7 @@ export async function addBuildings(buildingsAddress: string) {
 
     defenseTypes: [10, 10, 300],
     health: 100,
-    craftTime: 72,
+    craftTime: 72 * 20,
     name: "Ion Cannon",
   };
 
@@ -103,7 +103,7 @@ export async function addBuildings(buildingsAddress: string) {
 
     defenseTypes: [0, 0, 0],
     health: 50,
-    craftTime: 72,
+    craftTime: 72 * 20,
     name: "Metal Refinery",
   };
 
@@ -117,7 +117,7 @@ export async function addBuildings(buildingsAddress: string) {
 
     defenseTypes: [0, 0, 0],
     health: 50,
-    craftTime: 72,
+    craftTime: 72 * 20,
     name: "Crystal Mine",
   };
 
@@ -131,7 +131,7 @@ export async function addBuildings(buildingsAddress: string) {
 
     defenseTypes: [0, 0, 0],
     health: 50,
-    craftTime: 72,
+    craftTime: 72 * 20,
     name: "Antimatter Collector",
   };
 
@@ -145,7 +145,7 @@ export async function addBuildings(buildingsAddress: string) {
 
     defenseTypes: [0, 0, 0],
     health: 30,
-    craftTime: 72,
+    craftTime: 72 * 20,
     name: "Shipyard",
   };
 

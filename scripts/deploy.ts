@@ -225,10 +225,13 @@ export async function deployDiamond() {
   //planetType 0 is undiscovered.
   //the rest should have some meaning
   for (let i = 0; i < 10; i++) {
-    const initPlanets = await adminFacet.startInit(20, 0);
-    if (Math.random() < 0.07) {
-      const initBelts = await adminFacet.startInit(3, 1);
+    const initPlanets = await adminFacet.startInit(19, 0);
+    if (Math.random() < 0.15) {
+      const initBelts = await adminFacet.startInit(1, 1);
       await initBelts.wait();
+    } else {
+      const initPlanets2 = await adminFacet.startInit(1, 0);
+      await initPlanets2.wait();
     }
     await initPlanets.wait();
   }

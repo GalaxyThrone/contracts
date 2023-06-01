@@ -2,49 +2,49 @@
   "manifestVersion": "3.2",
   "admin": {
     "address": "0x0B306BF915C4d645ff596e518fAf3F9669b97016",
-    "txHash": "0x82f67b7255f07a7884b5307c577db8a76238567857c36574b655eaa73107e8e6"
+    "txHash": "0x702fd6c6148bf9fd268667defe9a22b90c29b85a9a2b4652381d1afc673cee1f"
   },
   "proxies": [
     {
       "address": "0x959922bE3CAee4b8Cd9a407cc3ac1C251C2007B1",
-      "txHash": "0x9b3b223931644db30d342abc18a91b6590211855deeb744502ac34092eabc4d5",
+      "txHash": "0xc19ba13a443ae92531bc26b2a7ddf64d1a0f6d976a4c1f7c71da602374dd042f",
       "kind": "transparent"
     },
     {
       "address": "0x68B1D87F95878fE05B998F19b66F4baba5De1aed",
-      "txHash": "0x261eb59282507ef2e6adaaba3e5be2f61574f54da541953729560ad586ae2688",
+      "txHash": "0x908443869130019e1a25a007b7db8feb2d3c0318bf70f7086b3bd80c401b0dd5",
       "kind": "transparent"
     },
     {
       "address": "0xc6e7DF5E7b4f2A278906862b61205850344D4e7d",
-      "txHash": "0xe2c7c3039792dfd371fe48861f50d7cd16817660535cdeceac7d2c48ef2a6e24",
+      "txHash": "0xa926e5788df45b97a457d16f65a695669ea8eb83d22b835606c4fe6a8971d62a",
       "kind": "transparent"
     },
     {
       "address": "0x4ed7c70F96B99c776995fB64377f0d4aB3B0e1C1",
-      "txHash": "0xd195ee409b0dc6676b3ec667f19ca9d5820845c52a83ccc9f8d50cc9594b82ad",
+      "txHash": "0x93ed5e7aba0a486e33bfa3c5b9d5b91cbf366c2e662c2b839a26b27f78c36033",
       "kind": "transparent"
     },
     {
       "address": "0xa85233C63b9Ee964Add6F2cffe00Fd84eb32338f",
-      "txHash": "0xf85abde6036b0336e4dd6b190208c0c26556cfc267756067edcf3bab9303979c",
+      "txHash": "0x40d1eb937c7e32ac5f289217c8a25359fba2d4b9d45ed264220c681fa13135eb",
       "kind": "transparent"
     },
     {
       "address": "0x7a2088a1bFc9d81c55368AE168C2C02570cB814F",
-      "txHash": "0xe6c27d71fa50b090ae1d2481cbb7bfc913cf0eb0b60850f05f3aa3c7bd27cb11",
+      "txHash": "0x7428510c7952378351b5f214cdb6dd988eb2ea7d7dbcb3901a688ea9d9f97ab5",
       "kind": "transparent"
     },
     {
       "address": "0xc5a5C42992dECbae36851359345FE25997F5C42d",
-      "txHash": "0xee9c699677b63c368f180462b074aaf0c76259a15a847f815d3e3ce81d6a47d8",
+      "txHash": "0x7daaf1201916782a14bdb8cbf00898420e31f66098c8203e89741bb144399d26",
       "kind": "transparent"
     }
   ],
   "impls": {
-    "734b8db82374a8e10f4aab26d240fa1c240b2f9bcfc8379104c104ffabbe71b9": {
+    "abd279372bf7f0ff6a85903c3b402f9730ed325e26b990915dd7b8771379dd34": {
       "address": "0x9A676e781A523b5d0C0e43731313A708CB607508",
-      "txHash": "0xb84d6eea9b6522b37685b2551e915c26177d7afbde5887959c9f3c9419e81813",
+      "txHash": "0x8a637e01e19dabe544e19f90aa5c4d7647b65952867b840fc585cf9d9d82fd28",
       "layout": {
         "solcVersion": "0.8.17",
         "storage": [
@@ -190,9 +190,9 @@
         }
       }
     },
-    "0dabf0d9339618548005b10268df0b9b50fcf5bebb7fdc39e45d73656a55e70d": {
+    "3d96ec3f74ff51116476f8e894fd4401df133960a9fbbfb9e9dac515512e7f80": {
       "address": "0x9A9f2CCfdE556A7E9Ff0848998Aa4a0CFD8863AE",
-      "txHash": "0xd681c3c8a3ed5442c945e373884ebff9fd2d4da0564abb9fab4bfb251ee6b43c",
+      "txHash": "0x9343939071b34a9794fab1678eb141e9f8723c47f221234b68e8e9a69e9c6cd1",
       "layout": {
         "solcVersion": "0.8.17",
         "storage": [
@@ -338,9 +338,9 @@
         }
       }
     },
-    "484c63bae335f405c4c94bf121b1fa88d131f1ef872c4da51a1996a8a23f2153": {
+    "63afecbf76dd599b4f6c8b0961d043a2969cc8b6cde453860f37a86b2418afc9": {
       "address": "0x3Aa5ebB10DC797CAC828524e59A333d0A371443c",
-      "txHash": "0xbce0bbe84e7080101e2cdc41d33ca4c3cbdbaab7f0b062fbe14709f9e5971a5c",
+      "txHash": "0xacecb9d8146c0bae6da974b13cb001dc800dfca71ad14c46f0ad1c7ae7c4c4b2",
       "layout": {
         "solcVersion": "0.8.17",
         "storage": [
@@ -486,9 +486,9 @@
         }
       }
     },
-    "bc2195c91e585aee8dca7f704b0f7077f5bcf320f7885122000d184d62533bda": {
+    "f6404a3f6f8c5cdfe96438f4e7aa6e6ec6baeaf77338d0f8f5a8ed4b0e154ded": {
       "address": "0x59b670e9fA9D0A427751Af201D676719a970857b",
-      "txHash": "0x1be30681bef8444d64b13375918a6db34f58f7d8b01e52bf3c75dd37ef192716",
+      "txHash": "0xe22ff4437821ad819c8ee3f019b78bf444d33268b22047e51e6f712af9615112",
       "layout": {
         "solcVersion": "0.8.17",
         "storage": [
@@ -634,9 +634,9 @@
         }
       }
     },
-    "65cba0c538539fcdb40ca21747b121167d153714a4459dabc825bfeb6af66f27": {
+    "698bc753f29028263f9ab8745c91e6b73445ddb7b4b5d98e96b037bfcb716c25": {
       "address": "0x322813Fd9A801c5507c9de605d63CEA4f2CE6c44",
-      "txHash": "0x147d81a9c8ee7230e804f3c425019a269b6bd47b48b8ce74700fb6c6dcdfdaad",
+      "txHash": "0x3572488a5f7ed3c469535d3bc29fb647e72697992b76b88c668756f807a883e2",
       "layout": {
         "solcVersion": "0.8.17",
         "storage": [
@@ -797,7 +797,7 @@
             "label": "planets",
             "offset": 0,
             "slot": "252",
-            "type": "t_mapping(t_uint256,t_struct(Planet)13375_storage)",
+            "type": "t_mapping(t_uint256,t_struct(Planet)22854_storage)",
             "contract": "Planets",
             "src": "contracts\\other\\Planets.sol:33"
           },
@@ -859,7 +859,7 @@
             "label": "mapping(uint256 => address)",
             "numberOfBytes": "32"
           },
-          "t_mapping(t_uint256,t_struct(Planet)13375_storage)": {
+          "t_mapping(t_uint256,t_struct(Planet)22854_storage)": {
             "label": "mapping(uint256 => struct Planets.Planet)",
             "numberOfBytes": "32"
           },
@@ -871,7 +871,7 @@
             "label": "string",
             "numberOfBytes": "32"
           },
-          "t_struct(Planet)13375_storage": {
+          "t_struct(Planet)22854_storage": {
             "label": "struct Planets.Planet",
             "members": [
               {
@@ -930,9 +930,9 @@
         }
       }
     },
-    "4edf32cdc6794149fcd2155cf5046335cfc1f5713e56a620cda217af7174be4a": {
+    "e2abe6bc71264c6b50c5d3f0390f396ecfe4fb47749de82aa79666c69397a7a7": {
       "address": "0x4A679253410272dd5232B3Ff7cF5dbB88f295319",
-      "txHash": "0xa8d0e35e7c48652ec347aa9193bd796a37ef2899fc67e0c4724958b96ca9928c",
+      "txHash": "0x8a124f73f14fd05f807326118469dbf3f7e1cffc644427e2545fc0647f42b83c",
       "layout": {
         "solcVersion": "0.8.17",
         "storage": [
@@ -1093,7 +1093,7 @@
             "label": "SpaceShips",
             "offset": 0,
             "slot": "252",
-            "type": "t_mapping(t_uint256,t_struct(ShipType)13720_storage)",
+            "type": "t_mapping(t_uint256,t_struct(ShipType)23199_storage)",
             "contract": "Ships",
             "src": "contracts\\other\\Ships.sol:36"
           },
@@ -1109,7 +1109,7 @@
             "label": "shipType",
             "offset": 0,
             "slot": "254",
-            "type": "t_mapping(t_uint256,t_struct(ShipType)13720_storage)",
+            "type": "t_mapping(t_uint256,t_struct(ShipType)23199_storage)",
             "contract": "Ships",
             "src": "contracts\\other\\Ships.sol:42"
           },
@@ -1117,7 +1117,7 @@
             "label": "shipModuleType",
             "offset": 0,
             "slot": "255",
-            "type": "t_mapping(t_uint256,t_struct(ShipModule)13737_storage)",
+            "type": "t_mapping(t_uint256,t_struct(ShipModule)23216_storage)",
             "contract": "Ships",
             "src": "contracts\\other\\Ships.sol:44"
           },
@@ -1125,7 +1125,7 @@
             "label": "equippedShipModuleType",
             "offset": 0,
             "slot": "256",
-            "type": "t_mapping(t_uint256,t_mapping(t_uint256,t_struct(ShipModule)13737_storage))",
+            "type": "t_mapping(t_uint256,t_mapping(t_uint256,t_struct(ShipModule)23216_storage))",
             "contract": "Ships",
             "src": "contracts\\other\\Ships.sol:47"
           },
@@ -1195,15 +1195,15 @@
             "label": "mapping(uint256 => address)",
             "numberOfBytes": "32"
           },
-          "t_mapping(t_uint256,t_mapping(t_uint256,t_struct(ShipModule)13737_storage))": {
+          "t_mapping(t_uint256,t_mapping(t_uint256,t_struct(ShipModule)23216_storage))": {
             "label": "mapping(uint256 => mapping(uint256 => struct Ships.ShipModule))",
             "numberOfBytes": "32"
           },
-          "t_mapping(t_uint256,t_struct(ShipModule)13737_storage)": {
+          "t_mapping(t_uint256,t_struct(ShipModule)23216_storage)": {
             "label": "mapping(uint256 => struct Ships.ShipModule)",
             "numberOfBytes": "32"
           },
-          "t_mapping(t_uint256,t_struct(ShipType)13720_storage)": {
+          "t_mapping(t_uint256,t_struct(ShipType)23199_storage)": {
             "label": "mapping(uint256 => struct Ships.ShipType)",
             "numberOfBytes": "32"
           },
@@ -1215,7 +1215,7 @@
             "label": "string",
             "numberOfBytes": "32"
           },
-          "t_struct(ShipModule)13737_storage": {
+          "t_struct(ShipModule)23216_storage": {
             "label": "struct Ships.ShipModule",
             "members": [
               {
@@ -1251,7 +1251,7 @@
             ],
             "numberOfBytes": "352"
           },
-          "t_struct(ShipType)13720_storage": {
+          "t_struct(ShipType)23199_storage": {
             "label": "struct Ships.ShipType",
             "members": [
               {
@@ -1334,9 +1334,9 @@
         }
       }
     },
-    "ae1f249c1ca5d73565caeb0226975fb07cf1fa7b57ae13ad1eaaf901b68755c0": {
+    "fb30de7a12d24c1c5ccada70b47abb571f577ec1fd32c8c10c3d02bee37dffba": {
       "address": "0x09635F643e140090A9A8Dcd712eD6285858ceBef",
-      "txHash": "0x6b8ea865afaa122cbf1734edd8c4a27244e8e4672485cd6915e11e976cd6f5f5",
+      "txHash": "0x4a1ed4cfd4ccbb7c74988282a3f1fec90154bdc238632d9821bd3dd3596e00ce",
       "layout": {
         "solcVersion": "0.8.17",
         "storage": [
@@ -1433,7 +1433,7 @@
             "label": "buildings",
             "offset": 0,
             "slot": "202",
-            "type": "t_mapping(t_uint256,t_struct(Building)15134_storage)",
+            "type": "t_mapping(t_uint256,t_struct(Building)22126_storage)",
             "contract": "Buildings",
             "src": "contracts\\other\\Buildings.sol:21"
           },
@@ -1495,7 +1495,7 @@
             "label": "mapping(uint256 => mapping(address => uint256))",
             "numberOfBytes": "32"
           },
-          "t_mapping(t_uint256,t_struct(Building)15134_storage)": {
+          "t_mapping(t_uint256,t_struct(Building)22126_storage)": {
             "label": "mapping(uint256 => struct Buildings.Building)",
             "numberOfBytes": "32"
           },
@@ -1503,7 +1503,7 @@
             "label": "string",
             "numberOfBytes": "32"
           },
-          "t_struct(Building)15134_storage": {
+          "t_struct(Building)22126_storage": {
             "label": "struct Buildings.Building",
             "members": [
               {

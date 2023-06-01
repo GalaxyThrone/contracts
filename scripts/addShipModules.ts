@@ -33,8 +33,8 @@ export async function addShipModules(diamondAddr: string) {
       healthBoostStat: 10,
       price: [
         ethers.utils.parseEther("100"),
-        ethers.utils.parseEther("200"),
-        ethers.utils.parseEther("1200"),
+        ethers.utils.parseEther("500"),
+        ethers.utils.parseEther("3000"),
       ],
     },
 
@@ -52,7 +52,7 @@ export async function addShipModules(diamondAddr: string) {
       ],
       healthBoostStat: 10,
       price: [
-        ethers.utils.parseEther("2500"),
+        ethers.utils.parseEther("3500"),
         ethers.utils.parseEther("200"),
         ethers.utils.parseEther("200"),
       ],
@@ -74,7 +74,7 @@ export async function addShipModules(diamondAddr: string) {
       price: [
         ethers.utils.parseEther("200"),
         ethers.utils.parseEther("200"),
-        ethers.utils.parseEther("3000"),
+        ethers.utils.parseEther("4000"),
       ],
     },
 
@@ -94,7 +94,7 @@ export async function addShipModules(diamondAddr: string) {
       price: [
         ethers.utils.parseEther("1000"),
         ethers.utils.parseEther("500"),
-        ethers.utils.parseEther("2000"),
+        ethers.utils.parseEther("4000"),
       ],
     },
 
@@ -113,7 +113,7 @@ export async function addShipModules(diamondAddr: string) {
       healthBoostStat: 10,
       price: [
         ethers.utils.parseEther("500"),
-        ethers.utils.parseEther("4000"),
+        ethers.utils.parseEther("6000"),
         ethers.utils.parseEther("100"),
       ],
     },
@@ -134,7 +134,7 @@ export async function addShipModules(diamondAddr: string) {
       price: [
         ethers.utils.parseEther("100"),
         ethers.utils.parseEther("100"),
-        ethers.utils.parseEther("4000"),
+        ethers.utils.parseEther("6000"),
       ],
     },
   ];

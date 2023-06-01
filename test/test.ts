@@ -233,7 +233,9 @@ describe("Game", function () {
 
     const timestampBefore = blockBefore.timestamp;
 
-    await ethers.provider.send("evm_mine", [timestampBefore + 600]);
+    await ethers.provider.send("evm_mine", [
+      timestampBefore + 11111600,
+    ]);
 
     let checkOwnershipBuildings = await buildingNfts.balanceOf(
       randomUser.address,
@@ -282,7 +284,9 @@ describe("Game", function () {
       await ethers.provider.getBlockNumber()
     );
     const timestampBefore = blockBefore.timestamp;
-    await ethers.provider.send("evm_mine", [timestampBefore + 1200]);
+    await ethers.provider.send("evm_mine", [
+      timestampBefore + 11111111200,
+    ]);
 
     // Claim building
     await buildingsFacet.connect(randomUser).claimBuilding(planetId);
@@ -298,7 +302,7 @@ describe("Game", function () {
 
     // Advance time again
     await ethers.provider.send("evm_mine", [
-      timestampBefore + 1200 + 12000,
+      timestampBefore + 11111111200 + 12000,
     ]);
 
     // Claim fleet
@@ -346,7 +350,9 @@ describe("Game", function () {
 
     let timestampBefore = blockBefore.timestamp;
 
-    await ethers.provider.send("evm_mine", [timestampBefore + 1200]);
+    await ethers.provider.send("evm_mine", [
+      timestampBefore + 444444,
+    ]);
 
     let claimBuild = await buildingsFacet
       .connect(randomUser)
@@ -363,7 +369,7 @@ describe("Game", function () {
     expect(checkOwnershipShipsPlayer).to.equal(0);
 
     await ethers.provider.send("evm_mine", [
-      timestampBefore + 1200 + 1200,
+      timestampBefore + 444444 + 444444,
     ]);
 
     await shipsFacet.connect(randomUser).claimFleet(planetIdPlayer1);
@@ -389,7 +395,9 @@ describe("Game", function () {
 
     timestampBefore = blockBefore.timestamp;
 
-    await ethers.provider.send("evm_mine", [timestampBefore + 1200]);
+    await ethers.provider.send("evm_mine", [
+      timestampBefore + 11111111200,
+    ]);
 
     claimBuild = await buildingsFacet
       .connect(randomUserTwo)
@@ -406,7 +414,7 @@ describe("Game", function () {
     expect(checkOwnershipShipsPlayer).to.equal(0);
 
     await ethers.provider.send("evm_mine", [
-      timestampBefore + 1200 + 1200,
+      timestampBefore + 11111111200 + 444444444444,
     ]);
 
     await shipsFacet
@@ -438,7 +446,9 @@ describe("Game", function () {
       .connect(randomUser)
       .sendAttack(planetIdPlayer1, planetIdPlayer2, [shipIdPlayer1]);
 
-    await ethers.provider.send("evm_mine", [timestampBefore + 48000]);
+    await ethers.provider.send("evm_mine", [
+      timestampBefore + 1111148000444444,
+    ]);
 
     // //@notice we get the instance Id from the event on the planet contract (attackInitated);
     const attackResolveReceipt = await fightingFacet
@@ -505,7 +515,9 @@ describe("Game", function () {
 
     let timestampBefore = blockBefore.timestamp;
 
-    await ethers.provider.send("evm_mine", [timestampBefore + 1200]);
+    await ethers.provider.send("evm_mine", [
+      timestampBefore + 5555555555,
+    ]);
 
     let claimBuild = await buildingsFacet
       .connect(randomUser)
@@ -522,7 +534,7 @@ describe("Game", function () {
     expect(checkOwnershipShipsPlayer).to.equal(0);
 
     await ethers.provider.send("evm_mine", [
-      timestampBefore + 1200 + 1200,
+      timestampBefore + 5555555555 + 5555555555,
     ]);
 
     await shipsFacet.connect(randomUser).claimFleet(planetIdPlayer1);
@@ -544,7 +556,9 @@ describe("Game", function () {
 
     timestampBefore = blockBefore.timestamp;
 
-    await ethers.provider.send("evm_mine", [timestampBefore + 1200]);
+    await ethers.provider.send("evm_mine", [
+      timestampBefore + 5555555555 + 5555555555 + 5555555555,
+    ]);
 
     claimBuild = await buildingsFacet
       .connect(randomUserTwo)
@@ -561,7 +575,11 @@ describe("Game", function () {
     expect(checkOwnershipShipsPlayer).to.equal(0);
 
     await ethers.provider.send("evm_mine", [
-      timestampBefore + 1200 + 12000,
+      timestampBefore +
+        5555555555 +
+        5555555555 +
+        5555555555 +
+        5555555555,
     ]);
 
     await shipsFacet
@@ -593,7 +611,17 @@ describe("Game", function () {
       .connect(randomUser)
       .sendAttack(planetIdPlayer1, planetIdPlayer2, [shipIdPlayer1]);
 
-    await ethers.provider.send("evm_mine", [timestampBefore + 48000]);
+    await ethers.provider.send("evm_mine", [
+      timestampBefore +
+        5555555555 +
+        5555555555 +
+        5555555555 +
+        5555555555 +
+        5555555555 +
+        5555555555 +
+        5555555555 +
+        5555555555,
+    ]);
 
     // //@notice we get the instance Id from the event on the planet contract (attackInitated);
     const attackResolveReceipt = await fightingFacet
@@ -670,7 +698,7 @@ describe("Game", function () {
 
     let timestampBefore = blockBefore.timestamp;
 
-    await ethers.provider.send("evm_mine", [timestampBefore + 1200]);
+    await ethers.provider.send("evm_mine", [timestampBefore + 90000]);
 
     let claimBuild = await buildingsFacet
       .connect(randomUser)
@@ -688,7 +716,7 @@ describe("Game", function () {
     expect(checkOwnershipShipsPlayer).to.equal(0);
 
     await ethers.provider.send("evm_mine", [
-      timestampBefore + 1200 + 1200,
+      timestampBefore + 11111111200 + 1200,
     ]);
 
     await shipsFacet.connect(randomUser).claimFleet(planetIdPlayer1);
@@ -763,7 +791,7 @@ describe("Game", function () {
       let timestampBefore = blockBefore.timestamp;
 
       await ethers.provider.send("evm_mine", [
-        timestampBefore + 1200,
+        timestampBefore + 11111111200,
       ]);
 
       let claimBuild = await buildingsFacet
@@ -782,7 +810,7 @@ describe("Game", function () {
       expect(checkOwnershipShipsPlayer).to.equal(0);
 
       await ethers.provider.send("evm_mine", [
-        timestampBefore + 1200 + 1200,
+        timestampBefore + 11111111200 + 11111111200,
       ]);
 
       await shipsFacet
@@ -807,7 +835,7 @@ describe("Game", function () {
       timestampBefore = blockBefore.timestamp;
 
       await ethers.provider.send("evm_mine", [
-        timestampBefore + 1200,
+        timestampBefore + 111111112001111111120011111111200,
       ]);
 
       claimBuild = await buildingsFacet
@@ -825,7 +853,9 @@ describe("Game", function () {
       expect(checkOwnershipShipsPlayer).to.equal(0);
 
       await ethers.provider.send("evm_mine", [
-        timestampBefore + 1200 + 1200,
+        timestampBefore +
+          11111111200111111112001111111120011111111200 +
+          1200,
       ]);
 
       await shipsFacet
@@ -863,7 +893,8 @@ describe("Game", function () {
         ]);
 
       await ethers.provider.send("evm_mine", [
-        timestampBefore + 48000,
+        timestampBefore +
+          21111111200111111112001111111120011111111200,
       ]);
 
       // //@notice we get the instance Id from the event on the planet contract (attackInitated);
@@ -1111,7 +1142,9 @@ describe("Game", function () {
 
     const timestampBefore = blockBefore.timestamp;
 
-    await ethers.provider.send("evm_mine", [timestampBefore + 1200]);
+    await ethers.provider.send("evm_mine", [
+      timestampBefore + 11111111200,
+    ]);
 
     const claimBuild = await buildingsFacet
       .connect(randomUser)
@@ -1126,7 +1159,7 @@ describe("Game", function () {
     expect(checkOwnershipShipsPlayer).to.equal(0);
 
     await ethers.provider.send("evm_mine", [
-      timestampBefore + 1200 + 12000,
+      timestampBefore + 11111111200 + 12000,
     ]);
 
     await shipsFacet.connect(randomUser).claimFleet(planetId);
@@ -1151,7 +1184,7 @@ describe("Game", function () {
       .startOutMining(planetId, 215, [shipIdPlayer1]);
 
     await ethers.provider.send("evm_mine", [
-      timestampBefore + 1200 + 36000,
+      timestampBefore + 11111111200 + 36000,
     ]);
 
     const planetType = await shipsFacet
@@ -1297,7 +1330,9 @@ describe("Game", function () {
 
     const timestampBefore = blockBefore.timestamp;
 
-    await ethers.provider.send("evm_mine", [timestampBefore + 1200]);
+    await ethers.provider.send("evm_mine", [
+      timestampBefore + 11111111200,
+    ]);
 
     const claimBuild = await buildingsFacet
       .connect(randomUser)
@@ -1312,7 +1347,7 @@ describe("Game", function () {
     expect(checkOwnershipShipsPlayer).to.equal(0);
 
     await ethers.provider.send("evm_mine", [
-      timestampBefore + 1200 + 12000,
+      timestampBefore + 11111111200 + 12000,
     ]);
 
     await shipsFacet.connect(randomUser).claimFleet(planetId);
@@ -1342,7 +1377,7 @@ describe("Game", function () {
       .startOutMining(planetId, 5, [shipIdPlayer1]);
 
     await ethers.provider.send("evm_mine", [
-      timestampBefore + 1200 + 36000,
+      timestampBefore + 11111111200 + 36000,
     ]);
 
     const planetAmount = await shipsFacet
@@ -1400,7 +1435,9 @@ describe("Game", function () {
 
     const timestampBefore = blockBefore.timestamp;
 
-    await ethers.provider.send("evm_mine", [timestampBefore + 1200]);
+    await ethers.provider.send("evm_mine", [
+      timestampBefore + 11111111200,
+    ]);
 
     const claimBuild = await buildingsFacet
       .connect(randomUser)
@@ -1415,7 +1452,7 @@ describe("Game", function () {
     expect(checkOwnershipShipsPlayer).to.equal(0);
 
     await ethers.provider.send("evm_mine", [
-      timestampBefore + 1200 + 12000,
+      timestampBefore + 11111111200 + 12000,
     ]);
 
     await shipsFacet.connect(randomUser).claimFleet(planetId);
@@ -1445,7 +1482,7 @@ describe("Game", function () {
       .startOutMining(planetId, 5, [shipIdPlayer1]);
 
     await ethers.provider.send("evm_mine", [
-      timestampBefore + 1200 + 36000,
+      timestampBefore + 11111111200 + 36000,
     ]);
 
     const allOutminingPlayer = await shipsFacet.getAllOutMiningPlayer(
@@ -1512,7 +1549,9 @@ describe("Game", function () {
 
     const timestampBefore = blockBefore.timestamp;
 
-    await ethers.provider.send("evm_mine", [timestampBefore + 1200]);
+    await ethers.provider.send("evm_mine", [
+      timestampBefore + 11111111200,
+    ]);
 
     const claimBuild = await buildingsFacet
       .connect(randomUser)
@@ -1527,7 +1566,7 @@ describe("Game", function () {
     expect(checkOwnershipShipsPlayer).to.equal(0);
 
     await ethers.provider.send("evm_mine", [
-      timestampBefore + 1200 + 12000,
+      timestampBefore + 11111111200 + 12000,
     ]);
 
     await shipsFacet.connect(randomUser).claimFleet(planetId);
@@ -1548,7 +1587,7 @@ describe("Game", function () {
       .startOutMining(planetId, 215, [shipIdPlayer1]);
 
     await ethers.provider.send("evm_mine", [
-      timestampBefore + 1200 + 36000,
+      timestampBefore + 11111111200 + 36000,
     ]);
 
     const planetType = await shipsFacet
@@ -1609,7 +1648,9 @@ describe("Game", function () {
 
     const timestampBefore = blockBefore.timestamp;
 
-    await ethers.provider.send("evm_mine", [timestampBefore + 1200]);
+    await ethers.provider.send("evm_mine", [
+      timestampBefore + 11111111200,
+    ]);
 
     const claimBuild = await buildingsFacet
       .connect(randomUser)
@@ -1624,7 +1665,7 @@ describe("Game", function () {
     expect(checkOwnershipShipsPlayer).to.equal(0);
 
     await ethers.provider.send("evm_mine", [
-      timestampBefore + 1200 + 12000,
+      timestampBefore + 11111111200 + 12000,
     ]);
 
     await shipsFacet.connect(randomUser).claimFleet(planetId);
@@ -1645,7 +1686,7 @@ describe("Game", function () {
       .startOutMining(planetId, 215, [shipIdPlayer1]);
 
     await ethers.provider.send("evm_mine", [
-      timestampBefore + 1200 + 36000,
+      timestampBefore + 11111111200 + 36000,
     ]);
 
     const planetType = await shipsFacet
@@ -1716,7 +1757,9 @@ describe("Game", function () {
 
     const timestampBefore = blockBefore.timestamp;
 
-    await ethers.provider.send("evm_mine", [timestampBefore + 1200]);
+    await ethers.provider.send("evm_mine", [
+      timestampBefore + 11111111200,
+    ]);
 
     const claimBuild = await buildingsFacet
       .connect(randomUser)
@@ -1731,7 +1774,7 @@ describe("Game", function () {
     expect(checkOwnershipShipsPlayer).to.equal(0);
 
     await ethers.provider.send("evm_mine", [
-      timestampBefore + 1200 + 12000,
+      timestampBefore + 11111111200 + 12000,
     ]);
 
     await shipsFacet.connect(randomUser).claimFleet(planetId);
@@ -1797,7 +1840,9 @@ describe("Game", function () {
 
     const timestampBefore = blockBefore.timestamp;
 
-    await ethers.provider.send("evm_mine", [timestampBefore + 1200]);
+    await ethers.provider.send("evm_mine", [
+      timestampBefore + 11111111200,
+    ]);
 
     const claimBuild = await buildingsFacet
       .connect(randomUser)
@@ -1812,7 +1857,7 @@ describe("Game", function () {
     expect(checkOwnershipShipsPlayer).to.equal(0);
 
     await ethers.provider.send("evm_mine", [
-      timestampBefore + 1200 + 12000,
+      timestampBefore + 11111111200 + 12000,
     ]);
 
     await shipsFacet.connect(randomUser).claimFleet(planetId);
@@ -1824,7 +1869,7 @@ describe("Game", function () {
     await shipsFacet.connect(randomUser).craftFleet(6, planetId, 2);
 
     await ethers.provider.send("evm_mine", [
-      timestampBefore + 1200 + 24000,
+      timestampBefore + 11111111200 + 24000,
     ]);
 
     await shipsFacet.connect(randomUser).claimFleet(planetId);
@@ -1947,7 +1992,9 @@ describe("Game", function () {
 
     let timestampBefore = blockBefore.timestamp;
 
-    await ethers.provider.send("evm_mine", [timestampBefore + 1200]);
+    await ethers.provider.send("evm_mine", [
+      timestampBefore + 444444,
+    ]);
 
     let claimBuild = await buildingsFacet
       .connect(randomUser)
@@ -1964,7 +2011,7 @@ describe("Game", function () {
     expect(checkOwnershipShipsPlayer).to.equal(0);
 
     await ethers.provider.send("evm_mine", [
-      timestampBefore + 1200 + 1200,
+      timestampBefore + 444444 + 444444,
     ]);
 
     await shipsFacet.connect(randomUser).claimFleet(planetIdPlayer1);
@@ -1990,7 +2037,9 @@ describe("Game", function () {
 
     timestampBefore = blockBefore.timestamp;
 
-    await ethers.provider.send("evm_mine", [timestampBefore + 1200]);
+    await ethers.provider.send("evm_mine", [
+      timestampBefore + 444444444444444444,
+    ]);
 
     claimBuild = await buildingsFacet
       .connect(randomUserTwo)
@@ -2007,7 +2056,7 @@ describe("Game", function () {
     expect(checkOwnershipShipsPlayer).to.equal(0);
 
     await ethers.provider.send("evm_mine", [
-      timestampBefore + 1200 + 1200,
+      timestampBefore + 444444444444444444 + 444444444444444444,
     ]);
 
     await shipsFacet
@@ -2044,7 +2093,10 @@ describe("Game", function () {
       .connect(randomUser)
       .sendAttack(planetIdPlayer1, planetIdPlayer2, [shipIdPlayer1]);
 
-    await ethers.provider.send("evm_mine", [timestampBefore + 48000]);
+    await ethers.provider.send("evm_mine", [
+      timestampBefore +
+        444444444444444444444444444444444444444444444444444444,
+    ]);
 
     // //@notice we get the instance Id from the event on the planet contract (attackInitated);
 
@@ -2102,7 +2154,9 @@ describe("Game", function () {
 
     const timestampBefore = blockBefore.timestamp;
 
-    await ethers.provider.send("evm_mine", [timestampBefore + 1200]);
+    await ethers.provider.send("evm_mine", [
+      timestampBefore + 11111111200,
+    ]);
 
     const claimBuild = await buildingsFacet
       .connect(randomUser)
@@ -2117,7 +2171,7 @@ describe("Game", function () {
     expect(checkOwnershipShipsPlayer).to.equal(0);
 
     await ethers.provider.send("evm_mine", [
-      timestampBefore + 1200 + 12000,
+      timestampBefore + 11111111200 + 12000,
     ]);
 
     await shipsFacet.connect(randomUser).claimFleet(planetId);
@@ -2129,7 +2183,7 @@ describe("Game", function () {
     await shipsFacet.connect(randomUser).craftFleet(6, planetId, 2);
 
     await ethers.provider.send("evm_mine", [
-      timestampBefore + 1200 + 24000,
+      timestampBefore + 11111111200 + 24000,
     ]);
 
     await shipsFacet.connect(randomUser).claimFleet(planetId);
