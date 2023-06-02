@@ -21,10 +21,9 @@ interface IPlanets {
         uint256 _amount
     ) external;
 
-    function getCoordinates(uint256 _planetId)
-        external
-        view
-        returns (uint256, uint256);
+    function getCoordinates(
+        uint256 _planetId
+    ) external view returns (uint256, uint256);
 
     function planetConquestTransfer(
         uint256 _tokenId,
@@ -33,34 +32,34 @@ interface IPlanets {
         uint256 _attackIdResolved
     ) external;
 
-    function getDefensePlanet(uint256 planetId)
-        external
-        returns (uint256[] memory);
+    function getDefensePlanet(
+        uint256 planetId
+    ) external returns (uint256[] memory);
 
     function resolveLostAttack(uint256 attackIdResolved) external;
 
-    function addAttack(attackStatus memory _attackToBeInitated)
-        external
-        returns (uint256);
+    function addAttack(
+        attackStatus memory _attackToBeInitated
+    ) external returns (uint256);
 
-    function getAttackStatus(uint256 _instanceId)
-        external
-        view
-        returns (attackStatus memory);
+    function getAttackStatus(
+        uint256 _instanceId
+    ) external view returns (attackStatus memory);
 
     function getPVPStatus(uint256 _planetId) external view returns (bool);
 
     function enablePVP(uint256 _planetId) external;
 
-    function addAttackSeed(uint256 _attackId, uint256[] calldata _randomness)
-        external;
+    function addAttackSeed(
+        uint256 _attackId,
+        uint256[] calldata _randomness
+    ) external;
 
     function getTotalPlanetCount() external view returns (uint256);
 
-    function checkIfPlayerHasAttackRunning(address _player)
-        external
-        view
-        returns (uint256[] memory, uint256[] memory);
+    function checkIfPlayerHasAttackRunning(
+        address _player
+    ) external view returns (uint256[] memory, uint256[] memory);
 
     function getAllRunningAttacks()
         external
@@ -68,4 +67,14 @@ interface IPlanets {
         returns (attackStatus[] memory);
 
     function planetTerraform(uint256 _tokenId, address _newOwner) external;
+
+    function getPlanetResources(
+        uint256 _planetId
+    ) external view returns (uint256, uint256, uint256);
+
+    function addResource(
+        uint256 _planetId,
+        uint256 _resourceId,
+        uint256 _amount
+    ) external;
 }

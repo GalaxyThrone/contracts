@@ -8,6 +8,7 @@ import "../libraries/LibMeta.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
+import "../interfaces/IPlanets.sol";
 
 contract RegisterFacet is Modifiers {
     event playerRegistered(address indexed playerAddress, uint indexed faction);
@@ -89,20 +90,34 @@ contract RegisterFacet is Modifiers {
                 );
                 s.registered[msg.sender] = true;
 
-                //@TODO make dependend on planetType
                 IERC20(s.metalAddress).mint(address(this), 120000 ether);
                 IERC20(s.crystalAddress).mint(address(this), 80000 ether);
                 IERC20(s.antimatterAddress).mint(address(this), 60000 ether);
 
                 s.planetType[tokenId] = _planetTypeChosen;
 
-                //@TODO make dependend on planetType, see appStorage mapping
-                //@TODO dont forget to fix terraforming of planetType 0 planets to something else (random?)
+                IPlanets planetContract = IPlanets(s.planetsAddress);
 
-                //@TODO @Marco did you fix the minimumRec issue with this?
+                (
+                    uint256 metal,
+                    uint256 crystal,
+                    uint256 antimatter
+                ) = planetContract.getPlanetResources(tokenId);
+
+                if (metal < 70000 ether) {
+                    planetContract.addResource(tokenId, 0, 130000 ether);
+                }
+                if (crystal < 70000 ether) {
+                    planetContract.addResource(tokenId, 1, 130000 ether);
+                }
+                if (antimatter < 70000 ether) {
+                    planetContract.addResource(tokenId, 2, 130000 ether);
+                }
+
                 s.planetResources[tokenId][0] += 120000 ether;
                 s.planetResources[tokenId][1] += 80000 ether;
                 s.planetResources[tokenId][2] += 60000 ether;
+
                 break;
             }
         }

@@ -134,7 +134,7 @@ export async function addFleets(fleetsAddress: string) {
     attackTypes: [100, 10, 10],
     defenseTypes: [100, 10, 10],
     health: 100,
-    cargo: 10000,
+    cargo: 3000,
     craftTime: 18 * 20,
     craftedFrom: 10,
     name: "Miner Ship",

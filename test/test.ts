@@ -2089,6 +2089,11 @@ describe("Game", function () {
       1
     );
 
+    let shipIdPlayer1Three = await shipNfts.tokenOfOwnerByIndex(
+      randomUser.address,
+      2
+    );
+
     const outgoingAtksEmpty =
       await fightingFacet.getAllOutgoingAttacks(randomUser.address);
 
@@ -2104,6 +2109,12 @@ describe("Game", function () {
         shipIdPlayer1Second,
       ]);
 
+    await fightingFacet
+      .connect(randomUser)
+      .sendAttack(planetIdPlayer1, planetIdPlayer2, [
+        shipIdPlayer1Three,
+      ]);
+
     await ethers.provider.send("evm_mine", [
       timestampBefore +
         +444444 +
@@ -2113,8 +2124,6 @@ describe("Game", function () {
         444444 +
         444444,
     ]);
-
-    // //@notice we get the instance Id from the event on the planet contract (attackInitated);
 
     const outgoingAtks = await fightingFacet.getAllOutgoingAttacks(
       randomUser.address
@@ -2135,11 +2144,13 @@ describe("Game", function () {
     const outgoingAtksPlayer =
       await fightingFacet.getAllOutgoingAttacks(randomUser.address);
 
-    expect(incomingAtksPlanet.length).to.equal(2);
+    expect(incomingAtksPlanet.length).to.equal(3);
 
-    expect(incomingAtksPlayer.length).to.equal(2);
+    expect(incomingAtksPlayer.length).to.equal(3);
 
-    expect(outgoingAtksPlayer.length).to.equal(2);
+    expect(outgoingAtksPlayer.length).to.equal(3);
+
+    console.log(outgoingAtksPlayer[2]);
   });
 
   it("check terraform viewing functions", async function () {

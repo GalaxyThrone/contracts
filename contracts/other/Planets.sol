@@ -78,25 +78,58 @@ contract Planets is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         uint256 _resourceId,
         uint256 _amount
     ) external onlyGameDiamond {
-        //@TODO underflow seems possible when mined out.
         if (_resourceId == 0) {
-            planets[_planetId].metal -= _amount;
+            if (planets[_planetId].metal < _amount) {
+                planets[_planetId].metal = 0;
+            } else {
+                planets[_planetId].metal -= _amount;
+            }
         } else if (_resourceId == 1) {
-            planets[_planetId].crystal -= _amount;
+            if (planets[_planetId].crystal < _amount) {
+                planets[_planetId].crystal = 0;
+            } else {
+                planets[_planetId].crystal -= _amount;
+            }
         } else if (_resourceId == 2) {
-            planets[_planetId].antimatter -= _amount;
+            if (planets[_planetId].antimatter < _amount) {
+                planets[_planetId].antimatter = 0;
+            } else {
+                planets[_planetId].antimatter -= _amount;
+            }
         }
+    }
+
+    function addResource(
+        uint256 _planetId,
+        uint256 _resourceId,
+        uint256 _amount
+    ) external onlyGameDiamond {
+        if (_resourceId == 0) {
+            planets[_planetId].metal += _amount;
+        } else if (_resourceId == 1) {
+            planets[_planetId].crystal += _amount;
+        } else if (_resourceId == 2) {
+            planets[_planetId].antimatter += _amount;
+        }
+    }
+
+    function getPlanetResources(
+        uint256 _planetId
+    ) external view returns (uint256, uint256, uint256) {
+        return (
+            planets[_planetId].metal,
+            planets[_planetId].crystal,
+            planets[_planetId].antimatter
+        );
     }
 
     function setAddresses(address _gameDiamond) external onlyOwner {
         gameDiamond = _gameDiamond;
     }
 
-    function getCoordinates(uint256 _planetId)
-        external
-        view
-        returns (uint256, uint256)
-    {
+    function getCoordinates(
+        uint256 _planetId
+    ) external view returns (uint256, uint256) {
         return (planets[_planetId].coordinateX, planets[_planetId].coordinateY);
     }
 
@@ -110,10 +143,10 @@ contract Planets is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         emit planetConquered(_tokenId, _oldOwner, _newOwner);
     }
 
-    function planetTerraform(uint256 _tokenId, address _newOwner)
-        external
-        onlyGameDiamond
-    {
+    function planetTerraform(
+        uint256 _tokenId,
+        address _newOwner
+    ) external onlyGameDiamond {
         _safeTransfer(gameDiamond, _newOwner, _tokenId, "");
         emit planetTerraformed(_tokenId, _newOwner);
     }
@@ -129,104 +162,4 @@ contract Planets is ERC721EnumerableUpgradeable, OwnableUpgradeable {
     function getTotalPlanetCount() external view returns (uint256) {
         return totalSupply();
     }
-
-    /*
-    function getAllRunningAttacks()
-        external
-        view
-        returns (attackStatus[] memory)
-    {
-        return runningAttacks;
-    }
-
-    /*
-    //@notice get all incoming attacks of a specific player address
-    function getAllIncomingAttacksPlayer(address _player)
-        external
-        view
-        returns (attackStatus[] memory)
-    {
-        uint256 totalAttackCount;
-        for (uint256 i = 0; i < runningAttacks.length; i++) {
-            if (ownerOf(runningAttacks[i].toPlanet) == _player) {
-                totalAttackCount += 1;
-            }
-        }
-
-        attackStatus[] memory incomingAttacksPlayer = new attackStatus[](
-            totalAttackCount
-        );
-
-        uint256 step = 0;
-        for (uint256 i = 0; i < runningAttacks.length; i++) {
-            if (ownerOf(runningAttacks[i].toPlanet) == _player) {
-                incomingAttacksPlayer[step] = runningAttacks[i];
-                step++;
-            }
-        }
-
-        return incomingAttacksPlayer;
-    }
-
-    //@notice get all outgoing attacks of a players address
-
-    //@notice deprecated, see FightingFacet.
-    /*
-    function getAllOutgoingAttacks(address _player)
-        external
-        view
-        returns (attackStatus[] memory)
-    {
-        uint256 totalAttackCount;
-        for (uint256 i = 0; i < runningAttacks.length; i++) {
-            if (runningAttacks[i].attacker == _player) {
-                totalAttackCount += 1;
-            }
-        }
-
-        attackStatus[] memory outgoingAttacks = new attackStatus[](
-            totalAttackCount
-        );
-
-        uint256 step = 0;
-        for (uint256 i = 0; i < runningAttacks.length; i++) {
-            if (runningAttacks[i].attacker == _player) {
-                outgoingAttacks[step] = runningAttacks[i];
-                step++;
-            }
-        }
-
-        return outgoingAttacks;
-    }
-    */
-    //@notice get all incoming attacks of a planet NFT id
-    //@notice deprecated, see FightingFacet.
-    /*
-    function getAllIncomingAttacksPlanet(uint256 _planetId)
-        external
-        view
-        returns (attackStatus[] memory)
-    {
-        uint256 totalAttackCount;
-        for (uint256 i = 0; i < runningAttacks.length; i++) {
-            if (runningAttacks[i].toPlanet == _planetId) {
-                totalAttackCount += 1;
-            }
-        }
-
-        attackStatus[] memory planetIncomingAttacks = new attackStatus[](
-            totalAttackCount
-        );
-
-        uint256 step = 0;
-        for (uint256 i = 0; i < runningAttacks.length; i++) {
-            if (runningAttacks[i].toPlanet == _planetId) {
-                planetIncomingAttacks[step] = runningAttacks[i];
-                step++;
-            }
-        }
-
-        return planetIncomingAttacks;
-    }
-    */
 }

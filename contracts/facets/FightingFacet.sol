@@ -87,6 +87,8 @@ contract FightingFacet is Modifiers {
         attackToBeAdded.attacker = msg.sender;
 
         s.sendAttackId++;
+
+        attackToBeAdded.attackInstanceId = s.sendAttackId;
         s.runningAttacks[s.sendAttackId] = attackToBeAdded;
 
         AdminFacet(address(this)).drawRandomAttackSeed(s.sendAttackId);
@@ -153,10 +155,10 @@ contract FightingFacet is Modifiers {
 
         for (uint256 i = 0; i < attackStrength.length; i++) {
             attackStrength[i] +=
-                (attackStrength[i] * int256((attackSeed[0] % 15))) /
+                (attackStrength[i] * int256((attackSeed[0] % 5))) /
                 100;
             attackStrength[i] -=
-                (attackStrength[i] * int256((attackSeed[1] % 15))) /
+                (attackStrength[i] * int256((attackSeed[1] % 5))) /
                 100;
         }
 
@@ -206,10 +208,10 @@ contract FightingFacet is Modifiers {
 
         for (uint256 i = 0; i < defenseStrength.length; i++) {
             defenseStrength[i] +=
-                (defenseStrength[i] * int256((attackSeed[2] % 15))) /
+                (defenseStrength[i] * int256((attackSeed[2] % 5))) /
                 100;
             defenseStrength[i] -=
-                (defenseStrength[i] * int256((attackSeed[3] % 15))) /
+                (defenseStrength[i] * int256((attackSeed[3] % 5))) /
                 100;
         }
 
@@ -314,13 +316,40 @@ contract FightingFacet is Modifiers {
         //battle calculation
         int256 battleResult;
 
+        // Apply the underdog bonus if the defender's total strength is significantly weaker.
+        int256 UNDERDOG_THRESHOLD = 50; // 50% weaker defender is considered an underdog.
+        int256 UNDERDOG_BONUS_PERCENT = 5; // Underdog defense is increased by 5%.
+
+        int256 totalAttackStrength = attackStrength[0] +
+            attackStrength[1] +
+            attackStrength[2];
+        int256 totalDefenseStrength = defenseStrength[0] +
+            defenseStrength[1] +
+            defenseStrength[2];
+
+        if (
+            (totalDefenseStrength * 100) / totalAttackStrength <
+            UNDERDOG_THRESHOLD
+        ) {
+            defenseStrength[0] +=
+                (defenseStrength[0] * UNDERDOG_BONUS_PERCENT) /
+                100;
+            defenseStrength[1] +=
+                (defenseStrength[1] * UNDERDOG_BONUS_PERCENT) /
+                100;
+            defenseStrength[2] +=
+                (defenseStrength[2] * UNDERDOG_BONUS_PERCENT) /
+                100;
+        }
+
+        //type weakness modifier
         for (uint256 i = 0; i < 3; i++) {
             //if (attackStrength[i] - defenseStrength[i] > 0) { }
 
             //weakness modifier by, 15% if the difference between the two is 30% in favour of the attacker
             if (attackStrength[i] * 7 > defenseStrength[i] * 10) {
                 battleResult += attackStrength[i] - defenseStrength[i];
-                battleResult -= ((attackStrength[i] * 15) / 100);
+                battleResult += ((attackStrength[i] * 15) / 100);
             } else {
                 battleResult += attackStrength[i] - defenseStrength[i];
             }
@@ -371,9 +400,7 @@ contract FightingFacet is Modifiers {
                 //burn nfts and unassign ship from planets
                 for (uint256 i = 0; i < defenderShips.length; i++) {
                     int256 defenderShipHealth = int256(
-                        IShips(s.shipsAddress)
-                            .getShipStats(defenderShips[i])
-                            .health
+                        s.SpaceShips[defenderShips[i]].health
                     );
 
                     if (battleResult > defenderShipHealth) {
@@ -403,7 +430,7 @@ contract FightingFacet is Modifiers {
             //burn attacker nfts that lost
             for (uint256 i = 0; i < attackerShips.length; i++) {
                 int256 attackerShipHealth = int256(
-                    IShips(s.shipsAddress).getShipStats(attackerShips[i]).health
+                    s.SpaceShips[attackerShips[i]].health
                 );
 
                 if (battleResult < attackerShipHealth) {

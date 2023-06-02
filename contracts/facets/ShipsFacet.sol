@@ -429,7 +429,7 @@ contract ShipsFacet is Modifiers {
             //@TODO refactor
 
             for (uint256 j = 0; j < 4; j++) {
-                uint256 minedAmount = calculatePercentage(cargo, 30);
+                uint256 minedAmount = calculatePercentage(cargo, 20);
 
                 //mining the resources on the diamond
                 if (j < 3) {
@@ -451,7 +451,7 @@ contract ShipsFacet is Modifiers {
                             s.outMining[_outMiningId].toPlanetId
                         ) == 1
                     ) {
-                        minedAmount = calculatePercentage(cargo, 5);
+                        minedAmount = calculatePercentage(cargo, 3);
 
                         s.aetherHeldPlayer[
                             IShips(s.shipsAddress).ownerOf(
