@@ -7,7 +7,7 @@ import "../interfaces/IShips.sol";
 import "../interfaces/IERC20.sol";
 import "../interfaces/IERC721.sol";
 import "../interfaces/IResource.sol";
-import "../interfaces/IBuildings.sol";
+
 import "./AdminFacet.sol";
 
 contract ShipsFacet is Modifiers {

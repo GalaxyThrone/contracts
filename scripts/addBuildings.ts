@@ -1,13 +1,13 @@
 import { ethers } from "hardhat";
-import { Buildings } from "../typechain-types";
+import { AdminFacet, Buildings } from "../typechain-types";
 import { Building } from "../types";
 
-export async function addBuildings(buildingsAddress: string) {
+export async function addBuildings(diamondAddr: string) {
   // const gasPrice = 35000000000;
-  let buildingsContract = (await ethers.getContractAt(
-    "Buildings",
-    buildingsAddress
-  )) as Buildings;
+  let adminFacet = (await ethers.getContractAt(
+    "AdminFacet",
+    diamondAddr
+  )) as AdminFacet;
 
   const building1: Building = {
     price: [
@@ -163,11 +163,10 @@ export async function addBuildings(buildingsAddress: string) {
   ];
 
   for (const { id, building } of buildingsToAdd) {
-    const addBuildingTx = await buildingsContract.addBuilding(
+    const addBuildingTx = await adminFacet.addBuildingType(
       id,
       building
     );
-    await addBuildingTx.wait();
   }
 }
 

@@ -7,7 +7,6 @@ import "../interfaces/IShips.sol";
 import "../interfaces/IERC20.sol";
 import "../interfaces/IERC721.sol";
 import "../interfaces/IResource.sol";
-import "../interfaces/IBuildings.sol";
 import "./AdminFacet.sol";
 import "./BuildingsFacet.sol";
 
@@ -189,7 +188,7 @@ contract FightingFacet is Modifiers {
         }
 
         //Building metadata type array
-        Building[] memory buildingTypesArray = IBuildings(s.buildingsAddress)
+        Building[] memory buildingTypesArray = BuildingsFacet(address(this))
             .getBuildingTypes(buildingsPlanetCount);
 
         for (uint256 i = 0; i < buildingsPlanetCount.length; i++) {
@@ -295,10 +294,7 @@ contract FightingFacet is Modifiers {
 
         //load defense buildings
         uint256[] memory buildingsPlanetCount = BuildingsFacet(address(this))
-            .getAllBuildings(
-                attackToResolve.toPlanet,
-                IBuildings(s.buildingsAddress).getTotalBuildingTypes()
-            );
+            .getAllBuildings(attackToResolve.toPlanet);
 
         //@TODO to be refactored to accomodate new attackTypes / Defense Types
         (attackStrength, attackHealth) = calculateAttackBattleStats(
@@ -388,12 +384,6 @@ contract FightingFacet is Modifiers {
                     s.assignedPlanet[attackerShips[i]] = attackToResolve
                         .toPlanet;
                 }
-
-                IBuildings(s.buildingsAddress).transferBuildingsToConquerer(
-                    buildingsPlanetCount,
-                    loserAddr,
-                    attackToResolve.attacker
-                );
             }
             //burn killed ships until there are no more left; then reassign attacking fleet to home-planet
             else {

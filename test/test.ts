@@ -4,7 +4,6 @@ import * as hre from "hardhat";
 import { deployDiamond } from "../scripts/deploy";
 import {
   AdminFacet,
-  Buildings,
   Planets,
   BuildingsFacet,
   RegisterFacet,
@@ -45,7 +44,7 @@ describe("Game", function () {
   let antimatterToken: Antimatter;
 
   let aetherToken: Aether;
-  let buildingNfts: Buildings;
+
   let shipNfts: Ships;
   let fightingFacet: FightingFacet;
   let allianceFacet: AllianceFacet;
@@ -92,11 +91,6 @@ describe("Game", function () {
       "Planets",
       g.planetsAddress
     )) as Planets;
-
-    buildingNfts = (await ethers.getContractAt(
-      "Buildings",
-      g.buildingsAddress
-    )) as Buildings;
 
     shipNfts = (await ethers.getContractAt(
       "Ships",
@@ -237,23 +231,22 @@ describe("Game", function () {
       timestampBefore + 11111600,
     ]);
 
-    let checkOwnershipBuildings = await buildingNfts.balanceOf(
-      randomUser.address,
-      buildingTypeToCraft
-    );
+    let checkOwnershipBuildings =
+      await buildingsFacet.getAllBuildings(planetId);
 
-    expect(checkOwnershipBuildings).to.equal(0);
+    expect(checkOwnershipBuildings[buildingTypeToCraft]).to.equal(0);
 
     const claimBuild = await buildingsFacet
       .connect(randomUser)
       .claimBuilding(planetId);
 
-    checkOwnershipBuildings = await buildingNfts.balanceOf(
-      randomUser.address,
-      buildingTypeToCraft
+    checkOwnershipBuildings = await buildingsFacet.getAllBuildings(
+      planetId
     );
 
-    expect(checkOwnershipBuildings).to.equal(1);
+    //console.log(checkOwnershipBuildings);
+
+    expect(checkOwnershipBuildings[buildingTypeToCraft]).to.equal(1);
   });
 
   it("allows registered users to craft and claim ships", async function () {

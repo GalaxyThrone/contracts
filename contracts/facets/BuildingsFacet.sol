@@ -2,7 +2,7 @@
 pragma solidity 0.8.17;
 
 import {AppStorage, Modifiers, CraftItem} from "../libraries/AppStorage.sol";
-import "../interfaces/IBuildings.sol";
+
 import "../interfaces/IPlanets.sol";
 import "../interfaces/IERC20.sol";
 import "../interfaces/IERC721.sol";
@@ -15,9 +15,8 @@ contract BuildingsFacet is Modifiers {
         uint256 _planetId,
         uint256 _amount
     ) external onlyPlanetOwner(_planetId) {
-        IBuildings buildingsContract = IBuildings(s.buildingsAddress);
-        uint256[3] memory price = buildingsContract.getPrice(_buildingId);
-        uint256 craftTime = buildingsContract.getCraftTime(_buildingId);
+        uint256[3] memory price = getPrice(_buildingId);
+        uint256 craftTime = getCraftTime(_buildingId);
 
         require(
             _amount > 0 && _amount % 1 == 0 && _amount <= 10,
@@ -37,18 +36,7 @@ contract BuildingsFacet is Modifiers {
         }
 
         // new player crafting buff
-        uint256[] memory buildingsPlanetCount = BuildingsFacet(address(this))
-            .getAllBuildings(
-                _planetId,
-                IBuildings(s.buildingsAddress).getTotalBuildingTypes()
-            );
-
-        uint256 totalBuildings = 0;
-        for (uint256 i = 0; i < buildingsPlanetCount.length; i++) {
-            totalBuildings += buildingsPlanetCount[i];
-        }
-
-        if (totalBuildings < 10) {
+        if (s.totalBuiltBuildingsPlanet[_planetId] <= 10) {
             readyTimestamp -= ((craftTime * _amount) * 80) / 100;
         }
 
@@ -71,6 +59,8 @@ contract BuildingsFacet is Modifiers {
             s.planetResources[_planetId][2] >= price[2] * _amount,
             "BuildingsFacet: not enough antimatter"
         );
+
+        s.totalBuiltBuildingsPlanet[_planetId] += _amount;
         s.planetResources[_planetId][0] -= price[0] * _amount;
         s.planetResources[_planetId][1] -= price[1] * _amount;
         s.planetResources[_planetId][2] -= price[2] * _amount;
@@ -90,17 +80,10 @@ contract BuildingsFacet is Modifiers {
         uint256 buildingId = s.craftBuildings[_planetId].itemId;
 
         for (uint256 i = 0; i < s.craftBuildings[_planetId].amount; i++) {
-            //@TODO refactor to batchMinting
-            IBuildings(s.buildingsAddress).mint(
-                IERC721(s.planetsAddress).ownerOf(_planetId),
-                s.craftBuildings[_planetId].itemId
-            );
-
             s.buildings[_planetId][buildingId] += 1;
 
-            uint256[3] memory boosts = IBuildings(s.buildingsAddress).getBoosts(
-                buildingId
-            );
+            uint256[3] memory boosts = getBoosts(buildingId);
+
             if (boosts[0] > 0) {
                 s.boosts[_planetId][0] += boosts[0];
             }
@@ -224,6 +207,46 @@ contract BuildingsFacet is Modifiers {
         return currentlyCraftedBuildings;
     }
 
+    function getPrice(
+        uint256 _buildingId
+    ) internal view returns (uint256[3] memory) {
+        return s.buildingTypes[_buildingId].price;
+    }
+
+    function getCraftTime(uint256 _buildingId) internal view returns (uint256) {
+        return s.buildingTypes[_buildingId].craftTime;
+    }
+
+    function getBoosts(
+        uint256 _buildingId
+    ) internal view returns (uint256[3] memory) {
+        return s.buildingTypes[_buildingId].boosts;
+    }
+
+    function getTotalBuildingTypes() external view returns (uint256) {
+        return s.totalBuildingTypes;
+    }
+
+    function getBuildingType(
+        uint256 _buildingId
+    ) external view returns (Building memory) {
+        return s.buildingTypes[_buildingId];
+    }
+
+    function getBuildingTypes(
+        uint256[] memory _buildingId
+    ) external view returns (Building[] memory) {
+        Building[] memory buildingTypesArray = new Building[](
+            _buildingId.length
+        );
+
+        for (uint256 i = 0; i < _buildingId.length; i++) {
+            buildingTypesArray[i] = s.buildingTypes[i];
+        }
+
+        return buildingTypesArray;
+    }
+
     function getBuildings(
         uint256 _planetId,
         uint256 _buildingId
@@ -232,14 +255,11 @@ contract BuildingsFacet is Modifiers {
     }
 
     function getAllBuildings(
-        uint256 _planetId,
-        uint256 _totalBuildingTypeCount
+        uint256 _planetId
     ) external view returns (uint256[] memory) {
-        uint256[] memory buildingsCount = new uint256[](
-            _totalBuildingTypeCount
-        );
+        uint256[] memory buildingsCount = new uint256[](s.totalBuildingTypes);
 
-        for (uint256 i = 0; i < _totalBuildingTypeCount; i++) {
+        for (uint256 i = 0; i < s.totalBuildingTypes; i++) {
             buildingsCount[i] = s.buildings[_planetId][i];
         }
         return buildingsCount;

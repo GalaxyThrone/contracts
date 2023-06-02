@@ -176,6 +176,10 @@ struct AppStorage {
     mapping(uint256 => mapping(uint256 => uint256)) planetResources;
     mapping(address => uint256) playersFaction;
     uint256 availableFactions;
+    // tokenId => BuildingType
+    mapping(uint256 => Building) buildingTypes;
+    uint totalBuildingTypes;
+    mapping(uint256 => uint) totalBuiltBuildingsPlanet;
 }
 
 library LibAppStorage {

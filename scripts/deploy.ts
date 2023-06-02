@@ -11,7 +11,6 @@ import {
   Antimatter,
   Planets,
   Ships,
-  Buildings,
   VRFFacet,
   RegisterFacet,
   AutomationFacet,
@@ -168,19 +167,11 @@ export async function deployDiamond() {
   ])) as Ships;
   await ships.deployed();
 
-  console.log("deploying Buildings");
-  const Buildings = await ethers.getContractFactory("Buildings");
-  const buildings = (await upgrades.deployProxy(Buildings, [
-    diamond.address,
-  ])) as Buildings;
-  await buildings.deployed();
-
   console.log(`Metal deployed: ${metal.address}`);
   console.log(`Crystal deployed: ${crystal.address}`);
   console.log(`Antimatter deployed: ${antimatter.address}`);
   console.log(`Aether deployed: ${aether.address}`);
   console.log(`Planets deployed: ${planets.address}`);
-  console.log(`Buildings deployed: ${buildings.address}`);
   console.log(`Ships deployed: ${ships.address}`);
 
   const adminFacet = (await ethers.getContractAt(
@@ -204,7 +195,6 @@ export async function deployDiamond() {
     antimatter.address,
     metal.address,
     aether.address,
-    buildings.address,
     ships.address,
     planets.address,
     chainRunner
@@ -212,7 +202,7 @@ export async function deployDiamond() {
   await setAddresses.wait();
 
   console.log("adding buildings");
-  await addBuildings(buildings.address);
+  await addBuildings(diamond.address);
   console.log("adding ships");
   await addFleets(ships.address);
   await addFleets(diamond.address);
@@ -253,7 +243,6 @@ export async function deployDiamond() {
     metalAddress: metal.address,
     crystalAddress: crystal.address,
     antimatterAddress: antimatter.address,
-    buildingsAddress: buildings.address,
     planetsAddress: planets.address,
     shipsAddress: ships.address,
     aetherAddress: aether.address,

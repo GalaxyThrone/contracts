@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-import {AppStorage, Modifiers, ShipType, ShipModule} from "../libraries/AppStorage.sol";
+import {AppStorage, Modifiers, ShipType, ShipModule, Building} from "../libraries/AppStorage.sol";
 import "../interfaces/IPlanets.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
@@ -13,7 +13,6 @@ contract AdminFacet is Modifiers {
         address _antimatter,
         address _metal,
         address _aether,
-        address _buildings,
         address _ships,
         address _planets,
         address _chainRunner
@@ -22,7 +21,6 @@ contract AdminFacet is Modifiers {
         s.antimatterAddress = _antimatter;
         s.metalAddress = _metal;
         s.aetherAddress = _aether;
-        s.buildingsAddress = _buildings;
         s.shipsAddress = _ships;
         s.planetsAddress = _planets;
         s.chainRunner = _chainRunner;
@@ -55,6 +53,14 @@ contract AdminFacet is Modifiers {
     ) external onlyOwner {
         s.totalAvailableShipModules += 1;
         s.shipModuleType[_id] = _newShipModuleType;
+    }
+
+    function addBuildingType(
+        uint256 _id,
+        Building calldata _building
+    ) external onlyOwner {
+        s.buildingTypes[_id] = _building;
+        s.totalBuildingTypes += 1;
     }
 
     function addFaction(uint256 _newAmount) external onlyOwner {
