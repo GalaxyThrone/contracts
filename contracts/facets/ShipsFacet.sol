@@ -36,10 +36,9 @@ contract ShipsFacet is Modifiers {
         uint256 _planetId,
         uint256 _amount
     ) external onlyPlanetOwner(_planetId) {
-        IShips fleetsContract = IShips(s.shipsAddress);
-        uint256[4] memory price = fleetsContract.getPrice(_fleetId);
-        uint256 craftTime = fleetsContract.getCraftTime(_fleetId);
-        uint256 craftedFrom = fleetsContract.getCraftedFrom(_fleetId);
+        uint256[4] memory price = s.shipType[_fleetId].price;
+        uint256 craftTime = s.shipType[_fleetId].craftTime;
+        uint256 craftedFrom = s.shipType[_fleetId].craftedFrom;
         uint256 buildings = s.buildings[_planetId][craftedFrom];
         require(
             _amount > 0 && _amount % 1 == 0 && _amount <= 10,
@@ -242,10 +241,7 @@ contract ShipsFacet is Modifiers {
                 "not your ship!"
             );
 
-            //@TODO replace with simple ID check to save gas.
-            if (
-                (IShips(s.shipsAddress).getShipStats(_shipIds[i]).shipType == 9)
-            ) {
+            if ((s.SpaceShips[_shipIds[i]].shipType == 9)) {
                 includeTerraform = true;
             }
 
@@ -362,9 +358,7 @@ contract ShipsFacet is Modifiers {
                 "not your ship!"
             );
 
-            uint256 shipType = IShips(s.shipsAddress)
-                .getShipStats(_shipIds[i])
-                .shipType;
+            uint256 shipType = s.SpaceShips[_shipIds[i]].shipType;
 
             require(shipType == 7, "only minerShip!");
             delete s.assignedPlanet[_shipIds[i]];
@@ -672,10 +666,9 @@ contract ShipsFacet is Modifiers {
         uint256 currShipType;
         uint256 currShipCargo;
         for (uint256 i = 0; i < totalCount; i++) {
-            currShipType = IShips(s.shipsAddress)
-                .getShipStats(ownedShips[i])
-                .shipType;
-            currShipCargo = IShips(s.shipsAddress).getCargo(ownedShips[i]);
+            currShipType = s.SpaceShips[ownedShips[i]].shipType;
+
+            currShipCargo = s.SpaceShips[ownedShips[i]].cargo;
 
             if (currShipType == 8) {
                 if (s.assignedPlanet[ownedShips[i]] == _planetId) {
@@ -708,10 +701,7 @@ contract ShipsFacet is Modifiers {
         uint256 currShipCargo;
 
         for (uint256 i = 0; i < totalCount; i++) {
-            currShipType = IShips(s.shipsAddress)
-                .getShipStats(ownedShips[i])
-                .shipType;
-            currShipCargo = IShips(s.shipsAddress).getCargo(ownedShips[i]);
+            currShipType = s.SpaceShips[ownedShips[i]].shipType;
 
             if (currShipType == 8) {
                 if (s.assignedPlanet[ownedShips[i]] == _planetId) {
@@ -747,9 +737,7 @@ contract ShipsFacet is Modifiers {
         for (uint256 i = 0; i < totalCount; i++) {
             if (currShipType == 8) {
                 if (s.assignedPlanet[ownedShips[i]] == _planetId) {
-                    currShipCargo = IShips(s.shipsAddress).getCargo(
-                        ownedShips[i]
-                    );
+                    currShipCargo = s.SpaceShips[ownedShips[i]].cargo;
                     cargoShips[counter] = ownedShips[i];
                     cargoCapacity[counter] = currShipCargo;
                     totalShippingCapacity += currShipCargo;
@@ -1085,9 +1073,7 @@ contract ShipsFacet is Modifiers {
         );
 
         //@TODO require to be stationary, not travelling
-        uint currAssignedPlanet = IShips(s.shipsAddress).checkAssignedPlanet(
-            _shipId
-        );
+        uint currAssignedPlanet = s.assignedPlanet[_shipId];
 
         require(
             IERC721(s.planetsAddress).ownerOf(currAssignedPlanet) == msg.sender,

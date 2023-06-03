@@ -152,7 +152,6 @@ struct AppStorage {
     //shipId => planetId
     mapping(uint256 => uint256) assignedPlanet;
     //ship categories template
-    //@TODO to be removed. Its duplicated on the actual ship contract
     mapping(uint256 => ShipType) shipType;
     //load level cost
     mapping(uint => uint) maxLevelShipType;

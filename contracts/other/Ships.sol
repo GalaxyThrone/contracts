@@ -73,11 +73,10 @@ contract Ships is ERC721EnumerableUpgradeable, OwnableUpgradeable {
 
     //done
     //@param
-    function mint(address _account, uint256 _shipTypeId)
-        external
-        onlyGameDiamond
-        returns (uint256)
-    {
+    function mint(
+        address _account,
+        uint256 _shipTypeId
+    ) external onlyGameDiamond returns (uint256) {
         uint256 shipId = totalSupply();
         SpaceShips[shipId] = shipType[_shipTypeId];
 
@@ -85,25 +84,23 @@ contract Ships is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         return (shipId);
     }
 
-    function addShipType(uint256 _id, ShipType calldata _newShipType)
-        external
-        onlyOwner
-    {
+    function addShipType(
+        uint256 _id,
+        ShipType calldata _newShipType
+    ) external onlyOwner {
         shipType[_id] = _newShipType;
     }
 
-    function checkAssignedPlanet(uint256 _shipId)
-        external
-        view
-        returns (uint256)
-    {
+    function checkAssignedPlanet(
+        uint256 _shipId
+    ) external view returns (uint256) {
         return assignedPlanet[_shipId];
     }
 
-    function assignShipToPlanet(uint256 _shipId, uint256 _toPlanetId)
-        external
-        onlyGameDiamond
-    {
+    function assignShipToPlanet(
+        uint256 _shipId,
+        uint256 _toPlanetId
+    ) external onlyGameDiamond {
         assignedPlanet[_shipId] = _toPlanetId;
     }
 
@@ -111,11 +108,9 @@ contract Ships is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         delete assignedPlanet[_shipId];
     }
 
-    function getPrice(uint256 _fleetId)
-        external
-        view
-        returns (uint256[4] memory)
-    {
+    function getPrice(
+        uint256 _fleetId
+    ) external view returns (uint256[4] memory) {
         return shipType[_fleetId].price;
     }
 
@@ -139,19 +134,15 @@ contract Ships is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         );
     }
 
-    function getShipStats(uint256 _shipId)
-        public
-        view
-        returns (ShipType memory)
-    {
+    function getShipStats(
+        uint256 _shipId
+    ) public view returns (ShipType memory) {
         return SpaceShips[_shipId];
     }
 
-    function getDefensePlanet(uint256 _planetId)
-        external
-        view
-        returns (uint256[] memory)
-    {
+    function getDefensePlanet(
+        uint256 _planetId
+    ) external view returns (uint256[] memory) {
         //@TODO to be refactored / removed / fixed / solved differently
         uint256 totalFleetSize;
         for (uint256 i = 0; i < totalSupply() + 1; i++) {
@@ -171,47 +162,11 @@ contract Ships is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         return defenseFleetToReturn;
     }
 
-    function getDefensePlanetDetailed(uint256 _planetId)
-        external
-        view
-        returns (uint256[] memory, ShipType[] memory)
-    {
-        //@TODO to be refactored / removed / fixed / solved differently
-        uint256 totalFleetSize;
-        for (uint256 i = 0; i < totalSupply() + 1; i++) {
-            if (assignedPlanet[i] == _planetId) {
-                totalFleetSize += 1;
-            }
-        }
-        uint256[] memory defenseFleetToReturn = new uint256[](totalFleetSize);
-        ShipType[] memory defenseFleetShipTypesToReturn = new ShipType[](
-            totalFleetSize
-        );
-        for (uint256 i = 0; i < totalSupply() + 1; i++) {
-            if (assignedPlanet[i] == _planetId) {
-                defenseFleetToReturn[totalFleetSize - 1] = i;
-                totalFleetSize--;
-            }
-        }
-
-        for (uint256 j = 0; j < defenseFleetToReturn.length; j++) {
-            defenseFleetShipTypesToReturn[j] = getShipStats(
-                defenseFleetToReturn[j]
-            );
-        }
-
-        return (defenseFleetToReturn, defenseFleetShipTypesToReturn);
-    }
-
-
     //
     //@TODO to be refactored to backend, to accomodate more realtime-traits
-    function tokenURI(uint256 _tokenId)
-        public
-        view
-        override
-        returns (string memory)
-    {
+    function tokenURI(
+        uint256 _tokenId
+    ) public view override returns (string memory) {
         ShipType memory shipAttributes = SpaceShips[_tokenId];
 
         string memory maxHP = Strings.toString(shipAttributes.health);

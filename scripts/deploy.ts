@@ -204,7 +204,6 @@ export async function deployDiamond() {
   console.log("adding buildings");
   await addBuildings(diamond.address);
   console.log("adding ships");
-  await addFleets(ships.address);
   await addFleets(diamond.address);
   await addShipModules(diamond.address);
   await addLevels(diamond.address);
