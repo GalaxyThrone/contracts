@@ -418,7 +418,7 @@ contract ShipsFacet is Modifiers {
 
         require(
             block.timestamp >= s.outMining[_outMiningId].arrivalTime,
-            "ShipsFacet: not ready yet"
+            "ShipsFacet: not arrived yet!"
         );
 
         for (uint256 i; i < s.outMining[_outMiningId].shipsIds.length; i++) {

@@ -1383,6 +1383,80 @@ describe("Game", function () {
 
       expect(AetherBalanceAfter).to.be.above(AetherBalanceBefore);
     });
+
+    it("reverts when attempting to outmine with an invalid shipId", async function () {
+      const { randomUser } = await loadFixture(deployUsers);
+
+      await registerUser(randomUser);
+
+      const planetId = await planetNfts.tokenOfOwnerByIndex(
+        randomUser.address,
+        0
+      );
+
+      await craftAndClaimShipyard(randomUser, planetId);
+      await craftAndClaimFleet(randomUser, 7, planetId, 1);
+
+      const invalidShipId = 999; // Invalid ship ID
+
+      await expect(
+        shipsFacet
+          .connect(randomUser)
+          .startOutMining(planetId, 5, [invalidShipId])
+      ).to.be.revertedWith("ship is not assigned to this planet!");
+    });
+
+    it("reverts when attempting to outmine with a non-mining ship", async function () {
+      const { randomUser } = await loadFixture(deployUsers);
+
+      await registerUser(randomUser);
+
+      const planetId = await planetNfts.tokenOfOwnerByIndex(
+        randomUser.address,
+        0
+      );
+
+      await craftAndClaimShipyard(randomUser, planetId);
+      await craftAndClaimFleet(randomUser, 1, planetId, 1);
+
+      const shipIdPlayer1 = await shipNfts.tokenOfOwnerByIndex(
+        randomUser.address,
+        0
+      );
+
+      await expect(
+        shipsFacet
+          .connect(randomUser)
+          .startOutMining(planetId, 5, [shipIdPlayer1])
+      ).to.be.revertedWith("only minerShip!");
+    });
+
+    it("reverts when attempting to resolve an unmined outmining", async function () {
+      const { randomUser } = await loadFixture(deployUsers);
+
+      await registerUser(randomUser);
+
+      const planetId = await planetNfts.tokenOfOwnerByIndex(
+        randomUser.address,
+        0
+      );
+
+      await craftAndClaimShipyard(randomUser, planetId);
+      await craftAndClaimFleet(randomUser, 7, planetId, 1);
+
+      const shipIdPlayer1 = await shipNfts.tokenOfOwnerByIndex(
+        randomUser.address,
+        0
+      );
+
+      await shipsFacet
+        .connect(randomUser)
+        .startOutMining(planetId, 5, [shipIdPlayer1]);
+
+      await expect(
+        shipsFacet.connect(randomUser).resolveOutMining(1) // Attempt to resolve an unmined outmining with ID 2
+      ).to.be.revertedWith("ShipsFacet: not arrived yet!");
+    });
   });
 
   describe("Terraforming Testing", function () {
