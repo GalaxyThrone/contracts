@@ -106,8 +106,9 @@ contract FightingFacet is Modifiers {
         //check if ships are assigned to the planet
 
         require(
-            checkAlliance(IERC721(s.planetsAddress).ownerOf(_toPlanetId)) ==
-                checkAlliance(msg.sender) ||
+            (checkAlliance(IERC721(s.planetsAddress).ownerOf(_toPlanetId)) ==
+                checkAlliance(msg.sender) &&
+                checkAlliance(msg.sender) != bytes32(0)) ||
                 msg.sender == IERC721(s.planetsAddress).ownerOf(_toPlanetId),
             "not a friendly target!"
         );
