@@ -26,8 +26,8 @@ export async function addShipModules(diamondAddr: string) {
         ethers.utils.parseEther("0"),
       ],
       defenseBoostStat: [
-        ethers.utils.parseEther("200"),
-        ethers.utils.parseEther("200"),
+        ethers.utils.parseEther("100"),
+        ethers.utils.parseEther("100"),
         ethers.utils.parseEther("10"),
       ],
       healthBoostStat: 10,
@@ -37,7 +37,6 @@ export async function addShipModules(diamondAddr: string) {
         ethers.utils.parseEther("3000"),
       ],
     },
-
     {
       name: "Reinforced Nanocarbon ceramic plating",
       attackBoostStat: [
@@ -46,7 +45,7 @@ export async function addShipModules(diamondAddr: string) {
         ethers.utils.parseEther("0"),
       ],
       defenseBoostStat: [
-        ethers.utils.parseEther("500"),
+        ethers.utils.parseEther("300"),
         ethers.utils.parseEther("100"),
         ethers.utils.parseEther("0"),
       ],
@@ -57,7 +56,6 @@ export async function addShipModules(diamondAddr: string) {
         ethers.utils.parseEther("200"),
       ],
     },
-
     {
       name: "Holtzman EM-Repulse Shield ",
       attackBoostStat: [
@@ -68,7 +66,7 @@ export async function addShipModules(diamondAddr: string) {
       defenseBoostStat: [
         ethers.utils.parseEther("0"),
         ethers.utils.parseEther("0"),
-        ethers.utils.parseEther("600"),
+        ethers.utils.parseEther("300"),
       ],
       healthBoostStat: 10,
       price: [
@@ -77,11 +75,10 @@ export async function addShipModules(diamondAddr: string) {
         ethers.utils.parseEther("4000"),
       ],
     },
-
     {
       name: "0k Railgun",
       attackBoostStat: [
-        ethers.utils.parseEther("400"),
+        ethers.utils.parseEther("200"),
         ethers.utils.parseEther("50"),
         ethers.utils.parseEther("10"),
       ],
@@ -97,13 +94,12 @@ export async function addShipModules(diamondAddr: string) {
         ethers.utils.parseEther("4000"),
       ],
     },
-
     {
       name: "Hercules-Class Missile Platform",
       attackBoostStat: [
-        ethers.utils.parseEther("50"),
-        ethers.utils.parseEther("400"),
-        ethers.utils.parseEther("50"),
+        ethers.utils.parseEther("10"),
+        ethers.utils.parseEther("200"),
+        ethers.utils.parseEther("10"),
       ],
       defenseBoostStat: [
         ethers.utils.parseEther("0"),
@@ -117,13 +113,12 @@ export async function addShipModules(diamondAddr: string) {
         ethers.utils.parseEther("100"),
       ],
     },
-
     {
       name: "Faraday Polarization Scrambler",
       attackBoostStat: [
-        ethers.utils.parseEther("50"),
-        ethers.utils.parseEther("50"),
-        ethers.utils.parseEther("400"),
+        ethers.utils.parseEther("10"),
+        ethers.utils.parseEther("10"),
+        ethers.utils.parseEther("200"),
       ],
       defenseBoostStat: [
         ethers.utils.parseEther("0"),
@@ -134,7 +129,7 @@ export async function addShipModules(diamondAddr: string) {
       price: [
         ethers.utils.parseEther("100"),
         ethers.utils.parseEther("100"),
-        ethers.utils.parseEther("6000"),
+        ethers.utils.parseEther("5000"),
       ],
     },
   ];

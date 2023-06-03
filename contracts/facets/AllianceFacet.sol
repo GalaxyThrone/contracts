@@ -7,7 +7,6 @@ import "../interfaces/IShips.sol";
 import "../interfaces/IERC20.sol";
 import "../interfaces/IERC721.sol";
 import "../interfaces/IResource.sol";
-import "../interfaces/IBuildings.sol";
 import "./ShipsFacet.sol";
 import "./BuildingsFacet.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/AutomationCompatibleInterface.sol";

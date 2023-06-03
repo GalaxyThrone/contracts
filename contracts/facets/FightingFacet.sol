@@ -351,6 +351,52 @@ contract FightingFacet is Modifiers {
             }
         }
 
+        // Fleet size advantage/disadvantage modifier
+        int256 LARGER_FLEET_DEBUFF_THRESHOLD = 50; // 50% larger fleet
+        int256 LARGER_FLEET_DEBUFF_PERCENT_50 = 5; // 5% debuff
+        int256 LARGER_FLEET_DEBUFF_PERCENT_100 = 10; // 10% debuff
+        int256 LARGER_FLEET_DEBUFF_PERCENT_200 = 15; // 15% debuff
+        int256 LARGER_FLEET_DEBUFF_PERCENT_300 = 20; // 20% debuff
+
+        int256 SMALLER_FLEET_BUFF_PERCENT_50 = 5; // 5% buff
+        int256 SMALLER_FLEET_BUFF_PERCENT_100 = 10; // 10% buff
+        int256 SMALLER_FLEET_BUFF_PERCENT_200 = 15; // 15% buff
+        int256 SMALLER_FLEET_BUFF_PERCENT_300 = 20; // 20% buff
+
+        uint256 fleetSizeDifferencePercent = (attackerShips.length * 100) /
+            defenderShips.length;
+
+        if (fleetSizeDifferencePercent >= 100) {
+            // attacker fleet is larger, apply debuff
+            if (fleetSizeDifferencePercent >= 300) {
+                applyDebuff(attackStrength, LARGER_FLEET_DEBUFF_PERCENT_300);
+            } else if (fleetSizeDifferencePercent >= 200) {
+                applyDebuff(attackStrength, LARGER_FLEET_DEBUFF_PERCENT_200);
+            } else if (fleetSizeDifferencePercent >= 100) {
+                applyDebuff(attackStrength, LARGER_FLEET_DEBUFF_PERCENT_100);
+            } else {
+                applyDebuff(attackStrength, LARGER_FLEET_DEBUFF_PERCENT_50);
+            }
+        } else {
+            // attacker fleet is smaller, apply buff
+            if (fleetSizeDifferencePercent <= 33) {
+                // 33% represents 1/3, or 300% larger defending fleet
+                applyBuff(attackStrength, SMALLER_FLEET_BUFF_PERCENT_300);
+            } else if (fleetSizeDifferencePercent <= 50) {
+                // 50% represents 1/2, or 200% larger defending fleet
+                applyBuff(attackStrength, SMALLER_FLEET_BUFF_PERCENT_200);
+            } else if (fleetSizeDifferencePercent <= 75) {
+                // 75% represents 3/4, or 100% larger defending fleet
+                applyBuff(attackStrength, SMALLER_FLEET_BUFF_PERCENT_100);
+            } else {
+                applyBuff(attackStrength, SMALLER_FLEET_BUFF_PERCENT_50);
+            }
+        }
+
+        //Planets have an inherent defense strength which is type agnostic;
+        int256 FLAT_PLANETDEFENSE = 1000;
+        battleResult -= FLAT_PLANETDEFENSE;
+
         //attacker has higher atk than defender
         if (battleResult > 0) {
             //attacker has higher atk than defender + entire health destroyed
@@ -447,6 +493,25 @@ contract FightingFacet is Modifiers {
         }
 
         delete s.runningAttacks[_attackInstanceId];
+    }
+
+    // helper functions for applying debuff and buff
+    function applyDebuff(
+        int256[3] memory strengths,
+        int256 debuffPercent
+    ) private pure {
+        strengths[0] -= (strengths[0] * debuffPercent) / 100;
+        strengths[1] -= (strengths[1] * debuffPercent) / 100;
+        strengths[2] -= (strengths[2] * debuffPercent) / 100;
+    }
+
+    function applyBuff(
+        int256[3] memory strengths,
+        int256 buffPercent
+    ) private pure {
+        strengths[0] += (strengths[0] * buffPercent) / 100;
+        strengths[1] += (strengths[1] * buffPercent) / 100;
+        strengths[2] += (strengths[2] * buffPercent) / 100;
     }
 
     function checkAlliance(

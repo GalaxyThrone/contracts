@@ -7,7 +7,6 @@ import "../interfaces/IShips.sol";
 import "../interfaces/IERC20.sol";
 import "../interfaces/IERC721.sol";
 import "../interfaces/IResource.sol";
-import "../interfaces/IBuildings.sol";
 import "./ShipsFacet.sol";
 import "./FightingFacet.sol";
 import "./BuildingsFacet.sol";
@@ -21,13 +20,12 @@ contract AutomationFacet is Modifiers {
     //          4 is for claiming completed buildings
     //          5 is for resolving arrived attacks
 
-    function checkUpkeep(bytes calldata checkData)
+    function checkUpkeep(
+        bytes calldata checkData
+    )
         external
         view
-        returns (
-            bool upkeepNeeded,
-            bytes memory /* performData */
-        )
+        returns (bool upkeepNeeded, bytes memory /* performData */)
     {
         // path check if buildings are ready to claim
 
@@ -88,10 +86,9 @@ contract AutomationFacet is Modifiers {
         return (false, abi.encode(address(0)));
     }
 
-    function performUpkeep(bytes calldata performData)
-        external
-        onlyChainRunner
-    {
+    function performUpkeep(
+        bytes calldata performData
+    ) external onlyChainRunner {
         uint256 resourceId = 0;
 
         uint256 craftShipsId = 3;
@@ -134,11 +131,9 @@ contract AutomationFacet is Modifiers {
         }
     }
 
-    function getAttackStatus(uint256 _instanceId)
-        internal
-        view
-        returns (attackStatus memory)
-    {
+    function getAttackStatus(
+        uint256 _instanceId
+    ) internal view returns (attackStatus memory) {
         return s.runningAttacks[_instanceId];
     }
 }
