@@ -308,16 +308,7 @@ describe("Game", function () {
           buildingAmountToCraft
         );
 
-      const blockBefore = await ethers.provider.getBlock(
-        await ethers.provider.getBlockNumber()
-      );
-
-      const timestampBefore = blockBefore.timestamp;
-
-      await ethers.provider.send("evm_mine", [
-        timestampBefore + 11111600,
-      ]);
-
+      await advanceTimeAndBlock(50);
       let checkOwnershipBuildings =
         await buildingsFacet.getAllBuildings(planetId);
 
@@ -325,7 +316,7 @@ describe("Game", function () {
         0
       );
 
-      const claimBuild = await buildingsFacet
+      await buildingsFacet
         .connect(randomUser)
         .claimBuilding(planetId);
 
@@ -336,6 +327,73 @@ describe("Game", function () {
       expect(checkOwnershipBuildings[buildingTypeToCraft]).to.equal(
         1
       );
+    });
+
+    it("registered user can recycle buildings", async function () {
+      const { randomUser } = await loadFixture(deployUsers);
+
+      await registerUser(randomUser);
+
+      const planetId = await planetNfts.tokenOfOwnerByIndex(
+        randomUser.address,
+        0
+      );
+      const buildingTypeToCraft = 1;
+      const buildingAmountToCraft = 1;
+
+      await buildingsFacet
+        .connect(randomUser)
+        .craftBuilding(
+          buildingTypeToCraft,
+          planetId,
+          buildingAmountToCraft
+        );
+
+      await advanceTimeAndBlock(40);
+
+      let checkOwnershipBuildings =
+        await buildingsFacet.getAllBuildings(planetId);
+
+      expect(checkOwnershipBuildings[buildingTypeToCraft]).to.equal(
+        0
+      );
+
+      await buildingsFacet
+        .connect(randomUser)
+        .claimBuilding(planetId);
+
+      checkOwnershipBuildings = await buildingsFacet.getAllBuildings(
+        planetId
+      );
+
+      expect(checkOwnershipBuildings[buildingTypeToCraft]).to.equal(
+        1
+      );
+
+      const initialResources =
+        await buildingsFacet.getPlanetResourcesAll(planetId);
+
+      await buildingsFacet
+        .connect(randomUser)
+        .recycleBuildings(
+          planetId,
+          buildingTypeToCraft,
+          buildingAmountToCraft
+        );
+
+      const finalResources =
+        await buildingsFacet.getPlanetResourcesAll(planetId);
+
+      const buildingToRecycle = await buildingsFacet.getBuildingType(
+        buildingTypeToCraft
+      );
+
+      for (let i = 0; i < 3; i++) {
+        const expectedResource = initialResources[i].add(
+          buildingToRecycle.price[i].mul(50).div(100)
+        );
+        expect(finalResources[i]).to.equal(expectedResource);
+      }
     });
 
     it("allows registered users to craft and claim ships", async function () {
@@ -354,13 +412,7 @@ describe("Game", function () {
         .craftBuilding(10, planetId, 1);
 
       // Advance time
-      const blockBefore = await ethers.provider.getBlock(
-        await ethers.provider.getBlockNumber()
-      );
-      const timestampBefore = blockBefore.timestamp;
-      await ethers.provider.send("evm_mine", [
-        timestampBefore + 11111111200,
-      ]);
+      await advanceTimeAndBlock(500);
 
       // Claim building
       await buildingsFacet
@@ -376,10 +428,7 @@ describe("Game", function () {
       );
       expect(checkOwnershipShipsPlayer).to.equal(0);
 
-      // Advance time again
-      await ethers.provider.send("evm_mine", [
-        timestampBefore + 11111111200 + 12000,
-      ]);
+      await advanceTimeAndBlock(20);
 
       // Claim fleet
       await shipsFacet.connect(randomUser).claimFleet(planetId);

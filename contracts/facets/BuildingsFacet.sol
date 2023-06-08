@@ -98,6 +98,28 @@ contract BuildingsFacet is Modifiers {
         delete s.craftBuildings[_planetId];
     }
 
+    function recycleBuildings(
+        uint256 _planetId,
+        uint256 _buildingId,
+        uint256 _amount
+    ) external onlyPlanetOwner(_planetId) {
+        require(
+            s.buildings[_planetId][_buildingId] >= _amount,
+            "Recycle Amount too high!"
+        );
+
+        s.buildings[_planetId][_buildingId] -= _amount;
+
+        Building memory buildingToRecycle = s.buildingTypes[_buildingId];
+
+        //uint RECYCLE_MALUS = 50;
+        for (uint i = 0; i < 3; i++) {
+            s.planetResources[_planetId][i] +=
+                (buildingToRecycle.price[i] * 50) /
+                100;
+        }
+    }
+
     //@notice
     //replaces mineMetal, mineCrystal, mineAntimatter
     function mineResources(
@@ -281,6 +303,17 @@ contract BuildingsFacet is Modifiers {
         uint256 _resourceId
     ) external view returns (uint256) {
         return s.planetResources[_planetId][_resourceId];
+    }
+
+    function getPlanetResourcesAll(
+        uint256 _planetId
+    ) external view returns (uint256[3] memory) {
+        uint256[3] memory result;
+        result[0] = s.planetResources[_planetId][0];
+        result[1] = s.planetResources[_planetId][1];
+        result[2] = s.planetResources[_planetId][2];
+
+        return result;
     }
 
     function getAetherPlayer(address _address) external view returns (uint256) {

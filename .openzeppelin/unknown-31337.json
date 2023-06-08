@@ -2,7 +2,7 @@
   "manifestVersion": "3.2",
   "admin": {
     "address": "0x0B306BF915C4d645ff596e518fAf3F9669b97016",
-    "txHash": "0xc5b28a69e3c83de7e648399508b133bee42cbd6cb17d9abe5b4a6658dd76dc7e"
+    "txHash": "0xd0c0ea1d32e331d6789ce0610f1713e56936a99d61faae771d6fe4c0d884bcd8"
   },
   "proxies": [
     {
@@ -547,32 +547,32 @@
     },
     {
       "address": "0x959922bE3CAee4b8Cd9a407cc3ac1C251C2007B1",
-      "txHash": "0x8395b1077f69ec9a459e6c0d5949f24b3b3cea389740a904cf89f03d56ab1e08",
+      "txHash": "0xc743ae6ef2ec4bacfb6ce7ebc41e5a9179e7fc0f9e40d345214d497b90c10782",
       "kind": "transparent"
     },
     {
       "address": "0x68B1D87F95878fE05B998F19b66F4baba5De1aed",
-      "txHash": "0xc78204a8e6e289135f53cdb2b26bfc05ad3c8727598c01787d1b083227f91ed6",
+      "txHash": "0x20bde80c30ade811e52ee0f2a25c250ef571c1f8f77d2dec3c661ce26125fe9e",
       "kind": "transparent"
     },
     {
       "address": "0xc6e7DF5E7b4f2A278906862b61205850344D4e7d",
-      "txHash": "0xf431638a4ae4677ba1c0d20ac8f12ac5056b647dedda0186043205c8305b594c",
+      "txHash": "0x9c7bc18cfbb7c5681d43174f15becb7711dda8bebf82fc6f986ec05e798db75d",
       "kind": "transparent"
     },
     {
       "address": "0x4ed7c70F96B99c776995fB64377f0d4aB3B0e1C1",
-      "txHash": "0xd8fc24d08597db91dd103a3158dc6dfc1acdce7352426efecb4d4eb874aabd9c",
+      "txHash": "0x9da73e52283c926ca7bce0fded6dcda273429b010531800fdc31be47911e5728",
       "kind": "transparent"
     },
     {
       "address": "0xa85233C63b9Ee964Add6F2cffe00Fd84eb32338f",
-      "txHash": "0x6ce1126d4a727dd24e97ab6567704076fd3f8f363dcadc1f6c89fc48851e3d69",
+      "txHash": "0x871c01e5b9fecdcf84b4d5714d27cf49dd40bc2ca8e977bd375f7307991408c4",
       "kind": "transparent"
     },
     {
       "address": "0x7a2088a1bFc9d81c55368AE168C2C02570cB814F",
-      "txHash": "0x90a6e25b30cf1f4e7a48b4661e1cc6da580ea88e21c63f9446da973fca92ab49",
+      "txHash": "0x340c71ee2cde0c560da788041a112489ff5a8b95079156348432a373952a2195",
       "kind": "transparent"
     }
   ],
@@ -1097,7 +1097,7 @@
     },
     "abd279372bf7f0ff6a85903c3b402f9730ed325e26b990915dd7b8771379dd34": {
       "address": "0x9A676e781A523b5d0C0e43731313A708CB607508",
-      "txHash": "0x89ad026e0dcd637d92a642a1c66ae2d1d4ef0a48b3b9a7cbe470608ecf415a25",
+      "txHash": "0xb1433500f8d429307997299bfe372438abb66f9a2735876f33dff778dd714632",
       "layout": {
         "solcVersion": "0.8.17",
         "storage": [
@@ -1245,7 +1245,7 @@
     },
     "3d96ec3f74ff51116476f8e894fd4401df133960a9fbbfb9e9dac515512e7f80": {
       "address": "0x9A9f2CCfdE556A7E9Ff0848998Aa4a0CFD8863AE",
-      "txHash": "0xcac5b8c4fd29f8b169d1c0854447b931e515d7739ff51b389223bd326d19fd4e",
+      "txHash": "0x0c775a8418efff88b70c456c0ed138454b1f1e7b221ffc57a0878f781fba641c",
       "layout": {
         "solcVersion": "0.8.17",
         "storage": [
@@ -1393,7 +1393,7 @@
     },
     "63afecbf76dd599b4f6c8b0961d043a2969cc8b6cde453860f37a86b2418afc9": {
       "address": "0x3Aa5ebB10DC797CAC828524e59A333d0A371443c",
-      "txHash": "0x5240f2852cdecd01de9a2f15f3a3126332196a6b7324e2c4e279503013e1bb14",
+      "txHash": "0xd269d00287d8b4c0cf5d91a0ab19b3c821e60b804ddbe2f491f5bb8478f95e53",
       "layout": {
         "solcVersion": "0.8.17",
         "storage": [
@@ -1541,7 +1541,7 @@
     },
     "f6404a3f6f8c5cdfe96438f4e7aa6e6ec6baeaf77338d0f8f5a8ed4b0e154ded": {
       "address": "0x59b670e9fA9D0A427751Af201D676719a970857b",
-      "txHash": "0xa0f23fc246140fe32650dcdb2e9be65535485e26eee0c57f4092ff8c8ad5ac72",
+      "txHash": "0x370f425238f19d8b84cdd5bc60d6d74a40b4641f7f87f575d7e537d47fddc228",
       "layout": {
         "solcVersion": "0.8.17",
         "storage": [
@@ -1689,7 +1689,7 @@
     },
     "5922f91855d9ca917d9e4019218b39c8f505197de47df0ad458be5b03c46b71f": {
       "address": "0x322813Fd9A801c5507c9de605d63CEA4f2CE6c44",
-      "txHash": "0xb55d16be3c072d45fcb3354368a1d32078619571e62dae77b4c427755e9eeb48",
+      "txHash": "0xde1faaf1e99be429c3f697af3ce432772ec496e271cb8496abc3610cf65642f6",
       "layout": {
         "solcVersion": "0.8.17",
         "storage": [
@@ -1983,9 +1983,9 @@
         }
       }
     },
-    "e2abe6bc71264c6b50c5d3f0390f396ecfe4fb47749de82aa79666c69397a7a7": {
+    "9b6616f4689ffd608b0560d74e4e0bffcd1f33bb246492dcdf9cdaf1822e8b72": {
       "address": "0x4A679253410272dd5232B3Ff7cF5dbB88f295319",
-      "txHash": "0xe9525714ea90b201ecc229e1fcd13f068d857c9104aa260c9ab7e77155f06420",
+      "txHash": "0xeced66ec1a9a5bbf1ecf2573da5943a2838a33cf7429af573c12f7608b6c2c65",
       "layout": {
         "solcVersion": "0.8.17",
         "storage": [
@@ -2146,7 +2146,7 @@
             "label": "SpaceShips",
             "offset": 0,
             "slot": "252",
-            "type": "t_mapping(t_uint256,t_struct(ShipType)22470_storage)",
+            "type": "t_mapping(t_uint256,t_struct(ShipType)2697_storage)",
             "contract": "Ships",
             "src": "contracts\\other\\Ships.sol:36"
           },
@@ -2162,7 +2162,7 @@
             "label": "shipType",
             "offset": 0,
             "slot": "254",
-            "type": "t_mapping(t_uint256,t_struct(ShipType)22470_storage)",
+            "type": "t_mapping(t_uint256,t_struct(ShipType)2697_storage)",
             "contract": "Ships",
             "src": "contracts\\other\\Ships.sol:42"
           },
@@ -2170,7 +2170,7 @@
             "label": "shipModuleType",
             "offset": 0,
             "slot": "255",
-            "type": "t_mapping(t_uint256,t_struct(ShipModule)22487_storage)",
+            "type": "t_mapping(t_uint256,t_struct(ShipModule)2714_storage)",
             "contract": "Ships",
             "src": "contracts\\other\\Ships.sol:44"
           },
@@ -2178,7 +2178,7 @@
             "label": "equippedShipModuleType",
             "offset": 0,
             "slot": "256",
-            "type": "t_mapping(t_uint256,t_mapping(t_uint256,t_struct(ShipModule)22487_storage))",
+            "type": "t_mapping(t_uint256,t_mapping(t_uint256,t_struct(ShipModule)2714_storage))",
             "contract": "Ships",
             "src": "contracts\\other\\Ships.sol:47"
           },
@@ -2248,15 +2248,15 @@
             "label": "mapping(uint256 => address)",
             "numberOfBytes": "32"
           },
-          "t_mapping(t_uint256,t_mapping(t_uint256,t_struct(ShipModule)22487_storage))": {
+          "t_mapping(t_uint256,t_mapping(t_uint256,t_struct(ShipModule)2714_storage))": {
             "label": "mapping(uint256 => mapping(uint256 => struct Ships.ShipModule))",
             "numberOfBytes": "32"
           },
-          "t_mapping(t_uint256,t_struct(ShipModule)22487_storage)": {
+          "t_mapping(t_uint256,t_struct(ShipModule)2714_storage)": {
             "label": "mapping(uint256 => struct Ships.ShipModule)",
             "numberOfBytes": "32"
           },
-          "t_mapping(t_uint256,t_struct(ShipType)22470_storage)": {
+          "t_mapping(t_uint256,t_struct(ShipType)2697_storage)": {
             "label": "mapping(uint256 => struct Ships.ShipType)",
             "numberOfBytes": "32"
           },
@@ -2268,7 +2268,7 @@
             "label": "string",
             "numberOfBytes": "32"
           },
-          "t_struct(ShipModule)22487_storage": {
+          "t_struct(ShipModule)2714_storage": {
             "label": "struct Ships.ShipModule",
             "members": [
               {
@@ -2304,7 +2304,7 @@
             ],
             "numberOfBytes": "352"
           },
-          "t_struct(ShipType)22470_storage": {
+          "t_struct(ShipType)2697_storage": {
             "label": "struct Ships.ShipType",
             "members": [
               {
