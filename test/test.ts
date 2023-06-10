@@ -117,7 +117,7 @@ describe("Game", function () {
     planetId: PromiseOrValue<BigNumberish>
   ) => {
     await craftBuilding(user, planetId);
-    await advanceTimeAndBlock(1);
+    await advanceTimeAndBlock(10);
     await claimBuilding(user, planetId);
   };
 
@@ -350,7 +350,7 @@ describe("Game", function () {
         0
       );
       const buildingTypeToCraft = 1;
-      const buildingAmountToCraft = 5; // Change this to a higher number for partial claim
+      const buildingAmountToCraft = 5;
 
       await buildingsFacet
         .connect(randomUser)
@@ -365,8 +365,11 @@ describe("Game", function () {
       );
 
       const craftTime = buildingTypeStruct.craftTime;
+      const newPlayerCraftTime = craftTime.mul(20).div(100); // 80% time reduction for new players
 
-      await advanceTimeAndBlockByAmount(craftTime.toNumber() * 2); // Let's claim 2 out of 5 buildings
+      await advanceTimeAndBlockByAmount(
+        newPlayerCraftTime.toNumber() * 2
+      ); // Let's claim 2 out of 5 buildings
 
       let checkOwnershipBuildings =
         await buildingsFacet.getAllBuildings(planetId);
@@ -389,7 +392,9 @@ describe("Game", function () {
         2
       );
 
-      await advanceTimeAndBlockByAmount(craftTime.toNumber() * 3); // Let's claim the remaining 3 buildings
+      await advanceTimeAndBlockByAmount(
+        newPlayerCraftTime.toNumber() * 3
+      ); // Let's claim the remaining 3 buildings
 
       await buildingsFacet
         .connect(randomUser)
@@ -402,6 +407,78 @@ describe("Game", function () {
       // After the second claim, we should have all 5 buildings
       expect(checkOwnershipBuildings[buildingTypeToCraft]).to.equal(
         5
+      );
+    });
+
+    it("new player speed buff goes away after 10 buildings", async function () {
+      const { randomUser } = await loadFixture(deployUsers);
+
+      await registerUser(randomUser);
+
+      const planetId = await planetNfts.tokenOfOwnerByIndex(
+        randomUser.address,
+        0
+      );
+      const buildingTypeToCraft = 2;
+      const buildingAmountToCraft = 10;
+
+      await buildingsFacet
+        .connect(randomUser)
+        .craftBuilding(
+          buildingTypeToCraft,
+          planetId,
+          buildingAmountToCraft
+        );
+
+      const buildingTypeStruct = await buildingsFacet.getBuildingType(
+        buildingTypeToCraft
+      );
+
+      const craftTime = buildingTypeStruct.craftTime;
+      const newPlayerCraftTime = craftTime.mul(20).div(100);
+
+      await advanceTimeAndBlockByAmount(
+        newPlayerCraftTime.toNumber() * buildingAmountToCraft
+      );
+
+      await buildingsFacet
+        .connect(randomUser)
+        .claimBuilding(planetId);
+
+      let checkOwnershipBuildings =
+        await buildingsFacet.getAllBuildings(planetId);
+
+      // After claiming, we should have 10 buildings
+      expect(checkOwnershipBuildings[buildingTypeToCraft]).to.equal(
+        buildingAmountToCraft
+      );
+
+      // Now let's try to build an 11th building
+      const buildingAmountToCraft11 = 1;
+
+      await buildingsFacet
+        .connect(randomUser)
+        .craftBuilding(
+          buildingTypeToCraft,
+          planetId,
+          buildingAmountToCraft11
+        );
+
+      await advanceTimeAndBlockByAmount(
+        craftTime.toNumber() * buildingAmountToCraft11
+      );
+
+      await buildingsFacet
+        .connect(randomUser)
+        .claimBuilding(planetId);
+
+      checkOwnershipBuildings = await buildingsFacet.getAllBuildings(
+        planetId
+      );
+
+      // After claiming, we should have 11 buildings, meaning the 11th building took the full craft time, not the reduced new player time
+      expect(checkOwnershipBuildings[buildingTypeToCraft]).to.equal(
+        buildingAmountToCraft + buildingAmountToCraft11
       );
     });
 
@@ -514,6 +591,53 @@ describe("Game", function () {
         randomUser.address
       );
       expect(checkOwnershipShipsPlayer).to.equal(1);
+    });
+
+    it("allows registered users to craft and claim ships partially", async function () {
+      const { randomUser } = await loadFixture(deployUsers);
+
+      await registerUser(randomUser);
+      // Get planet ID
+      const planetId = await planetNfts.tokenOfOwnerByIndex(
+        randomUser.address,
+        0
+      );
+
+      await craftAndClaimShipyard(randomUser, planetId);
+
+      // Craft fleet
+      const shipTypeToCraft = 1;
+      const shipAmountToCraft = 10;
+
+      const shipTypeToCraftStruct = await shipsFacet.getShipTypeStats(
+        shipTypeToCraft
+      );
+
+      const craftTime = shipTypeToCraftStruct.craftTime.toNumber();
+
+      await shipsFacet
+        .connect(randomUser)
+        .craftFleet(shipTypeToCraft, planetId, shipAmountToCraft);
+
+      // Check ownership of ships
+      let checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+        randomUser.address
+      );
+      expect(checkOwnershipShipsPlayer).to.equal(0);
+
+      for (let i = 0; i < 10; i++) {
+        // Advance time
+        await advanceTimeAndBlockByAmount(craftTime + 10); // Assume each ship takes 10 seconds to craft
+
+        // Claim fleet
+        await shipsFacet.connect(randomUser).claimFleet(planetId);
+
+        // Check ownership of ships again
+        checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+          randomUser.address
+        );
+        expect(checkOwnershipShipsPlayer).to.equal(i + 1);
+      }
     });
   });
 

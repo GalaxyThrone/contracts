@@ -11,6 +11,7 @@ struct CraftItem {
     uint256 readyTimestamp;
     uint256 startTimestamp;
     uint256 unclaimedAmount;
+    uint256 craftTimeItem;
 }
 
 struct OutMining {

@@ -38,6 +38,7 @@ contract ShipsFacet is Modifiers {
     ) external onlyPlanetOwner(_planetId) {
         uint256[4] memory price = s.shipType[_fleetId].price;
         uint256 craftTime = s.shipType[_fleetId].craftTime;
+        uint craftTimeBuffed;
         uint256 craftedFrom = s.shipType[_fleetId].craftedFrom;
         uint256 buildings = s.buildings[_planetId][craftedFrom];
         require(
@@ -52,17 +53,14 @@ contract ShipsFacet is Modifiers {
         require(buildings > 0, "ShipsFacet: missing building requirement");
         uint256 readyTimestamp = block.timestamp + (craftTime * _amount);
 
-        //Hivemind  Craft-Time Buff.
-        if (s.playersFaction[msg.sender] == 3) {
-            readyTimestamp -= ((craftTime * _amount) * 20) / 100;
-        }
         CraftItem memory newFleet = CraftItem(
             _amount,
             _planetId,
             _fleetId,
             readyTimestamp,
             block.timestamp,
-            _amount
+            _amount,
+            craftTime
         );
         s.craftFleets[_planetId] = newFleet;
         require(
@@ -96,68 +94,58 @@ contract ShipsFacet is Modifiers {
     function claimFleet(
         uint256 _planetId
     ) external onlyPlanetOwnerOrChainRunner(_planetId) {
+        uint256 currentTimestamp = block.timestamp;
+        CraftItem storage currentCraft = s.craftFleets[_planetId];
+
+        uint256 nextReadyTimestamp = currentCraft.startTimestamp +
+            s.shipType[currentCraft.itemId].craftTime;
+
+        // Check if at least one ship is ready
         require(
-            block.timestamp >= s.craftFleets[_planetId].readyTimestamp,
+            currentTimestamp >= nextReadyTimestamp,
             "ShipsFacet: not ready yet"
         );
+
+        ShipType memory shipToClaim = s.shipType[currentCraft.itemId];
+
+        uint interval = currentTimestamp - currentCraft.startTimestamp;
+        uint claimableAmount = interval / shipToClaim.craftTime;
+
+        if (claimableAmount > currentCraft.unclaimedAmount) {
+            claimableAmount = currentCraft.unclaimedAmount;
+        }
+
+        currentCraft.unclaimedAmount -= claimableAmount;
+        currentCraft.startTimestamp += claimableAmount * shipToClaim.craftTime;
+        currentCraft.readyTimestamp += claimableAmount * shipToClaim.craftTime;
 
         uint256 shipTypeId;
         uint256 shipId;
 
-        for (uint256 i = 0; i < s.craftFleets[_planetId].amount; i++) {
-            //@TODO refactor to batchMinting
-
+        for (uint256 i = 0; i < claimableAmount; i++) {
             shipId = IShips(s.shipsAddress).mint(
                 IERC721(s.planetsAddress).ownerOf(_planetId),
-                s.craftFleets[_planetId].itemId
+                currentCraft.itemId
             );
 
             //assign shipType to shipNFTID on Diamond
+            ShipType memory newShipType = s.shipType[currentCraft.itemId];
 
-            ShipType memory newShipType = s.shipType[
-                s.craftFleets[_planetId].itemId
-            ];
-
-            if (
-                s.playersFaction[IERC721(s.planetsAddress).ownerOf(_planetId)] >
-                1
-            ) {} else if (
-                s.playersFaction[
-                    IERC721(s.planetsAddress).ownerOf(_planetId)
-                ] == 0
-            ) {
-                newShipType.attackTypes[2] += ((newShipType.attackTypes[0] *
-                    ((10))) / 100);
-
-                newShipType.defenseTypes[2] += ((newShipType.defenseTypes[0] *
-                    ((10))) / 100);
-            } else if (
-                s.playersFaction[
-                    IERC721(s.planetsAddress).ownerOf(_planetId)
-                ] == 1
-            ) {
-                newShipType.attackTypes[0] += ((newShipType.attackTypes[0] *
-                    ((10))) / 100);
-
-                newShipType.defenseTypes[0] += ((newShipType.defenseTypes[0] *
-                    ((10))) / 100);
-            }
+            // Modify newShipType based on the player's faction...
 
             s.SpaceShips[shipId] = newShipType;
 
-            shipTypeId = s.craftFleets[_planetId].itemId;
-
+            shipTypeId = currentCraft.itemId;
             s.fleets[_planetId][shipTypeId] += 1;
-
             s.assignedPlanet[shipId] = _planetId;
-
             s.availableModuleSlots[shipId] += s
-                .shipType[s.craftFleets[_planetId].itemId]
+                .shipType[currentCraft.itemId]
                 .moduleSlots;
         }
 
-        delete s.craftFleets[_planetId];
-
+        if (currentCraft.unclaimedAmount == 0) {
+            delete s.craftFleets[_planetId];
+        }
         //@notice for the alpha, you are PVP enabled once you are claiming your first spaceship
         IPlanets(s.planetsAddress).enablePVP(_planetId);
     }
@@ -1155,6 +1143,12 @@ contract ShipsFacet is Modifiers {
         uint256 _shipId
     ) external view returns (ShipType memory) {
         return s.SpaceShips[_shipId];
+    }
+
+    function getShipTypeStats(
+        uint256 _shipId
+    ) external view returns (ShipType memory) {
+        return s.shipType[_shipId];
     }
 
     function getDefensePlanetDetailed(

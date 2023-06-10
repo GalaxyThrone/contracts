@@ -17,6 +17,7 @@ contract BuildingsFacet is Modifiers {
     ) external onlyPlanetOwner(_planetId) {
         uint256[3] memory price = getPrice(_buildingId);
         uint256 craftTime = getCraftTime(_buildingId);
+        uint craftTimeBuffed;
 
         require(
             _amount > 0 && _amount % 1 == 0 && _amount <= 10,
@@ -33,11 +34,13 @@ contract BuildingsFacet is Modifiers {
         //Hivemind  Craft-Time Buff.
         if (s.playersFaction[msg.sender] == 3) {
             readyTimestamp -= ((craftTime * _amount) * 20) / 100;
+            craftTimeBuffed = ((craftTime * 80) / 100);
         }
 
-        // new player crafting buff
+        // new player crafting buff by 80% for the first 10 buildings
         if (s.totalBuiltBuildingsPlanet[_planetId] <= 10) {
             readyTimestamp -= ((craftTime * _amount) * 80) / 100;
+            craftTimeBuffed = ((craftTime * 20) / 100);
         }
 
         CraftItem memory newBuilding = CraftItem(
@@ -46,7 +49,8 @@ contract BuildingsFacet is Modifiers {
             _buildingId,
             readyTimestamp,
             block.timestamp,
-            _amount
+            _amount,
+            craftTimeBuffed
         );
         s.craftBuildings[_planetId] = newBuilding;
         require(
@@ -77,15 +81,21 @@ contract BuildingsFacet is Modifiers {
         uint256 currentTimestamp = block.timestamp;
         CraftItem storage currentCraft = s.craftBuildings[_planetId];
 
+        // Compute the readyTimestamp for the next claimable building
+        uint256 nextReadyTimestamp = currentCraft.startTimestamp +
+            s.craftBuildings[_planetId].craftTimeItem;
+
+        // Check if at least one building is ready
         require(
-            currentTimestamp >= currentCraft.readyTimestamp,
+            currentTimestamp >= nextReadyTimestamp,
             "BuildingsFacet: not ready yet"
         );
 
         Building memory buildingToClaim = s.buildingTypes[currentCraft.itemId];
 
         uint interval = currentTimestamp - currentCraft.startTimestamp;
-        uint claimableAmount = interval / buildingToClaim.craftTime;
+        uint claimableAmount = interval /
+            s.craftBuildings[_planetId].craftTimeItem;
 
         if (claimableAmount > currentCraft.unclaimedAmount) {
             claimableAmount = currentCraft.unclaimedAmount;
@@ -94,10 +104,11 @@ contract BuildingsFacet is Modifiers {
         currentCraft.unclaimedAmount -= claimableAmount;
         currentCraft.startTimestamp +=
             claimableAmount *
-            buildingToClaim.craftTime;
-        currentCraft.readyTimestamp +=
-            claimableAmount *
-            buildingToClaim.craftTime;
+            s.craftBuildings[_planetId].craftTimeItem;
+        // update readyTimestamp to reflect the time when the next unclaimed building will be ready
+        currentCraft.readyTimestamp =
+            currentCraft.startTimestamp +
+            s.craftBuildings[_planetId].craftTimeItem;
 
         uint256[3] memory boosts = getBoosts(currentCraft.itemId);
         s.buildings[_planetId][currentCraft.itemId] += claimableAmount;

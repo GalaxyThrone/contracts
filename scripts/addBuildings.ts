@@ -18,7 +18,7 @@ export async function addBuildings(diamondAddr: string) {
     boosts: [0, 0, 0],
 
     defenseTypes: [100, 100, 100],
-    health: 600,
+    health: 1000,
     craftTime: 108 * 20,
     name: "Space Station",
   };
