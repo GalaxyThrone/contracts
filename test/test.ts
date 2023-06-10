@@ -77,7 +77,18 @@ describe("Game", function () {
     const timestampBefore = blockBefore.timestamp;
 
     await ethers.provider.send("evm_mine", [
-      timestampBefore + 11111111200 + 12000 * quantity,
+      timestampBefore + 12000 * quantity,
+    ]);
+  };
+
+  const advanceTimeAndBlockByAmount = async (quantity: number) => {
+    const blockBefore = await ethers.provider.getBlock(
+      await ethers.provider.getBlockNumber()
+    );
+    const timestampBefore = blockBefore.timestamp;
+
+    await ethers.provider.send("evm_mine", [
+      timestampBefore + quantity,
     ]);
   };
 
@@ -326,6 +337,71 @@ describe("Game", function () {
 
       expect(checkOwnershipBuildings[buildingTypeToCraft]).to.equal(
         1
+      );
+    });
+
+    it("registered user can craft & partially claim buildings", async function () {
+      const { randomUser } = await loadFixture(deployUsers);
+
+      await registerUser(randomUser);
+
+      const planetId = await planetNfts.tokenOfOwnerByIndex(
+        randomUser.address,
+        0
+      );
+      const buildingTypeToCraft = 1;
+      const buildingAmountToCraft = 5; // Change this to a higher number for partial claim
+
+      await buildingsFacet
+        .connect(randomUser)
+        .craftBuilding(
+          buildingTypeToCraft,
+          planetId,
+          buildingAmountToCraft
+        );
+
+      const buildingTypeStruct = await buildingsFacet.getBuildingType(
+        buildingTypeToCraft
+      );
+
+      const craftTime = buildingTypeStruct.craftTime;
+
+      await advanceTimeAndBlockByAmount(craftTime.toNumber() * 2); // Let's claim 2 out of 5 buildings
+
+      let checkOwnershipBuildings =
+        await buildingsFacet.getAllBuildings(planetId);
+
+      // Initially, all the buildings are unclaimed
+      expect(checkOwnershipBuildings[buildingTypeToCraft]).to.equal(
+        0
+      );
+
+      await buildingsFacet
+        .connect(randomUser)
+        .claimBuilding(planetId);
+
+      checkOwnershipBuildings = await buildingsFacet.getAllBuildings(
+        planetId
+      );
+
+      // After claiming, we should have 2 buildings
+      expect(checkOwnershipBuildings[buildingTypeToCraft]).to.equal(
+        2
+      );
+
+      await advanceTimeAndBlockByAmount(craftTime.toNumber() * 3); // Let's claim the remaining 3 buildings
+
+      await buildingsFacet
+        .connect(randomUser)
+        .claimBuilding(planetId);
+
+      checkOwnershipBuildings = await buildingsFacet.getAllBuildings(
+        planetId
+      );
+
+      // After the second claim, we should have all 5 buildings
+      expect(checkOwnershipBuildings[buildingTypeToCraft]).to.equal(
+        5
       );
     });
 

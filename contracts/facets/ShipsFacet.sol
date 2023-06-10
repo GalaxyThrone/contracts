@@ -60,7 +60,9 @@ contract ShipsFacet is Modifiers {
             _amount,
             _planetId,
             _fleetId,
-            readyTimestamp
+            readyTimestamp,
+            block.timestamp,
+            _amount
         );
         s.craftFleets[_planetId] = newFleet;
         require(

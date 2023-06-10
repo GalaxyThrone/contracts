@@ -44,7 +44,9 @@ contract BuildingsFacet is Modifiers {
             _amount,
             _planetId,
             _buildingId,
-            readyTimestamp
+            readyTimestamp,
+            block.timestamp,
+            _amount
         );
         s.craftBuildings[_planetId] = newBuilding;
         require(
@@ -72,30 +74,42 @@ contract BuildingsFacet is Modifiers {
     function claimBuilding(
         uint256 _planetId
     ) external onlyPlanetOwnerOrChainRunner(_planetId) {
+        uint256 currentTimestamp = block.timestamp;
+        CraftItem storage currentCraft = s.craftBuildings[_planetId];
+
         require(
-            block.timestamp >= s.craftBuildings[_planetId].readyTimestamp,
+            currentTimestamp >= currentCraft.readyTimestamp,
             "BuildingsFacet: not ready yet"
         );
 
-        uint256 buildingId = s.craftBuildings[_planetId].itemId;
+        Building memory buildingToClaim = s.buildingTypes[currentCraft.itemId];
 
-        for (uint256 i = 0; i < s.craftBuildings[_planetId].amount; i++) {
-            s.buildings[_planetId][buildingId] += 1;
+        uint interval = currentTimestamp - currentCraft.startTimestamp;
+        uint claimableAmount = interval / buildingToClaim.craftTime;
 
-            uint256[3] memory boosts = getBoosts(buildingId);
+        if (claimableAmount > currentCraft.unclaimedAmount) {
+            claimableAmount = currentCraft.unclaimedAmount;
+        }
 
-            if (boosts[0] > 0) {
-                s.boosts[_planetId][0] += boosts[0];
-            }
-            if (boosts[1] > 0) {
-                s.boosts[_planetId][1] += boosts[1];
-            }
-            if (boosts[2] > 0) {
-                s.boosts[_planetId][2] += boosts[2];
+        currentCraft.unclaimedAmount -= claimableAmount;
+        currentCraft.startTimestamp +=
+            claimableAmount *
+            buildingToClaim.craftTime;
+        currentCraft.readyTimestamp +=
+            claimableAmount *
+            buildingToClaim.craftTime;
+
+        uint256[3] memory boosts = getBoosts(currentCraft.itemId);
+        s.buildings[_planetId][currentCraft.itemId] += claimableAmount;
+        for (uint256 i = 0; i < 3; i++) {
+            if (boosts[i] > 0) {
+                s.boosts[_planetId][i] += boosts[i] * claimableAmount;
             }
         }
 
-        delete s.craftBuildings[_planetId];
+        if (currentCraft.unclaimedAmount == 0) {
+            delete s.craftBuildings[_planetId];
+        }
     }
 
     function recycleBuildings(

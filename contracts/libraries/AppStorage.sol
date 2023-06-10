@@ -9,6 +9,8 @@ struct CraftItem {
     uint256 planetId;
     uint256 itemId;
     uint256 readyTimestamp;
+    uint256 startTimestamp;
+    uint256 unclaimedAmount;
 }
 
 struct OutMining {
