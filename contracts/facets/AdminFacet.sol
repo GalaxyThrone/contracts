@@ -8,6 +8,8 @@ import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 
 contract AdminFacet is Modifiers {
+    event GENESIS();
+
     function setAddresses(
         address _crystal,
         address _antimatter,
@@ -133,6 +135,8 @@ contract AdminFacet is Modifiers {
             );
         }
         finalizeInit(_amount, _randomness, typeOfPlanet);
+
+        emit GENESIS();
     }
 
     function finalizeInit(
