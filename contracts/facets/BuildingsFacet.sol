@@ -118,6 +118,18 @@ contract BuildingsFacet is Modifiers {
                 (buildingToRecycle.price[i] * 50) /
                 100;
         }
+
+        uint256[3] memory boosts = getBoosts(_buildingId);
+
+        if (boosts[0] > 0) {
+            s.boosts[_planetId][0] -= boosts[0] * _amount;
+        }
+        if (boosts[1] > 0) {
+            s.boosts[_planetId][1] -= boosts[1] * _amount;
+        }
+        if (boosts[2] > 0) {
+            s.boosts[_planetId][2] -= boosts[2] * _amount;
+        }
     }
 
     //@notice
