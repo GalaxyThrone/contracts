@@ -12,11 +12,13 @@ import "./AdminFacet.sol";
 
 contract ShipsFacet is Modifiers {
     event SendTerraformer(
+        uint id,
         uint256 indexed toPlanet,
         uint256 indexed arrivalTime,
         uint256 indexed instanceId
     );
     event StartOutMining(
+        uint id,
         uint256 indexed fromPlanetId,
         uint256 indexed toPlanetId,
         address indexed sender,
@@ -31,7 +33,9 @@ contract ShipsFacet is Modifiers {
         uint256 arrivalTime
     );
 
-    event resolvedOutmining();
+    event resolvedOutmining(uint id);
+
+    event resolvedTerraforming(uint id);
 
     function craftFleet(
         uint256 _fleetId,
@@ -251,7 +255,12 @@ contract ShipsFacet is Modifiers {
             includeTerraform,
             "only terraform-capital ships can transform uninhabitated planets!"
         );
-        emit SendTerraformer(_toPlanetId, arrivalTime, s.sendTerraformId);
+        emit SendTerraformer(
+            s.sendTerraformId,
+            _toPlanetId,
+            arrivalTime,
+            s.sendTerraformId
+        );
         s.sendTerraformId++;
     }
 
@@ -321,6 +330,7 @@ contract ShipsFacet is Modifiers {
             (random % 4) +
             2;
 
+        emit resolvedTerraforming(_sendTerraformId);
         delete s.sendTerraform[_sendTerraformId];
     }
 
@@ -375,6 +385,7 @@ contract ShipsFacet is Modifiers {
 
         s.outMining[s.outMiningId] = newOutMining;
         emit StartOutMining(
+            s.outMiningId,
             _fromPlanetId,
             _toPlanetId,
             msg.sender,
@@ -472,7 +483,7 @@ contract ShipsFacet is Modifiers {
                 .fromPlanetId;
         }
 
-        emit resolvedOutmining();
+        emit resolvedOutmining(_outMiningId);
         delete s.outMining[_outMiningId];
     }
 
@@ -897,6 +908,12 @@ contract ShipsFacet is Modifiers {
         uint256 _idToCheck
     ) external view returns (SendTerraform memory) {
         return s.sendTerraform[_idToCheck];
+    }
+
+    function showOutminingInstance(
+        uint256 _idToCheck
+    ) external view returns (OutMining memory) {
+        return s.outMining[_idToCheck];
     }
 
     function getAllOutMiningPlanet(

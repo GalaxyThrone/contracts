@@ -17,12 +17,17 @@ contract FightingFacet is Modifiers {
         address indexed fromPlayer
     );
     event planetConquered(
+        uint256 id,
         uint256 indexed tokenId,
         address indexed oldOwner,
         address indexed newOwner
     );
 
-    event attackLost(uint256 indexed attackedPlanet, address indexed Attacker);
+    event attackLost(
+        uint256 id,
+        uint256 indexed attackedPlanet,
+        address indexed Attacker
+    );
 
     function sendAttack(
         uint256 _fromPlanetId,
@@ -432,6 +437,7 @@ contract FightingFacet is Modifiers {
                 );
 
                 emit planetConquered(
+                    _attackInstanceId,
                     attackToResolve.toPlanet,
                     loserAddr,
                     attackToResolve.attacker
@@ -466,6 +472,7 @@ contract FightingFacet is Modifiers {
                 returnShipsToHome(attackToResolve.fromPlanet, attackerShips);
 
                 emit attackLost(
+                    _attackInstanceId,
                     attackToResolve.toPlanet,
                     attackToResolve.attacker
                 );
@@ -493,14 +500,22 @@ contract FightingFacet is Modifiers {
 
             returnShipsToHome(attackToResolve.fromPlanet, attackerShips);
 
-            emit attackLost(attackToResolve.toPlanet, attackToResolve.attacker);
+            emit attackLost(
+                _attackInstanceId,
+                attackToResolve.toPlanet,
+                attackToResolve.attacker
+            );
         }
 
         //draw -> currently leads to zero losses, only a retreat
         if (battleResult == 0) {
             returnShipsToHome(attackToResolve.fromPlanet, attackerShips);
 
-            emit attackLost(attackToResolve.toPlanet, attackToResolve.attacker);
+            emit attackLost(
+                _attackInstanceId,
+                attackToResolve.toPlanet,
+                attackToResolve.attacker
+            );
         }
 
         delete s.runningAttacks[_attackInstanceId];
