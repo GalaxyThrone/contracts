@@ -28,8 +28,7 @@ interface IPlanets {
     function planetConquestTransfer(
         uint256 _tokenId,
         address _oldOwner,
-        address _newOwner,
-        uint256 _attackIdResolved
+        address _newOwner
     ) external;
 
     function getDefensePlanet(

@@ -136,11 +136,9 @@ contract Planets is ERC721EnumerableUpgradeable, OwnableUpgradeable {
     function planetConquestTransfer(
         uint256 _tokenId,
         address _oldOwner,
-        address _newOwner,
-        uint256 _attackIdResolved
+        address _newOwner
     ) external onlyGameDiamond {
         _safeTransfer(_oldOwner, _newOwner, _tokenId, "");
-        emit planetConquered(_tokenId, _oldOwner, _newOwner);
     }
 
     function planetTerraform(

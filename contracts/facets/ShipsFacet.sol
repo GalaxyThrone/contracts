@@ -31,6 +31,8 @@ contract ShipsFacet is Modifiers {
         uint256 arrivalTime
     );
 
+    event resolvedOutmining();
+
     function craftFleet(
         uint256 _fleetId,
         uint256 _planetId,
@@ -470,6 +472,7 @@ contract ShipsFacet is Modifiers {
                 .fromPlanetId;
         }
 
+        emit resolvedOutmining();
         delete s.outMining[_outMiningId];
     }
 
@@ -1180,6 +1183,12 @@ contract ShipsFacet is Modifiers {
         }
 
         return (defenseFleetToReturn, defenseFleetShipTypesToReturn);
+    }
+
+    function checkShipAssignedPlanet(
+        uint _shipId
+    ) external view returns (uint) {
+        return s.assignedPlanet[_shipId];
     }
 
     function getDefensePlanetDetailedIds(

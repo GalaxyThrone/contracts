@@ -10,6 +10,9 @@ import "../interfaces/IResource.sol";
 import "./ShipsFacet.sol";
 
 contract BuildingsFacet is Modifiers {
+    event buildingsStartedCrafting();
+    event buildingsFinishedCrafting();
+
     function craftBuilding(
         uint256 _buildingId,
         uint256 _planetId,
@@ -73,6 +76,8 @@ contract BuildingsFacet is Modifiers {
         IERC20(s.metalAddress).burnFrom(address(this), price[0] * _amount);
         IERC20(s.crystalAddress).burnFrom(address(this), price[1] * _amount);
         IERC20(s.antimatterAddress).burnFrom(address(this), price[2] * _amount);
+
+        emit buildingsStartedCrafting();
     }
 
     function claimBuilding(
@@ -121,6 +126,8 @@ contract BuildingsFacet is Modifiers {
         if (currentCraft.unclaimedAmount == 0) {
             delete s.craftBuildings[_planetId];
         }
+
+        emit buildingsFinishedCrafting();
     }
 
     function recycleBuildings(

@@ -16,6 +16,11 @@ contract FightingFacet is Modifiers {
         uint256 indexed toPlanet,
         address indexed fromPlayer
     );
+    event planetConquered(
+        uint256 indexed tokenId,
+        address indexed oldOwner,
+        address indexed newOwner
+    );
 
     event attackLost(uint256 indexed attackedPlanet, address indexed Attacker);
 
@@ -423,8 +428,13 @@ contract FightingFacet is Modifiers {
                 IPlanets(s.planetsAddress).planetConquestTransfer(
                     attackToResolve.toPlanet,
                     loserAddr,
-                    attackToResolve.attacker,
-                    attackToResolve.attackInstanceId
+                    attackToResolve.attacker
+                );
+
+                emit planetConquered(
+                    attackToResolve.toPlanet,
+                    loserAddr,
+                    attackToResolve.attacker
                 );
 
                 for (uint256 i = 0; i < attackerShips.length; i++) {
@@ -659,7 +669,4 @@ contract FightingFacet is Modifiers {
 
         return arrivalTime;
     }
-
-    //@notice deprecated view function for now
-    //function checkIfPlayerHasAttackRunning(address _player)
 }
