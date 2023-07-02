@@ -153,11 +153,13 @@ contract AdminFacet is Modifiers {
             uint256 coordinateX = _randomness[0] % 10000;
             uint256 coordinateY = _randomness[1] % 10000;
             uint256 antimatter = ((_randomness[2] % 100000) * 1e18) +
-                (50000 * 1e18);
-            uint256 metal = ((_randomness[3] % 100000)) * 1e18 + (50000 * 1e18);
+                (100000 * 1e18);
+            uint256 metal = ((_randomness[3] % 100000)) *
+                1e18 +
+                (100000 * 1e18);
             uint256 crystal = ((_randomness[4] % 100000)) *
                 1e18 +
-                (50000 * 1e18);
+                (100000 * 1e18);
             IPlanets(s.planetsAddress).mint(
                 IPlanets.Planet({
                     coordinateX: coordinateX,

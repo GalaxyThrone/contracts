@@ -24,8 +24,8 @@ contract BuildingsFacet is Modifiers {
         uint craftTimeBuffed;
 
         require(
-            _amount > 0 && _amount % 1 == 0 && _amount <= 10,
-            "minimum 1, only in 1 increments, max 10"
+            _amount > 0 && _amount % 1 == 0 && _amount <= 20,
+            "minimum 1, only in 1 increments, max 20"
         );
         require(craftTime > 0, "BuildingsFacet: not released yet");
 

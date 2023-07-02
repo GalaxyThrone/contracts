@@ -90,10 +90,6 @@ contract RegisterFacet is Modifiers {
                 );
                 s.registered[msg.sender] = true;
 
-                IERC20(s.metalAddress).mint(address(this), 120000 ether);
-                IERC20(s.crystalAddress).mint(address(this), 80000 ether);
-                IERC20(s.antimatterAddress).mint(address(this), 60000 ether);
-
                 s.planetType[tokenId] = _planetTypeChosen;
 
                 IPlanets planetContract = IPlanets(s.planetsAddress);
@@ -114,9 +110,34 @@ contract RegisterFacet is Modifiers {
                     planetContract.addResource(tokenId, 2, 130000 ether);
                 }
 
+                if (_planetTypeChosen == 2) {
+                    s.planetResources[tokenId][0] += 30000 ether;
+                }
+
+                if (_planetTypeChosen == 3) {
+                    s.planetResources[tokenId][1] += 30000 ether;
+                }
+
+                if (_planetTypeChosen == 4) {
+                    s.planetResources[tokenId][2] += 30000 ether;
+                }
+
                 s.planetResources[tokenId][0] += 120000 ether;
                 s.planetResources[tokenId][1] += 80000 ether;
                 s.planetResources[tokenId][2] += 60000 ether;
+
+                IERC20(s.metalAddress).mint(
+                    address(this),
+                    s.planetResources[tokenId][0]
+                );
+                IERC20(s.crystalAddress).mint(
+                    address(this),
+                    s.planetResources[tokenId][1]
+                );
+                IERC20(s.antimatterAddress).mint(
+                    address(this),
+                    s.planetResources[tokenId][2]
+                );
 
                 break;
             }

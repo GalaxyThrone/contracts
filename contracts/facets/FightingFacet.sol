@@ -349,19 +349,6 @@ contract FightingFacet is Modifiers {
                 100;
         }
 
-        //type weakness modifier
-        for (uint256 i = 0; i < 3; i++) {
-            //if (attackStrength[i] - defenseStrength[i] > 0) { }
-
-            //weakness modifier by, 15% if the difference between the two is 30% in favour of the attacker
-            if (attackStrength[i] * 7 > defenseStrength[i] * 10) {
-                battleResult += attackStrength[i] - defenseStrength[i];
-                battleResult += ((attackStrength[i] * 15) / 100);
-            } else {
-                battleResult += attackStrength[i] - defenseStrength[i];
-            }
-        }
-
         // Fleet size advantage/disadvantage modifier
         int256 LARGER_FLEET_DEBUFF_THRESHOLD = 50; // 50% larger fleet
         int256 LARGER_FLEET_DEBUFF_PERCENT_50 = 5; // 5% debuff
@@ -404,6 +391,19 @@ contract FightingFacet is Modifiers {
             }
         }
 
+        //type weakness modifier
+        for (uint256 i = 0; i < 3; i++) {
+            //if (attackStrength[i] - defenseStrength[i] > 0) { }
+
+            //weakness modifier by, 15% if the difference between the two is 30% in favour of the attacker
+            if (attackStrength[i] * 7 > defenseStrength[i] * 10) {
+                battleResult += attackStrength[i] - defenseStrength[i];
+                battleResult += ((attackStrength[i] * 15) / 100);
+            } else {
+                battleResult += attackStrength[i] - defenseStrength[i];
+            }
+        }
+
         //Planets have an inherent defense strength which is type agnostic;
         int256 FLAT_PLANETDEFENSE = 1000;
         battleResult -= FLAT_PLANETDEFENSE;
@@ -430,6 +430,24 @@ contract FightingFacet is Modifiers {
                     attackToResolve.toPlanet
                 );
 
+                int takenDamageAttackers = totalDefenseStrength / 20;
+
+                for (uint i = 0; i < attackerShips.length; i++) {
+                    int256 attackerShipHealth = int256(
+                        s.SpaceShips[defenderShips[i]].health
+                    );
+
+                    if (takenDamageAttackers > attackerShipHealth) {
+                        takenDamageAttackers -= attackerShipHealth;
+
+                        IShips(s.shipsAddress).burnShip(attackerShips[i]);
+                        delete s.assignedPlanet[attackerShips[i]];
+                        delete attackerShips[i];
+                    }
+                }
+
+                //@TODO burn conquered planets buildings partially (or we can even  recycle them instead)
+
                 IPlanets(s.planetsAddress).planetConquestTransfer(
                     attackToResolve.toPlanet,
                     loserAddr,
@@ -444,8 +462,10 @@ contract FightingFacet is Modifiers {
                 );
 
                 for (uint256 i = 0; i < attackerShips.length; i++) {
-                    s.assignedPlanet[attackerShips[i]] = attackToResolve
-                        .toPlanet;
+                    if (attackerShips[i] != 0) {
+                        s.assignedPlanet[attackerShips[i]] = attackToResolve
+                            .toPlanet;
+                    }
                 }
             }
             //burn killed ships until there are no more left; then reassign attacking fleet to home-planet
