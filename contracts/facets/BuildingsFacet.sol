@@ -10,8 +10,9 @@ import "../interfaces/IResource.sol";
 import "./ShipsFacet.sol";
 
 contract BuildingsFacet is Modifiers {
-    event buildingsStartedCrafting();
-    event buildingsFinishedCrafting();
+    event buildingsStartedCrafting(uint planetId);
+    event buildingsFinishedCrafting(uint planetId);
+    event miningConcluded(uint planetId);
 
     function craftBuilding(
         uint256 _buildingId,
@@ -77,7 +78,7 @@ contract BuildingsFacet is Modifiers {
         IERC20(s.crystalAddress).burnFrom(address(this), price[1] * _amount);
         IERC20(s.antimatterAddress).burnFrom(address(this), price[2] * _amount);
 
-        emit buildingsStartedCrafting();
+        emit buildingsStartedCrafting(_planetId);
     }
 
     function claimBuilding(
@@ -127,7 +128,7 @@ contract BuildingsFacet is Modifiers {
             delete s.craftBuildings[_planetId];
         }
 
-        emit buildingsFinishedCrafting();
+        emit buildingsFinishedCrafting(_planetId);
     }
 
     function recycleBuildings(
@@ -199,6 +200,7 @@ contract BuildingsFacet is Modifiers {
         }
 
         s.lastClaimed[_planetId] = block.timestamp;
+        emit miningConcluded(_planetId);
     }
 
     function withdrawAether(uint256 _amount) external {

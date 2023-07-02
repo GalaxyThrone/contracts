@@ -34,8 +34,10 @@ contract ShipsFacet is Modifiers {
     );
 
     event resolvedOutmining(uint id);
-
     event resolvedTerraforming(uint id);
+
+    event shipsStartedCrafting(uint planetId);
+    event shipsFinishedCrafting(uint planetId);
 
     function craftFleet(
         uint256 _fleetId,
@@ -95,6 +97,8 @@ contract ShipsFacet is Modifiers {
         IERC20(s.crystalAddress).burnFrom(address(this), price[1] * _amount);
         IERC20(s.antimatterAddress).burnFrom(address(this), price[2] * _amount);
         IERC20(s.aetherAddress).burnFrom(address(this), price[3] * _amount);
+
+        emit shipsStartedCrafting(_planetId);
     }
 
     function claimFleet(
@@ -154,6 +158,8 @@ contract ShipsFacet is Modifiers {
         }
         //@notice for the alpha, you are PVP enabled once you are claiming your first spaceship
         IPlanets(s.planetsAddress).enablePVP(_planetId);
+
+        emit shipsFinishedCrafting(_planetId);
     }
 
     function getCraftFleets(
@@ -277,7 +283,7 @@ contract ShipsFacet is Modifiers {
                 s.sendTerraform[_sendTerraformId].fromPlanetId,
                 s.sendTerraform[_sendTerraformId].shipsIds
             );
-
+            emit resolvedTerraforming(_sendTerraformId);
             delete s.sendTerraform[_sendTerraformId];
             return;
         }
@@ -408,7 +414,7 @@ contract ShipsFacet is Modifiers {
                 s.outMining[_outMiningId].fromPlanetId,
                 s.outMining[_outMiningId].shipsIds
             );
-
+            emit resolvedOutmining(_outMiningId);
             delete s.outMining[_outMiningId];
             return;
         }
