@@ -62,6 +62,10 @@ contract AdminFacet is Modifiers {
         Building calldata _building
     ) external onlyOwner {
         s.buildingTypes[_id] = _building;
+
+        if (s.totalBuildingTypes == 0) {
+            s.totalBuildingTypes += 1;
+        }
         s.totalBuildingTypes += 1;
     }
 
