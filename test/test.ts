@@ -93,7 +93,7 @@ describe("Game", function () {
   };
 
   const registerUser = async (user: string | Signer | Provider) => {
-    return await vrfFacet.connect(user).startRegister(0, 2);
+    return await vrfFacet.connect(user).startRegister(0, 3);
   };
 
   const craftBuilding = async (
@@ -1235,9 +1235,9 @@ describe("Game", function () {
       const { randomUser, randomUserTwo, randomUserThree } =
         await loadFixture(deployUsers);
 
-      await vrfFacet.connect(randomUser).startRegister(0, 2);
-      await vrfFacet.connect(randomUserTwo).startRegister(0, 2);
-      await vrfFacet.connect(randomUserThree).startRegister(0, 2);
+      await vrfFacet.connect(randomUser).startRegister(0, 3);
+      await vrfFacet.connect(randomUserTwo).startRegister(0, 3);
+      await vrfFacet.connect(randomUserThree).startRegister(0, 3);
 
       const allianceNameBytes32 =
         ethers.utils.formatBytes32String("bananarama");
@@ -1283,9 +1283,9 @@ describe("Game", function () {
         AdminUser,
       } = await loadFixture(deployUsers);
 
-      await vrfFacet.connect(randomUser).startRegister(0, 2);
-      await vrfFacet.connect(randomUserTwo).startRegister(0, 2);
-      await vrfFacet.connect(randomUserThree).startRegister(0, 2);
+      await vrfFacet.connect(randomUser).startRegister(0, 3);
+      await vrfFacet.connect(randomUserTwo).startRegister(0, 3);
+      await vrfFacet.connect(randomUserThree).startRegister(0, 3);
 
       const allianceNameBytes32 =
         ethers.utils.formatBytes32String("bananarama");
@@ -1537,7 +1537,7 @@ describe("Game", function () {
       //@notice actual register function for Tron Network
       const registration = await vrfFacet
         .connect(randomUser)
-        .startRegister(0, 2);
+        .startRegister(0, 3);
 
       const checkOwnershipAmountPlayer = await planetNfts.balanceOf(
         randomUser.address
@@ -1843,7 +1843,7 @@ describe("Game", function () {
       //@notice actual register function for Tron Network
       const registration = await vrfFacet
         .connect(randomUser)
-        .startRegister(0, 2);
+        .startRegister(0, 3);
 
       const checkOwnershipAmountPlayer = await planetNfts.balanceOf(
         randomUser.address

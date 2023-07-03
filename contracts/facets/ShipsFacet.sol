@@ -206,7 +206,8 @@ contract ShipsFacet is Modifiers {
     ) external onlyPlanetOwner(_fromPlanetId) {
         //@notice: require an unowned planet
         require(
-            IERC721(s.planetsAddress).ownerOf(_toPlanetId) == address(this),
+            IERC721(s.planetsAddress).ownerOf(_toPlanetId) == address(this) &&
+                this.getPlanetType(_toPlanetId) != 2,
             "planet already terraformed!"
         );
 
@@ -347,7 +348,8 @@ contract ShipsFacet is Modifiers {
     ) external onlyPlanetOwner(_fromPlanetId) {
         // only unowned planets can be outmined ( see GAL-62 Asteroid Feature for future plans)
         require(
-            IERC721(s.planetsAddress).ownerOf(_toPlanetId) == address(this),
+            IERC721(s.planetsAddress).ownerOf(_toPlanetId) == address(this) &&
+                this.getPlanetType(_toPlanetId) != 2,
             "AppStorage: Planet is owned by somebody else!"
         );
 
@@ -507,7 +509,7 @@ contract ShipsFacet is Modifiers {
         }
         //player doesnt own any planets anymore, ships go to a tradehub ( curr always planet #42)
         else if (IERC721(s.planetsAddress).balanceOf(shipOwner) == 0) {
-            uint tradeHubPlanet = 42;
+            uint tradeHubPlanet = 1;
 
             for (uint256 i = 0; i < _shipIds.length; i++) {
                 s.assignedPlanet[_shipIds[i]] = tradeHubPlanet;

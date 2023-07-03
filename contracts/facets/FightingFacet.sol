@@ -41,7 +41,7 @@ contract FightingFacet is Modifiers {
 
         require(
             IERC721(s.planetsAddress).ownerOf(_toPlanetId) != address(this),
-            "planet is uninhabited!"
+            "planet is uninhabited or unattackable!"
         );
 
         require(

@@ -28,7 +28,10 @@ contract RegisterFacet is Modifiers {
             "Faction does not exist!"
         );
 
-        require(_planetTypeChosen > 1, "planetType not available!");
+        require(
+            _planetTypeChosen > 2 && _planetTypeChosen < 7,
+            "planetType not available!"
+        );
 
         // drawRandomNumbers(msg.sender);
         uint256[] memory _randomness = new uint256[](1);
@@ -110,16 +113,22 @@ contract RegisterFacet is Modifiers {
                     planetContract.addResource(tokenId, 2, 130000 ether);
                 }
 
-                if (_planetTypeChosen == 2) {
+                if (_planetTypeChosen == 3) {
                     s.planetResources[tokenId][0] += 30000 ether;
                 }
 
-                if (_planetTypeChosen == 3) {
+                if (_planetTypeChosen == 4) {
                     s.planetResources[tokenId][1] += 30000 ether;
                 }
 
-                if (_planetTypeChosen == 4) {
+                if (_planetTypeChosen == 5) {
                     s.planetResources[tokenId][2] += 30000 ether;
+                }
+
+                if (_planetTypeChosen == 6) {
+                    s.planetResources[tokenId][0] += 10000 ether;
+                    s.planetResources[tokenId][1] += 10000 ether;
+                    s.planetResources[tokenId][2] += 10000 ether;
                 }
 
                 s.planetResources[tokenId][0] += 120000 ether;

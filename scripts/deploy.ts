@@ -213,8 +213,14 @@ export async function deployDiamond() {
 
   //planetType 0 is undiscovered.
   //the rest should have some meaning
+  const genesisPlanets = await adminFacet.startInit(1, 2);
+  await adminFacet.startInit(9, 0);
+
+  //main one, first 50 are deterministic
   for (let i = 0; i < 10; i++) {
     const initPlanets = await adminFacet.startInit(19, 0);
+
+    //@notice this the chance for a trading hub to appear
     if (Math.random() < 0.15) {
       const initBelts = await adminFacet.startInit(1, 1);
       await initBelts.wait();
