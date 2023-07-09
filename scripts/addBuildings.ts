@@ -9,7 +9,7 @@ export async function addBuildings(diamondAddr: string) {
     diamondAddr
   )) as AdminFacet;
 
-  const CRAFT_TIME_FACTOR = 1; // 20;
+  const CRAFT_TIME_FACTOR = 20; // 20;
 
   const building1: Building = {
     price: [
@@ -21,7 +21,7 @@ export async function addBuildings(diamondAddr: string) {
 
     defenseTypes: [100, 100, 100],
     health: 1000,
-    craftTime: 108 * CRAFT_TIME_FACTOR,
+    craftTime: 216 * CRAFT_TIME_FACTOR,
     name: "Space Station",
   };
 
@@ -35,7 +35,7 @@ export async function addBuildings(diamondAddr: string) {
 
     defenseTypes: [20, 20, 20],
     health: 100,
-    craftTime: 72 * CRAFT_TIME_FACTOR,
+    craftTime: 108 * CRAFT_TIME_FACTOR,
     name: "Tower",
   };
 
@@ -49,7 +49,7 @@ export async function addBuildings(diamondAddr: string) {
 
     defenseTypes: [10, 300, 10],
     health: 100,
-    craftTime: 72 * CRAFT_TIME_FACTOR,
+    craftTime: 108 * CRAFT_TIME_FACTOR,
     name: "Missile Silo",
   };
 
@@ -63,7 +63,7 @@ export async function addBuildings(diamondAddr: string) {
 
     defenseTypes: [50, 50, 50],
     health: 200,
-    craftTime: 72 * CRAFT_TIME_FACTOR,
+    craftTime: 108 * CRAFT_TIME_FACTOR,
     name: "Defense Turret",
   };
 
@@ -77,7 +77,7 @@ export async function addBuildings(diamondAddr: string) {
 
     defenseTypes: [150, 150, 0],
     health: 100,
-    craftTime: 72 * CRAFT_TIME_FACTOR,
+    craftTime: 108 * CRAFT_TIME_FACTOR,
     name: "anti-material turret",
   };
 
@@ -91,7 +91,7 @@ export async function addBuildings(diamondAddr: string) {
 
     defenseTypes: [10, 10, 300],
     health: 100,
-    craftTime: 72 * CRAFT_TIME_FACTOR,
+    craftTime: 108 * CRAFT_TIME_FACTOR,
     name: "Ion Cannon",
   };
 
@@ -146,8 +146,8 @@ export async function addBuildings(diamondAddr: string) {
     boosts: [0, 0, 0],
 
     defenseTypes: [0, 0, 0],
-    health: 30,
-    craftTime: 72 * CRAFT_TIME_FACTOR,
+    health: 10,
+    craftTime: 36 * CRAFT_TIME_FACTOR,
     name: "Shipyard",
   };
 

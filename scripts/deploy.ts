@@ -212,20 +212,21 @@ export async function deployDiamond() {
   console.log("starting init");
 
   //planetType 0 is undiscovered.
-  //the rest should have some meaning
+
+  //planetType 2 is a Tradehub planet, which cannot be transformed or attacked.
   const genesisPlanets = await adminFacet.startInit(1, 2);
   await adminFacet.startInit(9, 0);
 
   //main one, first 50 are deterministic
-  for (let i = 0; i < 10; i++) {
-    const initPlanets = await adminFacet.startInit(19, 0);
+  for (let i = 0; i < 20; i++) {
+    const initPlanets = await adminFacet.startInit(8, 0);
 
-    //@notice this the chance for a trading hub to appear
-    if (Math.random() < 0.15) {
-      const initBelts = await adminFacet.startInit(1, 1);
+    //@notice this the chance for an asteroid belt hub to appear
+    if (Math.random() < 0.3) {
+      const initBelts = await adminFacet.startInit(2, 1);
       await initBelts.wait();
     } else {
-      const initPlanets2 = await adminFacet.startInit(1, 0);
+      const initPlanets2 = await adminFacet.startInit(2, 0);
       await initPlanets2.wait();
     }
     await initPlanets.wait();

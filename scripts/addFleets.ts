@@ -9,7 +9,7 @@ export async function addFleets(fleetsAddress: string) {
     fleetsAddress
   )) as Ships;
 
-  const CRAFT_TIME_FACTOR = 1; // 20;
+  const CRAFT_TIME_FACTOR = 20; // 20;
 
   const fleet1: ship = {
     shipType: 1,
@@ -33,7 +33,7 @@ export async function addFleets(fleetsAddress: string) {
   const fleet2: ship = {
     shipType: 2,
     price: [
-      ethers.utils.parseEther("2000"),
+      ethers.utils.parseEther("1000"),
       ethers.utils.parseEther("500"),
       ethers.utils.parseEther("400"),
       ethers.utils.parseEther("0"),
@@ -116,9 +116,9 @@ export async function addFleets(fleetsAddress: string) {
     attack: 600,
     attackTypes: [600, 400, 200],
     defenseTypes: [5, 5, 5],
-    health: 150,
+    health: 100,
     cargo: 50,
-    craftTime: 72 * CRAFT_TIME_FACTOR,
+    craftTime: 144 * CRAFT_TIME_FACTOR,
     craftedFrom: 10,
     name: "Bomber",
     moduleSlots: 1,
@@ -127,7 +127,7 @@ export async function addFleets(fleetsAddress: string) {
   const fleet7: ship = {
     shipType: 7,
     price: [
-      ethers.utils.parseEther("900"),
+      ethers.utils.parseEther("1000"),
       ethers.utils.parseEther("300"),
       ethers.utils.parseEther("200"),
       ethers.utils.parseEther("0"),
@@ -136,7 +136,7 @@ export async function addFleets(fleetsAddress: string) {
     attackTypes: [10, 10, 10],
     defenseTypes: [10, 10, 10],
     health: 100,
-    cargo: 3000,
+    cargo: 2000,
     craftTime: 72 * CRAFT_TIME_FACTOR,
     craftedFrom: 10,
     name: "Miner Ship",
@@ -156,7 +156,7 @@ export async function addFleets(fleetsAddress: string) {
     defenseTypes: [30, 30, 30],
     health: 30,
     cargo: 5000,
-    craftTime: 9 * CRAFT_TIME_FACTOR,
+    craftTime: 72 * CRAFT_TIME_FACTOR,
     craftedFrom: 10,
     name: "Courier",
     moduleSlots: 1,
@@ -187,14 +187,14 @@ export async function addFleets(fleetsAddress: string) {
       ethers.utils.parseEther("10000"),
       ethers.utils.parseEther("8000"),
       ethers.utils.parseEther("5000"),
-      ethers.utils.parseEther("1000"),
+      ethers.utils.parseEther("0"), //for alpha, no aether is required
     ],
     attack: 1000,
     attackTypes: [1000, 1000, 1000],
     defenseTypes: [1000, 1000, 1000],
-    health: 30,
+    health: 1000,
     cargo: 500,
-    craftTime: 9 * CRAFT_TIME_FACTOR,
+    craftTime: 720 * CRAFT_TIME_FACTOR,
     craftedFrom: 10,
     name: "Capital-Class Destroyer",
     moduleSlots: 1,
