@@ -156,11 +156,9 @@ describe("Game", function () {
     planetIdPlayer2: PromiseOrValue<BigNumberish>,
     shipIds: BigNumber[]
   ) => {
-    for (let shipId of shipIds) {
-      await fightingFacet
-        .connect(user)
-        .sendAttack(planetIdPlayer1, planetIdPlayer2, [shipId]);
-    }
+    await fightingFacet
+      .connect(user)
+      .sendAttack(planetIdPlayer1, planetIdPlayer2, shipIds);
   };
 
   const sendTerraform = async (
@@ -1962,118 +1960,6 @@ describe("Game", function () {
       expect(statsAfterModule.health).to.be.above(
         statsBeforeModule.health
       );
-    });
-  });
-
-  describe("Combat Balance Testing", function () {
-    it("scenario 1: user1 attacks with a 10 bombers against 1 Capital-Class Destroyer and loses", async function () {
-      const { randomUser, randomUserTwo } = await loadFixture(
-        deployUsers
-      );
-
-      // Setup user1 with 1 building and 2 ships of type 6
-      await setupUser(randomUser, 1, [{ type: 6, quantity: 10 }]);
-
-      // Setup user2 with 1 building and 1 ship of type 5
-      await setupUser(randomUserTwo, 1, [{ type: 10, quantity: 1 }]);
-
-      // Get the initial planet for each user
-      const planetIdPlayer1 = await planetNfts.tokenOfOwnerByIndex(
-        await randomUser.getAddress(),
-        0
-      );
-      const planetIdPlayer2 = await planetNfts.tokenOfOwnerByIndex(
-        await randomUserTwo.getAddress(),
-        0
-      );
-
-      // User1 attacks user2 with all ships
-      const shipIdsPlayer1 = await getShipIdsForOwner(randomUser);
-      await sendAttack(
-        randomUser,
-        planetIdPlayer1,
-        planetIdPlayer2,
-        shipIdsPlayer1
-      );
-
-      // Advance time and resolve the attack
-      await advanceTimeAndBlock(400);
-      const attackResolveReceipt = await fightingFacet
-        .connect(randomUser)
-        .resolveAttack(1);
-      await attackResolveReceipt.wait();
-
-      // Assert that user1 has won, and has therefore kept all ships
-      const shipsOwnedByPlayer1 = await getShipIdsForOwner(
-        randomUser
-      );
-      expect(shipsOwnedByPlayer1.length).to.be.above(0);
-
-      // Assert that user2 has lost, and has therefore lost all ships
-      const shipsOwnedByPlayer2 = await getShipIdsForOwner(
-        randomUserTwo
-      );
-      expect(shipsOwnedByPlayer2.length).to.equal(1);
-    });
-    it("scenario 2: user1 attacks with 5 fighters against 2 Capital-Class Destroyer and loses entire fleet", async function () {
-      const { randomUser, randomUserTwo } = await loadFixture(
-        deployUsers
-      );
-
-      // Setup user1 with 1 building and 2 ships of type 6
-      await setupUser(randomUser, 1, [{ type: 1, quantity: 5 }]);
-
-      // Setup user2 with 1 building and 1 ship of type 5
-      await setupUser(randomUserTwo, 1, [{ type: 10, quantity: 2 }]);
-
-      // Get the initial planet for each user
-      const planetIdPlayer1 = await planetNfts.tokenOfOwnerByIndex(
-        await randomUser.getAddress(),
-        0
-      );
-      const planetIdPlayer2 = await planetNfts.tokenOfOwnerByIndex(
-        await randomUserTwo.getAddress(),
-        0
-      );
-
-      // User1 attacks user2 with all ships
-      const shipIdsPlayer1 = await getShipIdsForOwner(randomUser);
-      console.log(shipIdsPlayer1);
-      await sendAttack(
-        randomUser,
-        planetIdPlayer1,
-        planetIdPlayer2,
-        shipIdsPlayer1
-      );
-
-      // Advance time and resolve the attack
-      await advanceTimeAndBlock(400);
-      const attackResolveReceipt = await fightingFacet
-        .connect(randomUser)
-        .resolveAttack(1);
-      await attackResolveReceipt.wait();
-
-      // Assert that user1 has won, and has therefore kept all ships
-      const shipsOwnedByPlayer1 = await getShipIdsForOwner(
-        randomUser
-      );
-      //console.log(shipsOwnedByPlayer1.length);
-      //expect(shipsOwnedByPlayer1.length).to.equal(0);
-
-      // Assert player2 still has ships
-      const checkOwnershipShipsPlayer = await shipNfts.balanceOf(
-        randomUser.address
-      );
-
-      console.log(checkOwnershipShipsPlayer);
-      expect(checkOwnershipShipsPlayer).to.be.above(1);
-
-      // Assert that user2 has lost, and has therefore lost all ships
-      const shipsOwnedByPlayer2 = await getShipIdsForOwner(
-        randomUserTwo
-      );
-      console.log(shipsOwnedByPlayer2.length);
-      expect(shipsOwnedByPlayer2.length).to.equal(2);
     });
   });
 

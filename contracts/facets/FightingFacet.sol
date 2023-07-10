@@ -270,12 +270,8 @@ contract FightingFacet is Modifiers {
 
         //@notice if the attacked Planet isnt eligible to be attacked on the resolve time, retreat ships
 
-        address attackerShipsOwner = IERC721(s.shipsAddress).ownerOf(
-            attackToResolve.attackerShipsIds[0]
-        );
-
         if (
-            attackerShipsOwner ==
+            attackToResolve.attacker ==
             IERC721(s.planetsAddress).ownerOf(attackToResolve.toPlanet) ||
             IERC721(s.planetsAddress).ownerOf(attackToResolve.toPlanet) ==
             address(this)
@@ -355,13 +351,13 @@ contract FightingFacet is Modifiers {
         int256 LARGER_FLEET_DEBUFF_THRESHOLD = 50; // 50% larger fleet
         int256 LARGER_FLEET_DEBUFF_PERCENT_50 = 5; // 5% debuff
         int256 LARGER_FLEET_DEBUFF_PERCENT_100 = 10; // 10% debuff
-        int256 LARGER_FLEET_DEBUFF_PERCENT_200 = 10; // 15% debuff
-        int256 LARGER_FLEET_DEBUFF_PERCENT_300 = 10; // 20% debuff
+        int256 LARGER_FLEET_DEBUFF_PERCENT_200 = 15; // 15% debuff
+        int256 LARGER_FLEET_DEBUFF_PERCENT_300 = 20; // 20% debuff
 
         int256 SMALLER_FLEET_BUFF_PERCENT_50 = 5; // 5% buff
         int256 SMALLER_FLEET_BUFF_PERCENT_100 = 10; // 10% buff
-        int256 SMALLER_FLEET_BUFF_PERCENT_200 = 10; // 15% buff
-        int256 SMALLER_FLEET_BUFF_PERCENT_300 = 10; // 20% buff
+        int256 SMALLER_FLEET_BUFF_PERCENT_200 = 15; // 15% buff
+        int256 SMALLER_FLEET_BUFF_PERCENT_300 = 20; // 20% buff
 
         uint256 fleetSizeDifferencePercent = (attackerShips.length * 100) /
             defenderShips.length;
