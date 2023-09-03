@@ -105,6 +105,16 @@ describe("Game", function () {
       .craftBuilding(10, planetId, 1);
   };
 
+  const craftBuildingSpecific = async (
+    buildingId: string,
+    user: string | Signer | Provider,
+    planetId: PromiseOrValue<BigNumberish>
+  ) => {
+    return await buildingsFacet
+      .connect(user)
+      .craftBuilding(buildingId, planetId, 1);
+  };
+
   const claimBuilding = async (
     user: string | Signer | Provider,
     planetId: PromiseOrValue<BigNumberish>
@@ -773,6 +783,103 @@ describe("Game", function () {
       expect(planetsOwnedPlayer1).to.equal(2);
     });
 
+    it("registered user attacks another user, conquers their NFT and crafts building on conquered planet", async function () {
+      const { randomUser, randomUserTwo } = await loadFixture(
+        deployUsers
+      );
+
+      // Create two opponents
+      await registerUser(randomUser);
+      await registerUser(randomUserTwo);
+
+      const planetIdPlayer1 = await planetNfts.tokenOfOwnerByIndex(
+        randomUser.address,
+        0
+      );
+      const planetIdPlayer2 = await planetNfts.tokenOfOwnerByIndex(
+        randomUserTwo.address,
+        0
+      );
+
+      // Craft buildings for both players
+      await craftBuilding(randomUser, planetIdPlayer1);
+      await advanceTimeAndBlock(40);
+      await claimBuilding(randomUser, planetIdPlayer1);
+
+      await craftBuilding(randomUserTwo, planetIdPlayer2);
+      await advanceTimeAndBlock(10000);
+      await claimBuilding(randomUserTwo, planetIdPlayer2);
+
+      // Craft fleets for both players
+      await craftFleet(randomUser, 6, planetIdPlayer1, 1);
+      await advanceTimeAndBlock(40);
+      await claimFleet(randomUser, planetIdPlayer1);
+
+      await craftFleet(randomUserTwo, 1, planetIdPlayer2, 1);
+      await advanceTimeAndBlock(40000);
+      await claimFleet(randomUserTwo, planetIdPlayer2);
+
+      // Assert players own the right amount of ships
+      let checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+        randomUser.address
+      );
+      expect(checkOwnershipShipsPlayer).to.equal(1);
+
+      checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+        randomUserTwo.address
+      );
+      expect(checkOwnershipShipsPlayer).to.equal(1);
+
+      // User1 attacks User2
+      let shipIdPlayer1 = await shipNfts.tokenOfOwnerByIndex(
+        randomUser.address,
+        0
+      );
+      await sendAttack(randomUser, planetIdPlayer1, planetIdPlayer2, [
+        shipIdPlayer1,
+      ]);
+
+      await advanceTimeAndBlock(100000);
+
+      // Resolve the attack
+      const attackResolveReceipt = await fightingFacet
+        .connect(randomUser)
+        .resolveAttack(1);
+      const result = attackResolveReceipt.wait();
+
+      // Assert player1 owns the same amount of ships
+      checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+        randomUser.address
+      );
+      expect(checkOwnershipShipsPlayer).to.equal(1);
+
+      // Assert player2 lost all ships
+      checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+        randomUserTwo.address
+      );
+      expect(checkOwnershipShipsPlayer).to.equal(0);
+
+      // Assert planet is owned by player1
+      const planetsOwnedPlayer1 = await planetNfts.balanceOf(
+        randomUser.address
+      );
+      expect(planetsOwnedPlayer1).to.equal(2);
+
+      let checkOwnershipBuildingsbefore =
+        await buildingsFacet.getAllBuildings(planetIdPlayer2);
+
+      // Craft and claim a building on the newly conquered planet
+      await craftBuilding(randomUser, planetIdPlayer2);
+      await advanceTimeAndBlock(40);
+      await claimBuilding(randomUser, planetIdPlayer2);
+
+      let checkOwnershipBuildingsAfter =
+        await buildingsFacet.getAllBuildings(planetIdPlayer2);
+
+      expect(checkOwnershipBuildingsAfter[10]).to.be.above(
+        checkOwnershipBuildingsbefore[10]
+      );
+    });
     it("registered user attacks other user and lose ", async function () {
       const { randomUser, randomUserTwo } = await loadFixture(
         deployUsers
@@ -1259,7 +1366,7 @@ describe("Game", function () {
       expect(checkOwnershipShipsPlayer).to.equal(shipAmountToCraft);
 
       const getShipsOnPlanetBefore =
-        await shipsFacet.getDefensePlanetDetailedIds(planetIdPlayer2);
+        await shipsFacet.getDefensePlanetDetailed(planetIdPlayer2);
 
       // User sends reinforcements to other user
       let shipIdPlayer1Reinforcement =
@@ -1271,12 +1378,102 @@ describe("Game", function () {
         ]);
 
       const getShipsOnPlanetAfter =
-        await shipsFacet.getDefensePlanetDetailedIds(planetIdPlayer2);
+        await shipsFacet.getDefensePlanetDetailed(planetIdPlayer2);
 
+      console.log(getShipsOnPlanetBefore[0]);
+      console.log(getShipsOnPlanetAfter[0]);
       // Assert other user received the reinforcements
-      expect(getShipsOnPlanetAfter.length).to.be.above(
-        getShipsOnPlanetBefore.length
+      expect(getShipsOnPlanetAfter[0].length).to.be.above(
+        getShipsOnPlanetBefore[0].length
       );
+    });
+
+    it("registered user can send resources  to his alliance member", async function () {
+      const { randomUser, randomUserTwo } = await loadFixture(
+        deployUsers
+      );
+
+      await registerUser(randomUser);
+      await registerUser(randomUserTwo);
+
+      const planetIdPlayer1 = await planetNfts.tokenOfOwnerByIndex(
+        randomUser.address,
+        0
+      );
+      const planetIdPlayer2 = await planetNfts.tokenOfOwnerByIndex(
+        randomUserTwo.address,
+        0
+      );
+
+      const allianceNameBytes32 =
+        ethers.utils.formatBytes32String("bananarama");
+
+      // User creates an alliance and invites other user
+      const createAlliance = await allianceFacet
+        .connect(randomUser)
+        .createAlliance(allianceNameBytes32);
+      const invitePlayer = await allianceFacet
+        .connect(randomUser)
+        .inviteToAlliance(randomUserTwo.address);
+      const acceptInvitation = await allianceFacet
+        .connect(randomUserTwo)
+        .joinAlliance(allianceNameBytes32);
+
+      // User crafts a building and a fleet
+      await craftBuilding(randomUser, planetIdPlayer1);
+      await advanceTimeAndBlock(1);
+      await claimBuilding(randomUser, planetIdPlayer1);
+
+      let shipAmountToCraft = 1;
+      let cargoShipId = 8;
+      await craftFleet(
+        randomUser,
+        cargoShipId,
+        planetIdPlayer1,
+        shipAmountToCraft
+      );
+      await advanceTimeAndBlock(10);
+      await claimFleet(randomUser, planetIdPlayer1);
+
+      const sentAmount = [42000000, 42000000, 42000000] as [
+        number,
+        number,
+        number
+      ];
+
+      const metalBefore = await buildingsFacet.getPlanetResources(
+        planetIdPlayer2,
+        0
+      );
+
+      const metalBefore1 = await buildingsFacet.getPlanetResources(
+        planetIdPlayer1,
+        0
+      );
+
+      await shipsFacet
+        .connect(randomUser)
+        .startSendResources(
+          planetIdPlayer1,
+          planetIdPlayer2,
+          sentAmount
+        );
+
+      await advanceTimeAndBlock(10);
+
+      await shipsFacet.connect(randomUser).resolveSendResources(0);
+
+      const metalAfter = await buildingsFacet.getPlanetResources(
+        planetIdPlayer2,
+        0
+      );
+
+      const metalAfter1 = await buildingsFacet.getPlanetResources(
+        planetIdPlayer1,
+        0
+      );
+
+      expect(metalBefore).to.be.below(metalAfter);
     });
 
     it("should return all members of an alliance", async function () {
@@ -1770,7 +1967,51 @@ describe("Game", function () {
       await craftAndClaimShipyard(randomUser, planetId);
 
       await craftAndClaimFleet(randomUser, 9, planetId, 1);
+
+      const planetsOwnedPlayer1Before = await planetNfts.balanceOf(
+        randomUser.address
+      );
+
+      expect(planetsOwnedPlayer1Before).to.equal(1);
+
+      const shipIds = Array.from(
+        { length: 1 },
+        async (_, i) =>
+          await shipNfts.tokenOfOwnerByIndex(randomUser.address, i)
+      );
+
+      await sendTerraform(randomUser, planetId, 14, shipIds);
+      await advanceTimeAndBlock(5);
+
+      await endTerraform(randomUser, 0);
+
+      const planetsOwnedPlayer1 = await planetNfts.balanceOf(
+        randomUser.address
+      );
+
+      expect(planetsOwnedPlayer1).to.equal(2);
+    });
+
+    it("User can terraform uninhabited planet with 1terraformer and 2 fighter ships", async function () {
+      const { randomUser } = await loadFixture(deployUsers);
+
+      await registerUser(randomUser);
+
+      const planetId = await planetNfts.tokenOfOwnerByIndex(
+        randomUser.address,
+        0
+      );
+
+      await craftAndClaimShipyard(randomUser, planetId);
+
+      await craftAndClaimFleet(randomUser, 9, planetId, 1);
       await craftAndClaimFleet(randomUser, 6, planetId, 2);
+
+      const planetsOwnedPlayer1Before = await planetNfts.balanceOf(
+        randomUser.address
+      );
+
+      expect(planetsOwnedPlayer1Before).to.equal(1);
 
       const shipIds = Array.from(
         { length: 3 },
@@ -1788,6 +2029,75 @@ describe("Game", function () {
       );
 
       expect(planetsOwnedPlayer1).to.equal(2);
+    });
+
+    it("User can terraform uninhabited planet with 1 terraformer and 2 fighter ships, then craft and claim building on terraformed planet", async function () {
+      const { randomUser } = await loadFixture(deployUsers);
+
+      await registerUser(randomUser);
+
+      const planetId = await planetNfts.tokenOfOwnerByIndex(
+        randomUser.address,
+        0
+      );
+
+      await craftAndClaimShipyard(randomUser, planetId);
+
+      await craftAndClaimFleet(randomUser, 9, planetId, 1); // Terraformer
+      await craftAndClaimFleet(randomUser, 6, planetId, 2); // Fighter ships
+
+      const planetsOwnedPlayer1Before = await planetNfts.balanceOf(
+        randomUser.address
+      );
+      expect(planetsOwnedPlayer1Before).to.equal(1);
+
+      const shipIds = await Promise.all(
+        Array.from(
+          { length: 3 },
+          async (_, i) =>
+            await shipNfts.tokenOfOwnerByIndex(randomUser.address, i)
+        )
+      );
+
+      await sendTerraform(randomUser, planetId, 14, shipIds); // Targeting planetId: 14
+      await advanceTimeAndBlock(5);
+
+      await endTerraform(randomUser, 0);
+
+      const planetsOwnedPlayer1 = await planetNfts.balanceOf(
+        randomUser.address
+      );
+      expect(planetsOwnedPlayer1).to.equal(2);
+
+      // Get the newly terraformed planet ID
+      const terraformedPlanetId =
+        await planetNfts.tokenOfOwnerByIndex(randomUser.address, 1); // Assuming it's at index 1
+
+      // Check buildings on the terraformed planet before crafting
+      let checkOwnershipBuildingsbefore =
+        await buildingsFacet.getAllBuildings(terraformedPlanetId);
+
+      await buildingsFacet
+        .connect(randomUser)
+        .mineResources(terraformedPlanetId);
+
+      // Craft and claim a building on the newly terraformed planet
+      await craftBuildingSpecific(
+        "5",
+        randomUser,
+        terraformedPlanetId
+      );
+      await advanceTimeAndBlock(40);
+      await claimBuilding(randomUser, terraformedPlanetId);
+
+      // Check buildings on the terraformed planet after crafting
+      let checkOwnershipBuildingsAfter =
+        await buildingsFacet.getAllBuildings(terraformedPlanetId);
+
+      // Assert that a building was crafted on the newly terraformed planet
+      expect(checkOwnershipBuildingsAfter[5]).to.be.above(
+        checkOwnershipBuildingsbefore[5]
+      ); // Check the specific building at index 10
     });
 
     it("check terraform viewing functions", async function () {

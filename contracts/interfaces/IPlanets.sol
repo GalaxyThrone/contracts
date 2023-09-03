@@ -13,6 +13,8 @@ interface IPlanets {
         uint256 planetType;
     }
 
+    function ownerOf(uint256 _tokenId) external view returns (address);
+
     function mint(Planet calldata _planet) external;
 
     function mineResource(

@@ -176,8 +176,8 @@ contract AdminFacet is Modifiers {
                 })
             );
             //@TODO we should also save the coordinates(tbh, actually everything. ) on the diamond itself
-            s.planetType[s.totalPlanetsAmount] = typeOfPlanet;
             s.totalPlanetsAmount++;
+            s.planetType[s.totalPlanetsAmount] = typeOfPlanet;
         }
         s.init = false;
     }

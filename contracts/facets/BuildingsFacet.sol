@@ -35,16 +35,17 @@ contract BuildingsFacet is Modifiers {
         );
         uint256 readyTimestamp = block.timestamp + (craftTime * _amount);
 
-        //Hivemind  Craft-Time Buff.
-        if (s.playersFaction[msg.sender] == 3) {
-            readyTimestamp -= ((craftTime * _amount) * 20) / 100;
-            craftTimeBuffed = ((craftTime * 80) / 100);
-        }
-
         // new player crafting buff by 80% for the first 10 buildings
         if (s.totalBuiltBuildingsPlanet[_planetId] <= 10) {
             readyTimestamp -= ((craftTime * _amount) * 80) / 100;
             craftTimeBuffed = ((craftTime * 20) / 100);
+        }
+        //Hivemind  Craft-Time Buff.
+        else if (s.playersFaction[msg.sender] == 3) {
+            readyTimestamp -= ((craftTime * _amount) * 20) / 100;
+            craftTimeBuffed = ((craftTime * 80) / 100);
+        } else {
+            craftTimeBuffed = craftTime;
         }
 
         CraftItem memory newBuilding = CraftItem(
@@ -86,6 +87,11 @@ contract BuildingsFacet is Modifiers {
     ) external onlyPlanetOwnerOrChainRunner(_planetId) {
         uint256 currentTimestamp = block.timestamp;
         CraftItem storage currentCraft = s.craftBuildings[_planetId];
+
+        //@notice @TODO temporary bandaid, that can be deleted safely after round 3
+        if (s.craftBuildings[_planetId].craftTimeItem == 0) {
+            s.craftBuildings[_planetId].craftTimeItem = 10;
+        }
 
         // Compute the readyTimestamp for the next claimable building
         uint256 nextReadyTimestamp = currentCraft.startTimestamp +
@@ -179,7 +185,7 @@ contract BuildingsFacet is Modifiers {
 
         for (uint256 i = 0; i < 3; i++) {
             uint256 boost = s.boosts[_planetId][i];
-            uint256 amountMined = 2000 ether + (boost * 1e18);
+            uint256 amountMined = 3000 ether + (boost * 1e18);
             IPlanets(s.planetsAddress).mineResource(_planetId, i, amountMined);
 
             //I know its hacky, but loading the resource contract addresses in an array is more gas intensive

@@ -269,12 +269,12 @@ contract FightingFacet is Modifiers {
         //@Retreat Path.
 
         //@notice if the attacked Planet isnt eligible to be attacked on the resolve time, retreat ships
-
+        address attackedOwner = IERC721(s.planetsAddress).ownerOf(
+            attackToResolve.toPlanet
+        );
         if (
-            attackToResolve.attacker ==
-            IERC721(s.planetsAddress).ownerOf(attackToResolve.toPlanet) ||
-            IERC721(s.planetsAddress).ownerOf(attackToResolve.toPlanet) ==
-            address(this)
+            attackToResolve.attacker == attackedOwner ||
+            attackedOwner == address(this)
         ) {
             returnShipsToHome(
                 attackToResolve.fromPlanet,
@@ -359,8 +359,15 @@ contract FightingFacet is Modifiers {
         int256 SMALLER_FLEET_BUFF_PERCENT_200 = 15; // 15% buff
         int256 SMALLER_FLEET_BUFF_PERCENT_300 = 20; // 20% buff
 
-        uint256 fleetSizeDifferencePercent = (attackerShips.length * 100) /
-            defenderShips.length;
+        uint256 fleetSizeDifferencePercent;
+
+        if (defenderShips.length > 0) {
+            fleetSizeDifferencePercent =
+                (attackerShips.length * 100) /
+                defenderShips.length;
+        } else {
+            fleetSizeDifferencePercent = 0; // Or another value that makes sense in your use case.
+        }
 
         if (fleetSizeDifferencePercent >= 100) {
             // attacker fleet is larger, apply debuff
