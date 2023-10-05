@@ -110,6 +110,20 @@ struct TechTreeUpdate {
     uint256[2] preRequisiteTech;
 }
 
+struct DiplomacyDeal {
+    address initiator;
+    address acceptor;
+    uint[3] resourcesAmount;
+    bool demanded; //if false, its offered.
+    uint timeFramePeaceDealInSeconds;
+    uint timeFrameExpirationOffer;
+    uint initiatorPlanetId;
+}
+
+struct PeaceDeal {
+    uint endTime;
+}
+
 struct AppStorage {
     address crystalAddress;
     address antimatterAddress;
@@ -144,7 +158,10 @@ struct AppStorage {
     mapping(uint256 => uint256) shipRelevantTechUpgradesMapping;
     mapping(address => string) playerName;
     mapping(string => bool) playerNameOwnership;
+    mapping(uint => DiplomacyDeal) diplomacyDeals;
+    mapping(address => mapping(address => PeaceDeal)) activePeaceDeals;
     uint256 maxTechCount;
+    uint256 dealCounter;
     uint256 sendAttackId;
     uint256 totalAllianceCount;
     uint256 outMiningId;

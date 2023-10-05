@@ -9,6 +9,7 @@ import "../interfaces/IERC721.sol";
 import "../interfaces/IResource.sol";
 import "./AdminFacet.sol";
 import "./BuildingsFacet.sol";
+import "./ManagementFacet.sol";
 
 contract FightingFacet is Modifiers {
     event AttackSent(
@@ -51,6 +52,14 @@ contract FightingFacet is Modifiers {
                 checkAlliance(msg.sender) ||
                 checkAlliance(msg.sender) == bytes32(0),
             "friendly target!"
+        );
+
+        require(
+            !ManagementFacet(address(this)).getPeaceDealStatus(
+                msg.sender,
+                (IERC721(s.planetsAddress).ownerOf(_toPlanetId))
+            ),
+            "Peace Treaty is in place!"
         );
 
         //@notice PVP is always enabled for alpha

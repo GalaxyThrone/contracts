@@ -224,7 +224,7 @@ export async function deployDiamond() {
   //main one, first 50 are deterministic
   for (let i = 0; i < 20; i++) {
     console.log("Planet Get Loop ID:", i);
-    const initPlanets = await adminFacet.startInit(3, 0);
+    const initPlanets = await adminFacet.startInit(8, 0);
 
     //@notice this the chance for an asteroid belt hub to appear
     if (Math.random() < 0.2) {

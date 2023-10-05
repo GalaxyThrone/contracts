@@ -2398,4 +2398,98 @@ describe("Game", function () {
       await buildingsFacet.mineResources(16);
     });
   });
+
+  describe("Diplomacy Feature Testing", function () {
+    it("Should create a peace treaty between two users, preventing them from attacking each other", async function () {
+      const { randomUser, randomUserTwo } = await loadFixture(
+        deployUsers
+      );
+
+      // Register the users
+      await registerUser(randomUser);
+      await registerUser(randomUserTwo);
+
+      const planetIdPlayer1 = await planetNfts.tokenOfOwnerByIndex(
+        randomUser.address,
+        0
+      );
+      const planetIdPlayer2 = await planetNfts.tokenOfOwnerByIndex(
+        randomUserTwo.address,
+        0
+      );
+
+      // craft buildings for both players
+      await craftBuilding(randomUser, planetIdPlayer1);
+      await advanceTimeAndBlock(40);
+      await claimBuilding(randomUser, planetIdPlayer1);
+
+      await craftBuilding(randomUserTwo, planetIdPlayer2);
+      await advanceTimeAndBlock(10000);
+      await claimBuilding(randomUserTwo, planetIdPlayer2);
+
+      // craft fleets for both players
+      await craftFleet(randomUser, 6, planetIdPlayer1, 1);
+      await advanceTimeAndBlock(40);
+      await claimFleet(randomUser, planetIdPlayer1);
+
+      await craftFleet(randomUserTwo, 1, planetIdPlayer2, 1);
+      await advanceTimeAndBlock(40000);
+      await claimFleet(randomUserTwo, planetIdPlayer2);
+
+      const sentAmount = [4200, 4200, 4200] as [
+        number,
+        number,
+        number
+      ];
+
+      // Construct a diplomacy deal (peace treaty)
+      const diplomacyDeal = {
+        initiator: randomUser.address,
+        acceptor: randomUserTwo.address,
+        initiatorPlanetId: planetIdPlayer1,
+        resourcesAmount: sentAmount, // Example amounts
+        demanded: false,
+        timeFrameExpirationOffer: 2996530365, // Expires in an hour
+        timeFramePeaceDealInSeconds: 3600, // Peace lasts for an hour
+      };
+
+      // Create the deal
+      const dealCreated = await managementFacet
+        .connect(randomUser)
+        .createDeal(diplomacyDeal);
+
+      const dealId = 1; //extracted by event, or in this case we know its the first deal.
+      // Acceptor agrees to the deal
+      await managementFacet
+        .connect(randomUserTwo)
+        .acceptDeal(dealId, planetIdPlayer2);
+
+      // Assert that a peace treaty is active between the two players
+      const peaceStatus = await managementFacet.getPeaceDealStatus(
+        randomUser.address,
+        randomUserTwo.address
+      );
+      expect(peaceStatus).to.equal(true);
+
+      // user1 attempts to attack user2
+      let shipIdPlayer1 = await shipNfts.tokenOfOwnerByIndex(
+        randomUser.address,
+        0
+      );
+
+      // This should revert because a peace treaty is in place
+      await expect(
+        sendAttack(randomUser, planetIdPlayer1, planetIdPlayer2, [
+          shipIdPlayer1,
+        ])
+      ).to.be.revertedWith("Peace Treaty is in place!");
+
+      // Check that player1's ship count is still the same after the failed attack
+      const checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+        randomUser.address
+      );
+
+      expect(checkOwnershipShipsPlayer).to.equal(1);
+    });
+  });
 });
