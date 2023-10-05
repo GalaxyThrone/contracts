@@ -15,6 +15,7 @@ import {
   FightingFacet,
   Aether,
   AllianceFacet,
+  ManagementFacet,
 } from "../typechain-types";
 import { BigNumber, Signer, BigNumberish } from "ethers";
 import { impersonate } from "../scripts/helperFunctions";
@@ -40,6 +41,7 @@ describe("Game", function () {
   let buildingsFacet: BuildingsFacet;
 
   let shipsFacet: ShipsFacet;
+  let managementFacet: ManagementFacet;
 
   let planetNfts: Planets;
   let metalToken: Metal;
@@ -310,6 +312,11 @@ describe("Game", function () {
       "AllianceFacet",
       diamond
     )) as AllianceFacet;
+
+    managementFacet = (await ethers.getContractAt(
+      "ManagementFacet",
+      diamond
+    )) as ManagementFacet;
 
     await adminFacet.startInit(20, 1);
   });
@@ -2269,6 +2276,103 @@ describe("Game", function () {
 
       expect(statsAfterModule.health).to.be.above(
         statsBeforeModule.health
+      );
+    });
+  });
+
+  describe("Tech Tree Testing", function () {
+    it("User can research Technology and buff their ships", async function () {
+      const {
+        owner,
+        randomUser,
+        randomUserTwo,
+        randomUserThree,
+        AdminUser,
+      } = await loadFixture(deployUsers);
+
+      //@notice actual register function for Tron Network
+      const registration = await vrfFacet
+        .connect(randomUser)
+        .startRegister(0, 3);
+
+      const checkOwnershipAmountPlayer = await planetNfts.balanceOf(
+        randomUser.address
+      );
+
+      const planetId = await planetNfts.tokenOfOwnerByIndex(
+        randomUser.address,
+        0
+      );
+
+      await buildingsFacet
+        .connect(randomUser)
+        .craftBuilding(10, planetId, 1);
+
+      const blockBefore = await ethers.provider.getBlock(
+        await ethers.provider.getBlockNumber()
+      );
+
+      const timestampBefore = blockBefore.timestamp;
+
+      await ethers.provider.send("evm_mine", [
+        timestampBefore + 120000 * 1,
+      ]);
+
+      const claimBuild = await buildingsFacet
+        .connect(randomUser)
+        .claimBuilding(planetId);
+
+      await shipsFacet.connect(randomUser).craftFleet(1, planetId, 1);
+
+      let checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+        randomUser.address
+      );
+
+      expect(checkOwnershipShipsPlayer).to.equal(0);
+
+      await ethers.provider.send("evm_mine", [
+        timestampBefore + 120000 * 2,
+      ]);
+
+      await shipsFacet.connect(randomUser).claimFleet(planetId);
+
+      checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+        randomUser.address
+      );
+
+      expect(checkOwnershipShipsPlayer).to.equal(1);
+
+      let shipIdPlayer1 = await shipNfts.tokenOfOwnerByIndex(
+        randomUser.address,
+        0
+      );
+
+      const statsBeforeResearch =
+        await shipsFacet.getShipStatsDiamond(shipIdPlayer1);
+
+      await shipsFacet.connect(randomUser).craftFleet(1, planetId, 1);
+
+      await ethers.provider.send("evm_mine", [
+        timestampBefore + 120000 * 3,
+      ]);
+
+      await managementFacet
+        .connect(randomUser)
+        .researchTech(1, planetId);
+
+      await shipsFacet.connect(randomUser).claimFleet(planetId);
+
+      let shipId2Player1 = await shipNfts.tokenOfOwnerByIndex(
+        randomUser.address,
+        1
+      );
+
+      const statsAfterResearch = await shipsFacet.getShipStatsDiamond(
+        shipId2Player1
+      );
+
+      expect(statsAfterResearch.health).to.be.above(
+        statsBeforeResearch.health
       );
     });
   });

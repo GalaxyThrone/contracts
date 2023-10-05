@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-import {AppStorage, Modifiers, ShipType, ShipModule, Building} from "../libraries/AppStorage.sol";
+import {AppStorage, Modifiers, ShipType, ShipModule, Building, TechTreeUpdate} from "../libraries/AppStorage.sol";
 import "../interfaces/IPlanets.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
@@ -180,6 +180,19 @@ contract AdminFacet is Modifiers {
             s.planetType[s.totalPlanetsAmount] = typeOfPlanet;
         }
         s.init = false;
+    }
+
+    function initalizeShipTechTree(
+        TechTreeUpdate calldata _newTechTree
+    ) external onlyOwner {
+        s.availableResearchTechs[_newTechTree.techId] = _newTechTree;
+        s.shipRelevantTechUpgradesMapping[
+            _newTechTree.shipTypeId
+        ] = _newTechTree.techId;
+    }
+
+    function setupMaxTechResearch(uint _newMaxCount) external onlyOwner {
+        s.maxTechCount = _newMaxCount;
     }
 
     //deprecated until VRF is readded

@@ -98,6 +98,18 @@ struct TransferResource {
     uint256[3] sentResources;
 }
 
+struct TechTreeUpdate {
+    uint256 techId;
+    string name;
+    uint shipTypeId;
+    uint256[4] price; // [metal, crystal, antimatter,aether]
+    uint256 cooldown; // in seconds
+    uint256 hpBuff;
+    uint256[3] attackBoostStat;
+    uint256[3] defenseBoostStat;
+    uint256[2] preRequisiteTech;
+}
+
 struct AppStorage {
     address crystalAddress;
     address antimatterAddress;
@@ -125,6 +137,14 @@ struct AppStorage {
     mapping(uint256 => bytes32) registeredAlliances;
     mapping(address => bool) hasCreatedAlliance;
     mapping(uint256 => attackStatus) runningAttacks;
+    mapping(address => uint256) lastResearchTimeCooldown; // timestamp of the last time a player researched
+    mapping(address => mapping(uint256 => bool)) playerTechnologies; // List of technologies each player has researched
+    mapping(address => uint) counterPlayerTechnologies; // relevant for max tech researched
+    mapping(uint256 => TechTreeUpdate) availableResearchTechs;
+    mapping(uint256 => uint256) shipRelevantTechUpgradesMapping;
+    mapping(address => string) playerName;
+    mapping(string => bool) playerNameOwnership;
+    uint256 maxTechCount;
     uint256 sendAttackId;
     uint256 totalAllianceCount;
     uint256 outMiningId;

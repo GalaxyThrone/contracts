@@ -59,7 +59,7 @@ const config: HardhatUserConfig = {
         process.env.PRIVATE_KEY !== undefined
           ? [process.env.PRIVATE_KEY]
           : [],
-      blockGasLimit: 90000000,
+      blockGasLimit: 20000000, //90000000,
     },
   },
   gasReporter: {

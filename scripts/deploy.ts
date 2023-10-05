@@ -16,6 +16,7 @@ import {
   AutomationFacet,
   AllianceFacet,
   FightingFacet,
+  ManagementFacet,
   Aether,
 } from "../typechain-types";
 import { addBuildings } from "./addBuildings";
@@ -77,6 +78,7 @@ export async function deployDiamond() {
     "AutomationFacet",
     "AllianceFacet",
     "FightingFacet",
+    "ManagementFacet",
   ];
   const cut = [];
   for (const FacetName of FacetNames) {
@@ -214,15 +216,18 @@ export async function deployDiamond() {
   //planetType 0 is undiscovered.
 
   //planetType 2 is a Tradehub planet, which cannot be transformed or attacked.
-  const genesisPlanets = await adminFacet.startInit(1, 2);
-  await adminFacet.startInit(9, 0);
 
+  console.log("Tradehub init");
+  const genesisPlanets = await adminFacet.startInit(1, 2);
+
+  console.log("Starting Planet Gen:");
   //main one, first 50 are deterministic
   for (let i = 0; i < 20; i++) {
-    const initPlanets = await adminFacet.startInit(8, 0);
+    console.log("Planet Get Loop ID:", i);
+    const initPlanets = await adminFacet.startInit(3, 0);
 
     //@notice this the chance for an asteroid belt hub to appear
-    if (Math.random() < 0.3) {
+    if (Math.random() < 0.2) {
       const initBelts = await adminFacet.startInit(2, 1);
       await initBelts.wait();
     } else {

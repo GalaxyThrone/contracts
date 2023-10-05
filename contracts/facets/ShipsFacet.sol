@@ -132,17 +132,35 @@ contract ShipsFacet is Modifiers {
         uint256 shipTypeId;
         uint256 shipId;
 
+        address planetOwner = IERC721(s.planetsAddress).ownerOf(_planetId);
+
+        bool researchEnabled = s.playerTechnologies[planetOwner][
+            s.shipRelevantTechUpgradesMapping[currentCraft.itemId]
+        ];
+
+        TechTreeUpdate memory techUpdate = s.availableResearchTechs[
+            s.shipRelevantTechUpgradesMapping[currentCraft.itemId]
+        ];
+
         for (uint256 i = 0; i < claimableAmount; i++) {
             shipId = IShips(s.shipsAddress).mint(
-                IERC721(s.planetsAddress).ownerOf(_planetId),
+                planetOwner,
                 currentCraft.itemId
             );
 
             //assign shipType to shipNFTID on Diamond
             ShipType memory newShipType = s.shipType[currentCraft.itemId];
 
-            // Modify newShipType based on the player's faction...
-
+            // Modify newShipType based on the player's faction and research
+            if (researchEnabled) {
+                for (uint i = 0; i < 3; i++) {
+                    newShipType.attackTypes[i] += techUpdate.attackBoostStat[i];
+                    newShipType.defenseTypes[i] += techUpdate.defenseBoostStat[
+                        i
+                    ];
+                }
+                newShipType.health += techUpdate.hpBuff;
+            }
             s.SpaceShips[shipId] = newShipType;
 
             shipTypeId = currentCraft.itemId;
