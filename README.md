@@ -2,7 +2,10 @@
 
 
 **Galaxy Throne**
+
 https://galaxythrone.io/
+
+https://galaxy-throne.gitbook.io/galaxy-throne-game-description/
 
 a fully on-chain SciFi Strategy Game.
 
