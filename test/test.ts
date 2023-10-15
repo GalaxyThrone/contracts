@@ -1483,6 +1483,80 @@ describe("Game", function () {
       expect(metalBefore).to.be.below(metalAfter);
     });
 
+    it("registered user can send resources only with cargo ships", async function () {
+      const { randomUser, randomUserTwo } = await loadFixture(
+        deployUsers
+      );
+
+      await registerUser(randomUser);
+      await registerUser(randomUserTwo);
+
+      const planetIdPlayer1 = await planetNfts.tokenOfOwnerByIndex(
+        randomUser.address,
+        0
+      );
+      const planetIdPlayer2 = await planetNfts.tokenOfOwnerByIndex(
+        randomUserTwo.address,
+        0
+      );
+
+      const allianceNameBytes32 =
+        ethers.utils.formatBytes32String("bananarama");
+
+      // User creates an alliance and invites other user
+      const createAlliance = await allianceFacet
+        .connect(randomUser)
+        .createAlliance(allianceNameBytes32);
+      const invitePlayer = await allianceFacet
+        .connect(randomUser)
+        .inviteToAlliance(randomUserTwo.address);
+      const acceptInvitation = await allianceFacet
+        .connect(randomUserTwo)
+        .joinAlliance(allianceNameBytes32);
+
+      // User crafts a building and a fleet
+      await craftBuilding(randomUser, planetIdPlayer1);
+      await advanceTimeAndBlock(1);
+      await claimBuilding(randomUser, planetIdPlayer1);
+
+      let shipAmountToCraft = 1;
+      let cargoShipId = 5;
+      await craftFleet(
+        randomUser,
+        cargoShipId,
+        planetIdPlayer1,
+        shipAmountToCraft
+      );
+      await advanceTimeAndBlock(10);
+      await claimFleet(randomUser, planetIdPlayer1);
+
+      const sentAmount = [42000000, 42000000, 42000000] as [
+        number,
+        number,
+        number
+      ];
+
+      const metalBefore = await buildingsFacet.getPlanetResources(
+        planetIdPlayer2,
+        0
+      );
+
+      const metalBefore1 = await buildingsFacet.getPlanetResources(
+        planetIdPlayer1,
+        0
+      );
+
+      await expect(
+        shipsFacet
+          .connect(randomUser)
+          .startSendResources(
+            planetIdPlayer1,
+            planetIdPlayer2,
+            sentAmount
+          )
+      ).to.be.revertedWith("above capacity!");
+    });
+
     it("should return all members of an alliance", async function () {
       const { randomUser, randomUserTwo, randomUserThree } =
         await loadFixture(deployUsers);

@@ -669,7 +669,7 @@ contract ShipsFacet is Modifiers {
             delete s.assignedPlanet[cargoShipIds[i]];
 
             if (carriedAmount >= totalAmount) {
-                for (uint256 j = 0; j + i < cargoShipIds.length; j++) {
+                for (uint256 j = i + 1; j < cargoShipIds.length; j++) {
                     delete cargoShipIds[j];
                 }
                 break;
@@ -754,11 +754,14 @@ contract ShipsFacet is Modifiers {
         }
 
         for (uint256 i = 0; i < totalCount; i++) {
-            if (s.assignedPlanet[ownedShips[i]] == _planetId) {
-                currShipCargo = s.SpaceShips[ownedShips[i]].cargo;
-                cargoShips[counter] = ownedShips[i];
-                cargoCapacity[counter] = currShipCargo;
-                totalShippingCapacity += currShipCargo;
+            currShipType = s.SpaceShips[ownedShips[i]].shipType;
+            if (currShipType == 8) {
+                if (s.assignedPlanet[ownedShips[i]] == _planetId) {
+                    currShipCargo = s.SpaceShips[ownedShips[i]].cargo;
+                    cargoShips[counter] = ownedShips[i];
+                    cargoCapacity[counter] = currShipCargo;
+                    totalShippingCapacity += currShipCargo;
+                }
             }
         }
         return (totalShippingCapacity, cargoShips, cargoCapacity);
