@@ -1,3 +1,5 @@
+[![Documentation](https://img.shields.io/badge/docs-available-brightgreen)](https://galaxy-throne.gitbook.io/galaxy-throne-game-description/galaxy-throne/overview/summary)
+
 ![upscaler-medium_ (1)-2x](https://user-images.githubusercontent.com/117198798/203138171-990e45cf-89b7-400e-830f-3817f70583ee.jpg)
 
 
@@ -17,7 +19,7 @@ We wanted to create a SciFi Strategy Building Game where your owned planets & sh
 
 Every Asset in our game has been created using **ERC721** for planets and ships, while the resources of the game itself are **ERC20** tokens. 
 
-A **governance DAO** exists via snapshot.org and the ownership of 1 planet NFT
+A **Governance DAO** exists via snapshot.org and the ownership of 1 planet NFT
 
 We are utilizing Chainlinks Verifiable Random Function to randomize planet generation & the assignment of the home planet as well as for dynamic fights.
 
