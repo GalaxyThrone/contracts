@@ -1,4 +1,7 @@
 [![Documentation](https://img.shields.io/badge/docs-available-brightgreen)](https://galaxy-throne.gitbook.io/galaxy-throne-game-description/galaxy-throne/overview/summary)
+[![Build & Test](https://github.com/GalaxyThrone/contracts/actions/workflows/Build%20%26%20Test.yml/badge.svg)](https://github.com/GalaxyThrone/contracts/actions?query=workflow%3A"Build+%26+Test")
+
+
 
 ![upscaler-medium_ (1)-2x](https://user-images.githubusercontent.com/117198798/203138171-990e45cf-89b7-400e-830f-3817f70583ee.jpg)
 
