@@ -28,6 +28,7 @@ contract ManagementFacet is Modifiers {
 
     function researchTech(
         uint _techIdToResearch,
+        uint _techTree,
         uint _researchBasePlanet
     ) external onlyPlanetOwner(_researchBasePlanet) {
         require(
@@ -36,47 +37,98 @@ contract ManagementFacet is Modifiers {
         );
 
         require(
-            s.playerTechnologies[msg.sender][_techIdToResearch] == false,
+            !s.playerTechnologies[msg.sender][_techTree][_techIdToResearch],
             "ManagementFacet: already researched!"
         );
 
-        require(
-            s.counterPlayerTechnologies[msg.sender] < s.maxTechCount,
-            "ManagementFacet: reached max tech researched"
-        );
+        uint256[4] memory price;
+        uint256 cooldown;
 
-        //@TODO prerequisite
-
-        for (uint256 i = 0; i < 3; i++) {
+        if (_techTree == 1) {
+            // Ships
             require(
-                s.planetResources[_researchBasePlanet][i] >=
-                    s.availableResearchTechs[_techIdToResearch].price[i],
-                "ManagementFacet: not enough resources"
+                s.counterPlayerTechnologiesShips[msg.sender] < s.maxTechCount,
+                "ManagementFacet: reached max tech researched for Ships"
             );
-            s.planetResources[_researchBasePlanet][i] -= s
-                .availableResearchTechs[_techIdToResearch]
-                .price[i];
-
-            burnResource(
-                i,
-                s.availableResearchTechs[_techIdToResearch].price[i]
+            ShipTypeTech memory tech = s.availableResearchTechsShips[
+                _techIdToResearch
+            ];
+            price = tech.price;
+            cooldown = tech.cooldown;
+            // other ship-specific logic...
+        } else if (_techTree == 2) {
+            // Military
+            require(
+                s.counterPlayerTechnologiesMilitary[msg.sender] <
+                    s.maxTechCount,
+                "ManagementFacet: reached max tech researched for Military"
             );
+            MilitaryTech memory tech = s.availableResearchTechsMilitary[
+                _techIdToResearch
+            ];
+            price = tech.price;
+            cooldown = tech.cooldown;
+        } else if (_techTree == 3) {
+            // Governance
+            require(
+                s.counterPlayerTechnologiesGovernance[msg.sender] <
+                    s.maxTechCount,
+                "ManagementFacet: reached max tech researched for Governance"
+            );
+            GovernanceTech memory tech = s.availableResearchTechsGovernance[
+                _techIdToResearch
+            ];
+            price = tech.price;
+            cooldown = tech.cooldown;
+        } else if (_techTree == 4) {
+            // Utility
+            require(
+                s.counterPlayerTechnologiesUtility[msg.sender] < s.maxTechCount,
+                "ManagementFacet: reached max tech researched for Utility"
+            );
+            UtilityTech memory tech = s.availableResearchTechsUtility[
+                _techIdToResearch
+            ];
+            price = tech.price;
+            cooldown = tech.cooldown;
+        } else {
+            revert("Invalid tech tree");
         }
 
-        s.lastResearchTimeCooldown[msg.sender] =
-            block.timestamp +
-            s.availableResearchTechs[_techIdToResearch].cooldown;
+        // Check if the planet has enough resources
+        for (uint256 i = 0; i < price.length; i++) {
+            require(
+                s.planetResources[_researchBasePlanet][i] >= price[i],
+                "ManagementFacet: not enough resources"
+            );
+            s.planetResources[_researchBasePlanet][i] -= price[i];
+            burnResource(i, price[i]);
+        }
 
-        s.playerTechnologies[msg.sender][_techIdToResearch] = true;
-        s.counterPlayerTechnologies[msg.sender]++;
+        s.lastResearchTimeCooldown[msg.sender] = block.timestamp + cooldown;
+        s.playerTechnologies[msg.sender][_techTree][_techIdToResearch] = true;
+
+        // Increment the relevant counter based on the tech tree
+        if (_techTree == 1) {
+            s.counterPlayerTechnologiesShips[msg.sender]++;
+        } else if (_techTree == 2) {
+            s.counterPlayerTechnologiesMilitary[msg.sender]++;
+        } else if (_techTree == 3) {
+            s.counterPlayerTechnologiesGovernance[msg.sender]++;
+        } else if (_techTree == 4) {
+            s.counterPlayerTechnologiesUtility[msg.sender]++;
+        }
+
         emit techResearched(_techIdToResearch, msg.sender);
     }
 
     function returnPlayerResearchedTech(
         uint _techIdToCheckStatus,
+        uint _techTree,
         address _playerAddr
     ) external view returns (bool) {
-        return s.playerTechnologies[_playerAddr][_techIdToCheckStatus];
+        return
+            s.playerTechnologies[_playerAddr][_techTree][_techIdToCheckStatus];
     }
 
     //Playernames Feature (@notice, this could be moved to backend via offchain signature validation..tbd)
@@ -196,6 +248,7 @@ contract ManagementFacet is Modifiers {
             block.timestamp + deal.timeFramePeaceDealInSeconds
         );
 
+        deal.status = 1;
         emit DealAccepted(_dealID);
     }
 
@@ -208,7 +261,9 @@ contract ManagementFacet is Modifiers {
         if (!deal.demanded) {
             unlockResources(deal.resourcesAmount, deal.initiatorPlanetId);
         }
-        delete s.diplomacyDeals[_dealID];
+        s.diplomacyDeals[_dealID].status = 2;
+        //delete s.diplomacyDeals[_dealID];
+
         emit DealCancelled(_dealID);
     }
 

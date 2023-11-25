@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-import {AppStorage, Modifiers, ShipType, ShipModule, Building, TechTreeUpdate} from "../libraries/AppStorage.sol";
+import {AppStorage, Modifiers, ShipType, ShipModule, Building, ShipTypeTech, MilitaryTech, GovernanceTech, UtilityTech} from "../libraries/AppStorage.sol";
 import "../interfaces/IPlanets.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
@@ -184,13 +184,40 @@ contract AdminFacet is Modifiers {
         s.init = false;
     }
 
-    function initalizeShipTechTree(
-        TechTreeUpdate calldata _newTechTree
+    function initializeShipTechTree(
+        ShipTypeTech calldata _newShipTech
     ) external onlyOwner {
-        s.availableResearchTechs[_newTechTree.techId] = _newTechTree;
-        s.shipRelevantTechUpgradesMapping[
-            _newTechTree.shipTypeId
-        ] = _newTechTree.techId;
+        s.availableResearchTechsShips[_newShipTech.techId] = _newShipTech;
+        s.shipRelevantTechUpgradesMapping[_newShipTech.shipTypeId].push(
+            _newShipTech.techId
+        );
+    }
+
+    function initializeMilitaryTechTree(
+        MilitaryTech calldata _newMilitaryTech
+    ) external onlyOwner {
+        s.availableResearchTechsMilitary[
+            _newMilitaryTech.techId
+        ] = _newMilitaryTech;
+        // Any additional logic specific to military techs
+    }
+
+    function initializeGovernanceTechTree(
+        GovernanceTech calldata _newGovernanceTech
+    ) external onlyOwner {
+        s.availableResearchTechsGovernance[
+            _newGovernanceTech.techId
+        ] = _newGovernanceTech;
+        // Any additional logic specific to governance techs
+    }
+
+    function initializeUtilityTechTree(
+        UtilityTech calldata _newUtilityTech
+    ) external onlyOwner {
+        s.availableResearchTechsUtility[
+            _newUtilityTech.techId
+        ] = _newUtilityTech;
+        // Any additional logic specific to utility techs
     }
 
     function setupMaxTechResearch(uint _newMaxCount) external onlyOwner {

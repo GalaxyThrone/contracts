@@ -98,16 +98,47 @@ struct TransferResource {
     uint256[3] sentResources;
 }
 
-struct TechTreeUpdate {
+struct MilitaryTech {
     uint256 techId;
     string name;
-    uint shipTypeId;
-    uint256[4] price; // [metal, crystal, antimatter,aether]
+    uint256[4] price; // [metal, crystal, antimatter, aether]
+    uint256 cooldown; // in seconds
+    uint256 hpBuff;
+    uint256[3] attackBoostStat; // [attack type 1, attack type 2, attack type 3]
+    uint256[3] defenseBoostStat; // [defense type 1, defense type 2, defense type 3]
+    uint256 preRequisiteTech;
+}
+
+struct UtilityTech {
+    uint256 techId;
+    string name;
+    uint256[4] price; // [metal, crystal, antimatter, aether]
+    uint256 cooldown; // in seconds
+    uint256 typeOfUtilityBoost; // 0 -> Mining Asteroids, 1, Mining Planets, 2.
+    uint256 utilityBoost; // as a percentage
+    uint256 utilityBoostFlat; // flat
+    uint256 preRequisiteTech;
+}
+
+struct GovernanceTech {
+    uint256 techId;
+    string name;
+    uint256[4] price; // [metal, crystal, antimatter, aether]
+    uint256 cooldown; // in seconds
+    uint256 governanceBuff; // Effects on governance, like improved trade efficiency
+    uint256 preRequisiteTech;
+}
+
+struct ShipTypeTech {
+    uint256 techId;
+    string name;
+    uint256 shipTypeId; // ID for the specific type of ship this tech applies to
+    uint256[4] price; // [metal, crystal, antimatter, aether]
     uint256 cooldown; // in seconds
     uint256 hpBuff;
     uint256[3] attackBoostStat;
     uint256[3] defenseBoostStat;
-    uint256[2] preRequisiteTech;
+    uint256 preRequisiteTech;
 }
 
 struct DiplomacyDeal {
@@ -118,6 +149,7 @@ struct DiplomacyDeal {
     uint timeFramePeaceDealInSeconds;
     uint timeFrameExpirationOffer;
     uint initiatorPlanetId;
+    uint status; //0 -> active, 1 -> accepted and 2 -> cancelled
 }
 
 struct PeaceDeal {
@@ -153,10 +185,19 @@ struct AppStorage {
     mapping(address => bool) hasCreatedAlliance;
     mapping(uint256 => attackStatus) runningAttacks;
     mapping(address => uint256) lastResearchTimeCooldown; // timestamp of the last time a player researched
-    mapping(address => mapping(uint256 => bool)) playerTechnologies; // List of technologies each player has researched
-    mapping(address => uint) counterPlayerTechnologies; // relevant for max tech researched
-    mapping(uint256 => TechTreeUpdate) availableResearchTechs;
-    mapping(uint256 => uint256) shipRelevantTechUpgradesMapping;
+    mapping(address => mapping(uint256 => mapping(uint => bool))) playerTechnologies; // List of technologies each player has researched
+    mapping(address => uint) counterPlayerTechnologiesShips; // relevant for max tech researched
+    mapping(address => uint) counterPlayerTechnologiesMilitary; // relevant for max tech researched
+    mapping(address => uint) counterPlayerTechnologiesGovernance; // relevant for max tech researched
+    mapping(address => uint) counterPlayerTechnologiesUtility; // relevant for max tech researched
+    mapping(uint256 => ShipTypeTech) availableResearchTechsShips;
+    mapping(uint256 => UtilityTech) availableResearchTechsUtility;
+    mapping(uint256 => MilitaryTech) availableResearchTechsMilitary;
+    mapping(uint256 => GovernanceTech) availableResearchTechsGovernance;
+    mapping(uint256 => uint256[]) shipRelevantTechUpgradesMapping;
+    mapping(uint256 => uint256[]) utilityRelevantTechUpgradesMapping;
+    mapping(uint256 => uint256[]) governanceRelevantTechUpgradesMapping;
+    mapping(uint256 => uint256[]) militaryRelevantTechUpgradesMapping;
     mapping(address => string) playerName;
     mapping(string => bool) playerNameOwnership;
     mapping(uint => DiplomacyDeal) diplomacyDeals;

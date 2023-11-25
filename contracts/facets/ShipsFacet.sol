@@ -134,33 +134,35 @@ contract ShipsFacet is Modifiers {
 
         address planetOwner = IERC721(s.planetsAddress).ownerOf(_planetId);
 
-        //@notice  check for research buff if the player researched the relevant research.
-        bool researchEnabled = s.playerTechnologies[planetOwner][
-            s.shipRelevantTechUpgradesMapping[currentCraft.itemId]
-        ];
-
-        TechTreeUpdate memory techUpdate = s.availableResearchTechs[
-            s.shipRelevantTechUpgradesMapping[currentCraft.itemId]
-        ];
-
         for (uint256 i = 0; i < claimableAmount; i++) {
             shipId = IShips(s.shipsAddress).mint(
                 planetOwner,
                 currentCraft.itemId
             );
 
-            //assign shipType to shipNFTID on Diamond
             ShipType memory newShipType = s.shipType[currentCraft.itemId];
 
-            // Modify newShipType based on the player's faction and research
-            if (researchEnabled) {
-                for (uint i = 0; i < 3; i++) {
-                    newShipType.attackTypes[i] += techUpdate.attackBoostStat[i];
-                    newShipType.defenseTypes[i] += techUpdate.defenseBoostStat[
-                        i
-                    ];
+            // Apply each relevant research buff
+            uint256[] memory relevantTechIds = s
+                .shipRelevantTechUpgradesMapping[currentCraft.itemId];
+            for (uint256 j = 0; j < relevantTechIds.length; j++) {
+                uint256 techId = relevantTechIds[j];
+                if (s.playerTechnologies[planetOwner][1][techId]) {
+                    // Checking for ShipTypeTechs
+                    ShipTypeTech memory techUpdate = s
+                        .availableResearchTechsShips[techId];
+
+                    newShipType.health += techUpdate.hpBuff;
+
+                    for (uint k = 0; k < 3; k++) {
+                        newShipType.attackTypes[k] += techUpdate
+                            .attackBoostStat[k];
+                        newShipType.defenseTypes[k] += techUpdate
+                            .defenseBoostStat[k];
+                    }
+
+                    // Add any other modifications based on techUpdate
                 }
-                newShipType.health += techUpdate.hpBuff;
             }
             s.SpaceShips[shipId] = newShipType;
 

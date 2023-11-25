@@ -2430,7 +2430,111 @@ describe("Game", function () {
 
       await managementFacet
         .connect(randomUser)
-        .researchTech(1, planetId);
+        .researchTech(1, 1, planetId);
+
+      await shipsFacet.connect(randomUser).claimFleet(planetId);
+
+      let shipId2Player1 = await shipNfts.tokenOfOwnerByIndex(
+        randomUser.address,
+        1
+      );
+
+      const statsAfterResearch = await shipsFacet.getShipStatsDiamond(
+        shipId2Player1
+      );
+
+      expect(statsAfterResearch.attackTypes[0]).to.be.above(
+        statsBeforeResearch.attackTypes[0]
+      );
+    });
+
+    it("User can research Advanced Shielding Techniques and buff their ships", async function () {
+      const {
+        owner,
+        randomUser,
+        randomUserTwo,
+        randomUserThree,
+        AdminUser,
+      } = await loadFixture(deployUsers);
+
+      //@notice actual register function for Tron Network
+      const registration = await vrfFacet
+        .connect(randomUser)
+        .startRegister(0, 3);
+
+      const checkOwnershipAmountPlayer = await planetNfts.balanceOf(
+        randomUser.address
+      );
+
+      const planetId = await planetNfts.tokenOfOwnerByIndex(
+        randomUser.address,
+        0
+      );
+
+      await buildingsFacet
+        .connect(randomUser)
+        .craftBuilding(10, planetId, 1);
+
+      const blockBefore = await ethers.provider.getBlock(
+        await ethers.provider.getBlockNumber()
+      );
+
+      const timestampBefore = blockBefore.timestamp;
+
+      await ethers.provider.send("evm_mine", [
+        timestampBefore + 120000 * 1,
+      ]);
+
+      const claimBuild = await buildingsFacet
+        .connect(randomUser)
+        .claimBuilding(planetId);
+
+      await shipsFacet.connect(randomUser).craftFleet(1, planetId, 1);
+
+      let checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+        randomUser.address
+      );
+
+      expect(checkOwnershipShipsPlayer).to.equal(0);
+
+      //research first one
+      await managementFacet
+        .connect(randomUser)
+        .researchTech(2, 1, planetId);
+
+      await ethers.provider.send("evm_mine", [
+        timestampBefore + 120000 * 2,
+      ]);
+
+      await shipsFacet.connect(randomUser).claimFleet(planetId);
+
+      checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+        randomUser.address
+      );
+
+      expect(checkOwnershipShipsPlayer).to.equal(1);
+
+      let shipIdPlayer1 = await shipNfts.tokenOfOwnerByIndex(
+        randomUser.address,
+        0
+      );
+
+      const statsBeforeResearch =
+        await shipsFacet.getShipStatsDiamond(shipIdPlayer1);
+
+      await shipsFacet.connect(randomUser).craftFleet(1, planetId, 1);
+
+      await ethers.provider.send("evm_mine", [
+        timestampBefore + 120000 * 3,
+      ]);
+
+      //cooldown research
+      await ethers.provider.send("evm_mine", [
+        timestampBefore + 120000 * 12,
+      ]);
+      await managementFacet
+        .connect(randomUser)
+        .researchTech(3, 1, planetId);
 
       await shipsFacet.connect(randomUser).claimFleet(planetId);
 
@@ -2501,6 +2605,7 @@ describe("Game", function () {
         demanded: false,
         timeFrameExpirationOffer: 2996530365, // Expires in an hour
         timeFramePeaceDealInSeconds: 3600, // Peace lasts for an hour
+        status: 0,
       };
 
       // Create the deal
