@@ -132,6 +132,7 @@ struct AppStorage {
     address buildingsAddress;
     address planetsAddress;
     address shipsAddress;
+    address commandersAddress;
     mapping(address => bool) registered;
     mapping(uint256 => CraftItem) craftBuildings;
     mapping(uint256 => CraftItem) craftFleets;
@@ -160,6 +161,7 @@ struct AppStorage {
     mapping(string => bool) playerNameOwnership;
     mapping(uint => DiplomacyDeal) diplomacyDeals;
     mapping(address => mapping(address => PeaceDeal)) activePeaceDeals;
+    mapping(address => bool) hasClaimedCommander;
     uint256 maxTechCount;
     uint256 dealCounter;
     uint256 sendAttackId;

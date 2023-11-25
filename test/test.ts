@@ -1387,8 +1387,6 @@ describe("Game", function () {
       const getShipsOnPlanetAfter =
         await shipsFacet.getDefensePlanetDetailed(planetIdPlayer2);
 
-      console.log(getShipsOnPlanetBefore[0]);
-      console.log(getShipsOnPlanetAfter[0]);
       // Assert other user received the reinforcements
       expect(getShipsOnPlanetAfter[0].length).to.be.above(
         getShipsOnPlanetBefore[0].length
@@ -2451,28 +2449,6 @@ describe("Game", function () {
     });
   });
 
-  describe("Deprecated Testing", function () {
-    it.skip("chainRunner can mine every 24hours for the user ", async function () {
-      const {
-        owner,
-        randomUser,
-        randomUserTwo,
-        randomUserThree,
-        AdminUser,
-      } = await loadFixture(deployUsers);
-    });
-    it.skip("debug", async function () {
-      buildingsFacet = await impersonate(
-        "0xf2381dD8B282669C139C2d227bAb5314B5E9EBC7",
-        buildingsFacet,
-        ethers,
-        network
-      );
-
-      await buildingsFacet.mineResources(16);
-    });
-  });
-
   describe("Diplomacy Feature Testing", function () {
     it("Should create a peace treaty between two users, preventing them from attacking each other", async function () {
       const { randomUser, randomUserTwo } = await loadFixture(
@@ -2564,6 +2540,28 @@ describe("Game", function () {
       );
 
       expect(checkOwnershipShipsPlayer).to.equal(1);
+    });
+  });
+
+  describe("Deprecated Testing", function () {
+    it.skip("chainRunner can mine every 24hours for the user ", async function () {
+      const {
+        owner,
+        randomUser,
+        randomUserTwo,
+        randomUserThree,
+        AdminUser,
+      } = await loadFixture(deployUsers);
+    });
+    it.skip("debug", async function () {
+      buildingsFacet = await impersonate(
+        "0xf2381dD8B282669C139C2d227bAb5314B5E9EBC7",
+        buildingsFacet,
+        ethers,
+        network
+      );
+
+      await buildingsFacet.mineResources(16);
     });
   });
 });

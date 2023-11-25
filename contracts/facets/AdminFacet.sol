@@ -17,7 +17,8 @@ contract AdminFacet is Modifiers {
         address _aether,
         address _ships,
         address _planets,
-        address _chainRunner
+        address _chainRunner,
+        address _commanderAddress
     ) external onlyOwner {
         s.crystalAddress = _crystal;
         s.antimatterAddress = _antimatter;
@@ -26,6 +27,7 @@ contract AdminFacet is Modifiers {
         s.shipsAddress = _ships;
         s.planetsAddress = _planets;
         s.chainRunner = _chainRunner;
+        s.commandersAddress = _commanderAddress;
     }
 
     //@notice generates new planets randomly

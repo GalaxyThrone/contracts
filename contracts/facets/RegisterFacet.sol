@@ -5,6 +5,7 @@ import {RequestConfig, Modifiers} from "../libraries/AppStorage.sol";
 import "../interfaces/IERC721.sol";
 import "../interfaces/IERC20.sol";
 import "../libraries/LibMeta.sol";
+import "../interfaces/ICommanders.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
@@ -53,6 +54,32 @@ contract RegisterFacet is Modifiers {
 
         emit playerRegistered(msg.sender, _factionChosen);
         finalizeRegister(msg.sender, _randomness, _planetTypeChosen);
+    }
+
+    function chooseCommander(uint _commanderChoice) external {
+        //@notice, this should have a pay/token/redeem logic in here. for now, its just a boolean mapping, where a player can only claim 1 commander.
+
+        require(s.registered[msg.sender], "Not registered!");
+        require(
+            !s.hasClaimedCommander[msg.sender],
+            "already claimed commander!"
+        );
+
+        // 0,1,2 commander choices.
+        require(
+            _commanderChoice >= 0 && _commanderChoice < 3,
+            "Invalid commander choice"
+        );
+
+        uint256 factionId = s.playersFaction[msg.sender];
+        ICommanders(s.commandersAddress).mint(
+            msg.sender,
+            _commanderChoice,
+            factionId
+        );
+        //@claimed logic:
+        s.hasClaimedCommander[msg.sender] = true;
+        //mint via the interface @CHATGPT.
     }
 
     function drawRandomNumbers(address _player) internal {

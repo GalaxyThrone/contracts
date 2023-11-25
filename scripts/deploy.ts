@@ -11,6 +11,7 @@ import {
   Antimatter,
   Planets,
   Ships,
+  Commanders,
   VRFFacet,
   RegisterFacet,
   AutomationFacet,
@@ -169,13 +170,20 @@ export async function deployDiamond() {
   ])) as Ships;
   await ships.deployed();
 
+  console.log("deploying commanders");
+  const Commanders = await ethers.getContractFactory("Commanders");
+  const commanders = (await upgrades.deployProxy(Commanders, [
+    diamond.address,
+  ])) as Commanders;
+  await commanders.deployed();
+
   console.log(`Metal deployed: ${metal.address}`);
   console.log(`Crystal deployed: ${crystal.address}`);
   console.log(`Antimatter deployed: ${antimatter.address}`);
   console.log(`Aether deployed: ${aether.address}`);
   console.log(`Planets deployed: ${planets.address}`);
   console.log(`Ships deployed: ${ships.address}`);
-
+  console.log(`Commanders deployed: ${commanders.address}`);
   const adminFacet = (await ethers.getContractAt(
     "AdminFacet",
     diamond.address
@@ -199,7 +207,8 @@ export async function deployDiamond() {
     aether.address,
     ships.address,
     planets.address,
-    chainRunner
+    chainRunner,
+    commanders.address
   );
   await setAddresses.wait();
 
@@ -217,13 +226,12 @@ export async function deployDiamond() {
 
   //planetType 2 is a Tradehub planet, which cannot be transformed or attacked.
 
-  console.log("Tradehub init");
+  console.log("Tradehub Planet Gen");
   const genesisPlanets = await adminFacet.startInit(1, 2);
 
-  console.log("Starting Planet Gen:");
+  console.log("Starting Planet Gen");
   //main one, first 50 are deterministic
   for (let i = 0; i < 20; i++) {
-    console.log("Planet Get Loop ID:", i);
     const initPlanets = await adminFacet.startInit(8, 0);
 
     //@notice this the chance for an asteroid belt hub to appear

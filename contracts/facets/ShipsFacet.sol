@@ -134,6 +134,7 @@ contract ShipsFacet is Modifiers {
 
         address planetOwner = IERC721(s.planetsAddress).ownerOf(_planetId);
 
+        //@notice  check for research buff if the player researched the relevant research.
         bool researchEnabled = s.playerTechnologies[planetOwner][
             s.shipRelevantTechUpgradesMapping[currentCraft.itemId]
         ];
