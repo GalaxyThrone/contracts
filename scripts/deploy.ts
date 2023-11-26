@@ -24,7 +24,10 @@ import { addBuildings } from "./addBuildings";
 import { addFleets } from "./addFleets";
 import { addFaction, addShipModules } from "./addShipModules";
 import { initPlanets } from "./initPlanets";
-import { addLevels, addShipTechLevels } from "./addLevelData";
+import { addShipTechLevels } from "./addResearchTreesShips";
+import { addMilitaryTechLevels } from "./addResearchTreesMilitary";
+import { addUtilityTechLevels } from "./addResearchTreesUtility";
+import { addGovernanceTechLevels } from "./addResearchTreesGovernance";
 
 const {
   getSelectors,
@@ -217,7 +220,16 @@ export async function deployDiamond() {
   console.log("adding ships");
   await addFleets(diamond.address);
   await addShipModules(diamond.address);
+  console.log("adding shipTech Research Tree, ID 1");
   await addShipTechLevels(diamond.address);
+  console.log("adding Military Research Tree, ID 2");
+  await addMilitaryTechLevels(diamond.address);
+
+  console.log("adding Governance Research Tree, ID 3 ");
+  await addGovernanceTechLevels(diamond.address);
+  console.log("adding Utility Research Tree, ID 4");
+  await addUtilityTechLevels(diamond.address);
+  console.log("adding Factions");
   await addFaction(diamond.address, 4);
 
   console.log("starting init");

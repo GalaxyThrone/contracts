@@ -58,7 +58,6 @@ export async function addShipTechLevels(diamondAddr: string) {
       defenseBoostStat: [20, 20, 20],
       preRequisiteTech: 2,
     },
-    // Add more technologies as needed
   ];
 
   for (const techTree of shipTechTrees) {

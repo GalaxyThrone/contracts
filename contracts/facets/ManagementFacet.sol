@@ -43,6 +43,7 @@ contract ManagementFacet is Modifiers {
 
         uint256[4] memory price;
         uint256 cooldown;
+        uint256 preRequisiteTechId;
 
         if (_techTree == 1) {
             // Ships
@@ -95,6 +96,13 @@ contract ManagementFacet is Modifiers {
             revert("Invalid tech tree");
         }
 
+        if (preRequisiteTechId != 0) {
+            require(
+                s.playerTechnologies[msg.sender][_techTree][preRequisiteTechId],
+                "ManagementFacet: prerequisite tech not researched"
+            );
+        }
+
         // Check if the planet has enough resources
         for (uint256 i = 0; i < price.length; i++) {
             require(
@@ -129,6 +137,27 @@ contract ManagementFacet is Modifiers {
     ) external view returns (bool) {
         return
             s.playerTechnologies[_playerAddr][_techTree][_techIdToCheckStatus];
+    }
+
+    function returnPlayerResearchedTechCount(
+        uint _techTree,
+        address _playerAddr
+    ) external view returns (uint) {
+        if (_techTree == 1) {
+            // Ships
+            return s.counterPlayerTechnologiesShips[_playerAddr];
+        } else if (_techTree == 2) {
+            // Military
+            return s.counterPlayerTechnologiesMilitary[_playerAddr];
+        } else if (_techTree == 3) {
+            // Governance
+            return s.counterPlayerTechnologiesGovernance[_playerAddr];
+        } else if (_techTree == 4) {
+            // Utility
+            return s.counterPlayerTechnologiesUtility[_playerAddr];
+        } else {
+            revert("Invalid tech tree");
+        }
     }
 
     //Playernames Feature (@notice, this could be moved to backend via offchain signature validation..tbd)

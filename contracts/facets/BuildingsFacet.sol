@@ -35,6 +35,7 @@ contract BuildingsFacet is Modifiers {
         );
         uint256 readyTimestamp = block.timestamp + (craftTime * _amount);
 
+        craftTimeBuffed = craftTime;
         // new player crafting buff by 80% for the first 10 buildings
         if (s.totalBuiltBuildingsPlanet[_planetId] <= 10) {
             readyTimestamp -= ((craftTime * _amount) * 80) / 100;
@@ -46,6 +47,12 @@ contract BuildingsFacet is Modifiers {
             craftTimeBuffed = ((craftTime * 80) / 100);
         } else {
             craftTimeBuffed = craftTime;
+        }
+
+        if (s.playerTechnologies[msg.sender][3][1]) {
+            // Governance Tech ID 1
+            readyTimestamp -= ((craftTime * _amount) * 10) / 100; // 10% reduction in total craft time
+            craftTimeBuffed = (craftTimeBuffed * 90) / 100; // 10% reduction in craft time per building
         }
 
         CraftItem memory newBuilding = CraftItem(
@@ -188,10 +195,35 @@ contract BuildingsFacet is Modifiers {
             uint256 amountMined = 3000 ether + (boost * 1e18);
             IPlanets(s.planetsAddress).mineResource(_planetId, i, amountMined);
 
+            // Check if Enhanced Planetary Mining is researched ( 4 is utility)
+            if (s.playerTechnologies[msg.sender][4][4]) {
+                UtilityTech memory tech = s.availableResearchTechsUtility[4];
+                uint256 percentageBoost = (amountMined * tech.utilityBoost) /
+                    100;
+
+                amountMined += percentageBoost;
+            }
+
             //I know its hacky, but loading the resource contract addresses in an array is more gas intensive
 
             if (i == 0) {
                 IResource(s.metalAddress).mint(address(this), amountMined);
+
+                // Aether Mining Logic
+                if (s.playerTechnologies[msg.sender][4][5]) {
+                    // Aether Mining Technology
+                    bool isAdvancedAetherTechResearched = s.playerTechnologies[
+                        msg.sender
+                    ][4][6];
+                    uint256 randomNumber = uint256(
+                        blockhash(block.number - 1)
+                    ) % 2; // 50% chance
+
+                    if (isAdvancedAetherTechResearched || randomNumber == 0) {
+                        uint256 aetherMined = (amountMined * 5) / 100; // 5% of the amountMined
+                        s.aetherHeldPlayer[msg.sender] += aetherMined; // Adding Aether to player's holdings
+                    }
+                }
             }
 
             if (i == 1) {
