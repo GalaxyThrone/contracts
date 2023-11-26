@@ -1466,7 +1466,10 @@ describe("Game", function () {
 
       await advanceTimeAndBlock(10);
 
-      await shipsFacet.connect(randomUser).resolveSendResources(0);
+      const sendResourcesId = 1;
+      await shipsFacet
+        .connect(randomUser)
+        .resolveSendResources(sendResourcesId);
 
       const metalAfter = await buildingsFacet.getPlanetResources(
         planetIdPlayer2,

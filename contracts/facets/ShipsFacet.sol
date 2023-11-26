@@ -684,6 +684,9 @@ contract ShipsFacet is Modifiers {
             _toPlanetId,
             s.playersFaction[msg.sender]
         );
+
+        s.transferResourceId++;
+
         s.transferResource[s.transferResourceId] = TransferResource(
             _fromPlanetId,
             _toPlanetId,
@@ -693,7 +696,6 @@ contract ShipsFacet is Modifiers {
             _resourcesToSend
         );
 
-        s.transferResourceId++;
         emit StartSendResources(
             _fromPlanetId,
             _toPlanetId,
