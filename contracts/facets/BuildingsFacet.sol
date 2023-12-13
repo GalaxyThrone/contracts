@@ -185,14 +185,20 @@ contract BuildingsFacet is Modifiers {
     ) external onlyPlanetOwnerOrChainRunner(_planetId) {
         uint256 lastClaimed = s.lastClaimed[_planetId];
 
+        uint256 timePassed = block.timestamp - lastClaimed;
+
         require(
-            block.timestamp > lastClaimed + 8 hours,
-            "BuildingsFacet: 8 hour cooldown"
+            block.timestamp > lastClaimed + 1 hours,
+            "BuildingsFacet: can only claim every hour, accumulating rewards only per hour"
         );
+
+        uint256 hoursPassed = timePassed / 1 hours; // Calculate hours since last claimed
 
         for (uint256 i = 0; i < 3; i++) {
             uint256 boost = s.boosts[_planetId][i];
-            uint256 amountMined = 3000 ether + (boost * 1e18);
+            uint256 baseMiningRatePerHour = 500 ether + (boost * 1e18); // Adjust this rate as per your game mechanics
+            uint256 amountMined = baseMiningRatePerHour * hoursPassed;
+
             IPlanets(s.planetsAddress).mineResource(_planetId, i, amountMined);
 
             // Check if Enhanced Planetary Mining is researched ( 4 is utility)
@@ -371,8 +377,18 @@ contract BuildingsFacet is Modifiers {
         return buildingsCount;
     }
 
+    //@notice can claim every hour, accumulating per hour
     function getLastClaimed(uint256 _planetId) external view returns (uint256) {
         return s.lastClaimed[_planetId];
+    }
+
+    function getHourlyMineRate(
+        uint256 _planetId
+    ) external view returns (uint256) {
+        uint256 baseMiningRatePerHour = 500 ether +
+            (s.boosts[_planetId][0] * 1e18);
+
+        return baseMiningRatePerHour;
     }
 
     function getBoost(

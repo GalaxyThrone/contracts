@@ -62,7 +62,14 @@ export async function addShipTechLevels(diamondAddr: string) {
 
   for (const techTree of shipTechTrees) {
     await adminFacet.initializeShipTechTree(techTree);
+    await delay(100);
   }
 
-  await adminFacet.setupMaxTechResearch(8); // Set the max tech research count
+  const maxTechTreeCount = await adminFacet.setupMaxTechResearch(8); // Set the max tech research count
+  maxTechTreeCount.wait();
+  await delay(100);
+}
+
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }

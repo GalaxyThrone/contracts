@@ -118,6 +118,13 @@ export async function addUtilityTechLevels(diamondAddr: string) {
   ];
 
   for (const techTree of utilityTechTrees) {
-    await adminFacet.initializeUtilityTechTree(techTree);
+    const TechTreeDeploy = await adminFacet.initializeUtilityTechTree(
+      techTree
+    );
+    await delay(50);
   }
+}
+
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }

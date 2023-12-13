@@ -1484,7 +1484,8 @@ describe("Game", function () {
       expect(metalBefore).to.be.below(metalAfter);
     });
 
-    it("registered user can send resources only with cargo ships", async function () {
+    //@notice every ship can transport..again. Can probably get rid of this test
+    it.skip("registered user can send resources only with cargo ships", async function () {
       const { randomUser, randomUserTwo } = await loadFixture(
         deployUsers
       );
@@ -2666,7 +2667,7 @@ describe("Game", function () {
 
       // Simulate mining multiple times to account for 50% chance
       let aetherMined = false;
-      for (let i = 0; i < 10; i++) {
+      for (let i = 0; i < 20; i++) {
         await buildingsFacet
           .connect(randomUser)
           .mineResources(planetId);
@@ -2745,6 +2746,13 @@ describe("Game", function () {
         planetId
       );
       let reducedCraftTime = craftItemWithTech.craftTimeItem;
+
+      let researchCooldown =
+        await managementFacet.returnPlayerResearchCooldown(
+          randomUser.address
+        );
+
+      console.log("the cooldown:", researchCooldown);
 
       // Compare the craft times
       expect(reducedCraftTime.lt(standardCraftTime)).to.be.true;

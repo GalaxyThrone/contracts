@@ -132,6 +132,14 @@ export async function addMilitaryTechLevels(diamondAddr: string) {
   ];
 
   for (const techTree of militaryTechTrees) {
-    await adminFacet.initializeMilitaryTechTree(techTree);
+    const techTreeDeploy =
+      await adminFacet.initializeMilitaryTechTree(techTree);
+
+    techTreeDeploy.wait();
+    await delay(40);
   }
+}
+
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }

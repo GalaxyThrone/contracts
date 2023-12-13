@@ -169,6 +169,10 @@ export async function addBuildings(diamondAddr: string) {
       id,
       building
     );
+
+    await addBuildingTx.wait();
+
+    await delay(10);
   }
 }
 
@@ -179,4 +183,8 @@ if (require.main === module) {
       console.error(error);
       process.exit(1);
     });
+}
+
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }

@@ -8,11 +8,11 @@ import {
 export async function upgrade() {
   const diamondUpgrader =
     "0x9Fdd6069b4DBb60cE882066dF7E11F0f12B7aFC7";
-  const diamondAddress = "0x565830a38FDea74861Bd1e35fFA49eC48b33A344";
+  const diamondAddress = "0xb07030a61e4d257d9dd72C3872Bb959449592e4A";
 
   const facets: FacetsAndAddSelectors[] = [
     {
-      facetName: "ShipsFacet",
+      facetName: "ManagementFacet",
       addSelectors: [],
       removeSelectors: [],
     },
@@ -39,7 +39,7 @@ export async function upgradeTestVersion(diamondAddr: any) {
 
   const facets: FacetsAndAddSelectors[] = [
     {
-      facetName: "ShipsFacet",
+      facetName: "ManagementFacet",
       addSelectors: [],
       removeSelectors: [],
     },

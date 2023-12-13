@@ -50,6 +50,12 @@ export async function addGovernanceTechLevels(diamondAddr: string) {
   ];
 
   for (const techTree of governanceTechTrees) {
-    await adminFacet.initializeGovernanceTechTree(techTree);
+    const techTreeDeploy =
+      await adminFacet.initializeGovernanceTechTree(techTree);
+    techTreeDeploy.wait();
+    await delay(50);
   }
+}
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }

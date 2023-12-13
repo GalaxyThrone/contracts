@@ -162,6 +162,9 @@ contract RegisterFacet is Modifiers {
                 s.planetResources[tokenId][1] += 80000 ether;
                 s.planetResources[tokenId][2] += 60000 ether;
 
+                //@notice to start mining-timer for accumulating mining rewards
+                s.lastClaimed[tokenId] = block.timestamp - 1 hours;
+
                 IERC20(s.metalAddress).mint(
                     address(this),
                     s.planetResources[tokenId][0]

@@ -56,7 +56,10 @@ contract ManagementFacet is Modifiers {
             ];
             price = tech.price;
             cooldown = tech.cooldown;
-            // other ship-specific logic...
+            require(
+                cooldown != 0,
+                "ManagementFacet: Research Technology not initialized!"
+            );
         } else if (_techTree == 2) {
             // Military
             require(
@@ -69,6 +72,10 @@ contract ManagementFacet is Modifiers {
             ];
             price = tech.price;
             cooldown = tech.cooldown;
+            require(
+                cooldown != 0,
+                "ManagementFacet: Research Technology not initialized!"
+            );
         } else if (_techTree == 3) {
             // Governance
             require(
@@ -81,6 +88,10 @@ contract ManagementFacet is Modifiers {
             ];
             price = tech.price;
             cooldown = tech.cooldown;
+            require(
+                cooldown != 0,
+                "ManagementFacet: Research Technology not initialized!"
+            );
         } else if (_techTree == 4) {
             // Utility
             require(
@@ -92,6 +103,10 @@ contract ManagementFacet is Modifiers {
             ];
             price = tech.price;
             cooldown = tech.cooldown;
+            require(
+                cooldown != 0,
+                "ManagementFacet: Research Technology not initialized!"
+            );
         } else {
             revert("Invalid tech tree");
         }
@@ -137,6 +152,40 @@ contract ManagementFacet is Modifiers {
     ) external view returns (bool) {
         return
             s.playerTechnologies[_playerAddr][_techTree][_techIdToCheckStatus];
+    }
+
+    function returnPlayerResearchCooldown(
+        address _playerAddr
+    ) external view returns (uint) {
+        return s.lastResearchTimeCooldown[_playerAddr];
+    }
+
+    function returnAllPlayerResearchedTechSimplified(
+        address _playerAddr
+    ) external view returns (bool[4][14] memory techStatuses) {
+        // Iterate over tech trees and tech IDs using zero-based indexing
+        for (uint i = 0; i < 4; i++) {
+            for (uint j = 0; j < 14; j++) {
+                // Check if the tech is researched and handle missing mapping entries
+                if (isTechResearched(_playerAddr, i + 1, j + 1)) {
+                    techStatuses[i][j] = true;
+                } else {
+                    techStatuses[i][j] = false;
+                }
+            }
+        }
+
+        return techStatuses;
+    }
+
+    function isTechResearched(
+        address _playerAddr,
+        uint _techTree,
+        uint _techId
+    ) internal view returns (bool) {
+        // Return false if the mapping entry does not exist
+        // Assuming your mapping is initialized to return false for non-existent keys
+        return s.playerTechnologies[_playerAddr][_techTree][_techId];
     }
 
     function returnPlayerResearchedTechCount(

@@ -662,11 +662,12 @@ contract ShipsFacet is Modifiers {
         uint256 carriedAmount;
 
         for (uint256 i; i < cargoShipIds.length; i++) {
+            /*
             require(
                 IShips(s.shipsAddress).ownerOf(cargoShipIds[i]) == msg.sender,
                 "not your ship!"
             );
-
+            */
             carriedAmount += CargoCapacitiesShips[i];
 
             delete s.assignedPlanet[cargoShipIds[i]];
@@ -760,18 +761,18 @@ contract ShipsFacet is Modifiers {
 
         for (uint256 i = 0; i < totalCount; i++) {
             currShipType = s.SpaceShips[ownedShips[i]].shipType;
-            if (currShipType == 8) {
-                if (s.assignedPlanet[ownedShips[i]] == _planetId) {
-                    currShipCargo = s.SpaceShips[ownedShips[i]].cargo;
-                    cargoShips[counter] = ownedShips[i];
-                    cargoCapacity[counter] = currShipCargo;
-                    totalShippingCapacity += currShipCargo;
-                }
+
+            if (s.assignedPlanet[ownedShips[i]] == _planetId) {
+                currShipCargo = s.SpaceShips[ownedShips[i]].cargo;
+                cargoShips[counter] = ownedShips[i];
+                cargoCapacity[counter] = currShipCargo;
+                totalShippingCapacity += currShipCargo;
             }
         }
         return (totalShippingCapacity, cargoShips, cargoCapacity);
     }
 
+    //@TODO add event emit
     function resolveSendResources(uint256 _transferResourceId) external {
         address shipsOwner = IERC721(s.shipsAddress).ownerOf(
             s.transferResource[_transferResourceId].shipsIds[0]

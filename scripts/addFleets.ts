@@ -216,5 +216,10 @@ export async function addFleets(fleetsAddress: string) {
   for (const { id, fleet } of fleetData) {
     const addFleetTx = await fleetsContract.addShipType(id, fleet);
     await addFleetTx.wait();
+    await delay(10);
   }
+}
+
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
