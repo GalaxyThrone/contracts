@@ -383,10 +383,11 @@ contract BuildingsFacet is Modifiers {
     }
 
     function getHourlyMineRate(
-        uint256 _planetId
+        uint256 _planetId,
+        uint256 _resourceId
     ) external view returns (uint256) {
         uint256 baseMiningRatePerHour = 500 ether +
-            (s.boosts[_planetId][0] * 1e18);
+            (s.boosts[_planetId][_resourceId] * 1e18);
 
         return baseMiningRatePerHour;
     }
