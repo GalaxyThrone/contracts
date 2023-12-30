@@ -11,7 +11,10 @@ import "./ShipsFacet.sol";
 
 contract TutorialFacet is Modifiers {
     event shipsStartedCrafting(uint planetId);
+    event shipTutorialConcluded(address player);
+
     event buildingsStartedCrafting(uint planetId);
+    event buildingTutorialConcluded(address player);
 
     //@notice, claim can stay the same. This is just instant instead, and slimmed down to reduce gas costs.
     function TUTORIALcraftBuilding(
@@ -72,6 +75,7 @@ contract TutorialFacet is Modifiers {
         IERC20(s.antimatterAddress).burnFrom(address(this), price[2] * _amount);
         s.tutorialStageBuildingDone[msg.sender] = true;
         emit buildingsStartedCrafting(_planetId);
+        emit buildingTutorialConcluded(msg.sender);
     }
 
     function TUTORIALcraftFleet(
@@ -136,5 +140,15 @@ contract TutorialFacet is Modifiers {
 
         s.tutorialStageShipDone[msg.sender] = true;
         emit shipsStartedCrafting(_planetId);
+        emit shipTutorialConcluded(msg.sender);
+    }
+
+    function checkTutorialStatus(
+        address _playerToCheck
+    ) external view returns (bool, bool) {
+        return (
+            s.tutorialStageBuildingDone[msg.sender],
+            s.tutorialStageShipDone[msg.sender]
+        );
     }
 }
