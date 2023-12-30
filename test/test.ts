@@ -16,6 +16,7 @@ import {
   Aether,
   AllianceFacet,
   ManagementFacet,
+  TutorialFacet,
 } from "../typechain-types";
 import { BigNumber, Signer, BigNumberish } from "ethers";
 import { impersonate } from "../scripts/helperFunctions";
@@ -39,6 +40,7 @@ describe("Game", function () {
   let vrfFacet: RegisterFacet;
   let adminFacet: AdminFacet;
   let buildingsFacet: BuildingsFacet;
+  let tutorialFacet: TutorialFacet;
 
   let shipsFacet: ShipsFacet;
   let managementFacet: ManagementFacet;
@@ -318,6 +320,10 @@ describe("Game", function () {
       diamond
     )) as ManagementFacet;
 
+    tutorialFacet = (await ethers.getContractAt(
+      "TutorialFacet",
+      diamond
+    )) as TutorialFacet;
     await adminFacet.startInit(20, 1);
   });
 
@@ -703,6 +709,290 @@ describe("Game", function () {
         );
         expect(checkOwnershipShipsPlayer).to.equal(i + 1);
       }
+    });
+  });
+
+  describe("TutorialFacet Tests", function () {
+    it("registered user should craft a building successfully in tutorial mode", async function () {
+      const { randomUser } = await loadFixture(deployUsers);
+
+      await registerUser(randomUser);
+
+      const planetId = await planetNfts.tokenOfOwnerByIndex(
+        randomUser.address,
+        0
+      );
+      const buildingTypeToCraft = 1;
+      const buildingAmountToCraft = 1;
+
+      await tutorialFacet
+        .connect(randomUser)
+        .TUTORIALcraftBuilding(
+          buildingTypeToCraft,
+          planetId,
+          buildingAmountToCraft
+        );
+
+      await advanceTimeAndBlockByAmount(5); //mining 5 seconds to the future
+      let checkOwnershipBuildings =
+        await buildingsFacet.getAllBuildings(planetId);
+
+      expect(checkOwnershipBuildings[buildingTypeToCraft]).to.equal(
+        0
+      );
+
+      await buildingsFacet
+        .connect(randomUser)
+        .claimBuilding(planetId);
+
+      checkOwnershipBuildings = await buildingsFacet.getAllBuildings(
+        planetId
+      );
+
+      expect(checkOwnershipBuildings[buildingTypeToCraft]).to.equal(
+        1
+      );
+    });
+
+    it("tutorial building mode still takes 5 seconds to work, reverts otherwise", async function () {
+      const { randomUser } = await loadFixture(deployUsers);
+
+      await registerUser(randomUser);
+
+      const planetId = await planetNfts.tokenOfOwnerByIndex(
+        randomUser.address,
+        0
+      );
+      const buildingTypeToCraft = 1;
+      const buildingAmountToCraft = 1;
+
+      await tutorialFacet
+        .connect(randomUser)
+        .TUTORIALcraftBuilding(
+          buildingTypeToCraft,
+          planetId,
+          buildingAmountToCraft
+        );
+
+      await advanceTimeAndBlockByAmount(2); //mining 2 seconds to the future. Should lead to a revert, since it takes 5 seconds in tutorial mode
+      let checkOwnershipBuildings =
+        await buildingsFacet.getAllBuildings(planetId);
+
+      expect(checkOwnershipBuildings[buildingTypeToCraft]).to.equal(
+        0
+      );
+
+      await expect(
+        buildingsFacet.connect(randomUser).claimBuilding(planetId)
+      ).to.be.revertedWith("BuildingsFacet: not ready yet");
+
+      checkOwnershipBuildings = await buildingsFacet.getAllBuildings(
+        planetId
+      );
+
+      expect(checkOwnershipBuildings[buildingTypeToCraft]).to.equal(
+        0
+      );
+    });
+
+    it("tutorial building mode only works once", async function () {
+      const { randomUser } = await loadFixture(deployUsers);
+
+      await registerUser(randomUser);
+
+      const planetId = await planetNfts.tokenOfOwnerByIndex(
+        randomUser.address,
+        0
+      );
+      const buildingTypeToCraft = 1;
+      const buildingAmountToCraft = 1;
+
+      await tutorialFacet
+        .connect(randomUser)
+        .TUTORIALcraftBuilding(
+          buildingTypeToCraft,
+          planetId,
+          buildingAmountToCraft
+        );
+
+      await advanceTimeAndBlockByAmount(5); //mining 5 seconds to the future.
+      let checkOwnershipBuildings =
+        await buildingsFacet.getAllBuildings(planetId);
+
+      expect(checkOwnershipBuildings[buildingTypeToCraft]).to.equal(
+        0
+      );
+
+      await buildingsFacet
+        .connect(randomUser)
+        .claimBuilding(planetId);
+
+      checkOwnershipBuildings = await buildingsFacet.getAllBuildings(
+        planetId
+      );
+
+      expect(checkOwnershipBuildings[buildingTypeToCraft]).to.equal(
+        1
+      );
+
+      await expect(
+        tutorialFacet
+          .connect(randomUser)
+          .TUTORIALcraftBuilding(
+            buildingTypeToCraft,
+            planetId,
+            buildingAmountToCraft
+          )
+      ).to.be.revertedWith(
+        "TutorialFacet: tutorial building already done!!!!!"
+      );
+    });
+
+    it("registered user should craft a ship successfully in tutorial mode", async function () {
+      const { randomUser } = await loadFixture(deployUsers);
+
+      await registerUser(randomUser);
+      // Get planet ID
+      const planetId = await planetNfts.tokenOfOwnerByIndex(
+        randomUser.address,
+        0
+      );
+
+      // Craft building
+      await buildingsFacet
+        .connect(randomUser)
+        .craftBuilding(10, planetId, 1);
+
+      // Advance time
+      await advanceTimeAndBlock(500);
+
+      // Claim building
+      await buildingsFacet
+        .connect(randomUser)
+        .claimBuilding(planetId);
+
+      // Craft fleet
+      await tutorialFacet
+        .connect(randomUser)
+        .TUTORIALcraftFleet(1, planetId, 1);
+
+      // Check ownership of ships
+      let checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+        randomUser.address
+      );
+      expect(checkOwnershipShipsPlayer).to.equal(0);
+
+      await advanceTimeAndBlockByAmount(5); //mining 5 seconds to the future
+
+      // Claim fleet
+      await shipsFacet.connect(randomUser).claimFleet(planetId);
+
+      // Check ownership of ships again
+      checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+        randomUser.address
+      );
+      expect(checkOwnershipShipsPlayer).to.equal(1);
+    });
+
+    it("tutorial ship mode still takes 5 seconds to work, reverts otherwise", async function () {
+      const { randomUser } = await loadFixture(deployUsers);
+
+      await registerUser(randomUser);
+      // Get planet ID
+      const planetId = await planetNfts.tokenOfOwnerByIndex(
+        randomUser.address,
+        0
+      );
+
+      // Craft building
+      await buildingsFacet
+        .connect(randomUser)
+        .craftBuilding(10, planetId, 1);
+
+      // Advance time
+      await advanceTimeAndBlock(500);
+
+      // Claim building
+      await buildingsFacet
+        .connect(randomUser)
+        .claimBuilding(planetId);
+
+      // Craft fleet
+      await tutorialFacet
+        .connect(randomUser)
+        .TUTORIALcraftFleet(1, planetId, 1);
+
+      // Check ownership of ships
+      let checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+        randomUser.address
+      );
+      expect(checkOwnershipShipsPlayer).to.equal(0);
+
+      await advanceTimeAndBlockByAmount(2); //mining 2 seconds to the future. Should lead to a revert, since it takes 5 seconds in tutorial mode
+
+      await expect(
+        shipsFacet.connect(randomUser).claimFleet(planetId)
+      ).to.be.revertedWith("ShipsFacet: not ready yet");
+
+      // Check ownership of ships again
+      checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+        randomUser.address
+      );
+      expect(checkOwnershipShipsPlayer).to.equal(0);
+    });
+
+    it("tutorial ship mode only works once", async function () {
+      const { randomUser } = await loadFixture(deployUsers);
+
+      await registerUser(randomUser);
+      // Get planet ID
+      const planetId = await planetNfts.tokenOfOwnerByIndex(
+        randomUser.address,
+        0
+      );
+
+      // Craft building
+      await buildingsFacet
+        .connect(randomUser)
+        .craftBuilding(10, planetId, 1);
+
+      // Advance time
+      await advanceTimeAndBlock(500);
+
+      // Claim building
+      await buildingsFacet
+        .connect(randomUser)
+        .claimBuilding(planetId);
+
+      // Craft fleet
+      await tutorialFacet
+        .connect(randomUser)
+        .TUTORIALcraftFleet(1, planetId, 1);
+
+      // Check ownership of ships
+      let checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+        randomUser.address
+      );
+      expect(checkOwnershipShipsPlayer).to.equal(0);
+
+      await advanceTimeAndBlockByAmount(5); //mining 5 seconds to the future
+
+      // Claim fleet
+      await shipsFacet.connect(randomUser).claimFleet(planetId);
+
+      // Check ownership of ships again
+      checkOwnershipShipsPlayer = await shipNfts.balanceOf(
+        randomUser.address
+      );
+      expect(checkOwnershipShipsPlayer).to.equal(1);
+
+      await expect(
+        tutorialFacet
+          .connect(randomUser)
+          .TUTORIALcraftFleet(1, planetId, 1)
+      ).to.be.revertedWith(
+        "TutorialFacet: tutorial ship already done!!!!!"
+      );
     });
   });
 

@@ -243,6 +243,8 @@ struct AppStorage {
     //shipType => level => resourcePrice
     mapping(uint => mapping(uint => uint[3])) resourceCostLeveling;
     mapping(uint => uint) currentLevelShip;
+    mapping(address => bool) tutorialStageBuildingDone;
+    mapping(address => bool) tutorialStageShipDone;
     //individual spaceShip Nfts
 
     mapping(uint256 => ShipType) SpaceShips;

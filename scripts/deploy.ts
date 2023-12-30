@@ -83,6 +83,7 @@ export async function deployDiamond() {
     "AllianceFacet",
     "FightingFacet",
     "ManagementFacet",
+    "TutorialFacet",
   ];
   const cut = [];
   for (const FacetName of FacetNames) {
@@ -166,14 +167,14 @@ export async function deployDiamond() {
   await planets.deployed();
 
   //@notice deploy ships contract instead of Ships
-  console.log("deploying ships");
+  console.log("deploying Ships");
   const Ships = await ethers.getContractFactory("Ships");
   const ships = (await upgrades.deployProxy(Ships, [
     diamond.address,
   ])) as Ships;
   await ships.deployed();
 
-  console.log("deploying commanders");
+  console.log("deploying Commanders");
   const Commanders = await ethers.getContractFactory("Commanders");
   const commanders = (await upgrades.deployProxy(Commanders, [
     diamond.address,
