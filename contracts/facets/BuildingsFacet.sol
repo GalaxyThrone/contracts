@@ -102,7 +102,7 @@ contract BuildingsFacet is Modifiers {
 
         // Compute the readyTimestamp for the next claimable building
         uint256 nextReadyTimestamp = currentCraft.startTimestamp +
-            s.craftBuildings[_planetId].craftTimeItem;
+            currentCraft.craftTimeItem;
 
         // Check if at least one building is ready
         require(

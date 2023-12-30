@@ -108,7 +108,7 @@ contract ShipsFacet is Modifiers {
         CraftItem storage currentCraft = s.craftFleets[_planetId];
 
         uint256 nextReadyTimestamp = currentCraft.startTimestamp +
-            s.shipType[currentCraft.itemId].craftTime;
+            currentCraft.craftTimeItem;
 
         // Check if at least one ship is ready
         require(
@@ -116,18 +116,22 @@ contract ShipsFacet is Modifiers {
             "ShipsFacet: not ready yet"
         );
 
-        ShipType memory shipToClaim = s.shipType[currentCraft.itemId];
+        //ShipType memory shipToClaim = s.shipType[currentCraft.itemId];
 
         uint interval = currentTimestamp - currentCraft.startTimestamp;
-        uint claimableAmount = interval / shipToClaim.craftTime;
+        uint claimableAmount = interval / currentCraft.craftTimeItem;
 
         if (claimableAmount > currentCraft.unclaimedAmount) {
             claimableAmount = currentCraft.unclaimedAmount;
         }
 
         currentCraft.unclaimedAmount -= claimableAmount;
-        currentCraft.startTimestamp += claimableAmount * shipToClaim.craftTime;
-        currentCraft.readyTimestamp += claimableAmount * shipToClaim.craftTime;
+        currentCraft.startTimestamp +=
+            claimableAmount *
+            currentCraft.craftTimeItem;
+        currentCraft.readyTimestamp +=
+            claimableAmount *
+            currentCraft.craftTimeItem;
 
         uint256 shipTypeId;
         uint256 shipId;
