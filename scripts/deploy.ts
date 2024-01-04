@@ -23,7 +23,7 @@ import {
 import { addBuildings } from "./addBuildings";
 import { addFleets } from "./addFleets";
 import { addFaction, addShipModules } from "./addShipModules";
-import { initPlanets } from "./initPlanets";
+
 import { addShipTechLevels } from "./addResearchTreesShips";
 import { addMilitaryTechLevels } from "./addResearchTreesMilitary";
 import { addUtilityTechLevels } from "./addResearchTreesUtility";

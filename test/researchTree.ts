@@ -415,7 +415,7 @@ describe("Research Technology Testing", function () {
         );
       });
 
-      it("User can research Aether Mining Technology and mine Aether on their Planets", async function () {
+      it("User can research Aether Mining Technology and mine Aether on their Planets 50% of the time", async function () {
         const {
           owner,
           randomUser,
@@ -439,12 +439,22 @@ describe("Research Technology Testing", function () {
 
         await ethers.provider.send("evm_mine", [1200000 * 2222]);
 
-        // Research prerequisites first
+        //fail if trying to research before researching prerequisite
+        await expect(
+          managementFacet
+            .connect(randomUser)
+            .researchTech(5, 4, planetId)
+        ).to.be.revertedWith(
+          "ManagementFacet: prerequisite tech not researched"
+        ); // TechId, TechTree, PlanetId
+
+        // Research prerequisite technlogy [Enhanced Planetary Mining [ID 4]] first
         await managementFacet
           .connect(randomUser)
           .researchTech(4, 4, planetId); // Enhanced Planetary Mining
 
-        await ethers.provider.send("evm_mine", [1200000 * 44444]);
+        //advance 24hours research cooldown
+        await advanceTimeAndBlockByAmount(60 * 60 * 24 + 60);
 
         // Research Aether Mining Technology
         await managementFacet
@@ -478,6 +488,74 @@ describe("Research Technology Testing", function () {
             aetherMined = true;
             break;
           }
+        }
+
+        // Check if Aether was mined
+        expect(aetherMined).to.be.true;
+      });
+
+      it("User can research Enhanced Aether Mining Technology and mine Aether on their Planets 100% of the time", async function () {
+        const {
+          owner,
+          randomUser,
+          randomUserTwo,
+          randomUserThree,
+          AdminUser,
+        } = await loadFixture(deployUsers);
+
+        const registration = await registerFacet
+          .connect(randomUser)
+          .startRegister(0, 3);
+
+        const checkOwnershipAmountPlayer = await planetNfts.balanceOf(
+          randomUser.address
+        );
+
+        const planetId = await planetNfts.tokenOfOwnerByIndex(
+          randomUser.address,
+          0
+        );
+
+        // Research prerequisite technlogy [Enhanced Planetary Mining [ID 4]] first
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(4, 4, planetId); // Enhanced Planetary Mining
+        //advance 24hours cooldown
+        await advanceTimeAndBlockByAmount(60 * 60 * 24 + 60);
+
+        // Research  prerequisite technlogy [Aether Mining Technology [ID 5]] first
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(5, 4, planetId); // TechId, TechTree, PlanetId
+
+        //advance 72hours cooldown
+        await advanceTimeAndBlockByAmount(60 * 60 * 72 + 60);
+
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(6, 4, planetId); // TechId, TechTree, PlanetId
+
+        // Verify the tech is now researched
+        const hasResearchedAetherTech =
+          await managementFacet.returnPlayerResearchedTech(
+            6,
+            4,
+            randomUser.address
+          );
+        expect(hasResearchedAetherTech).to.be.true;
+
+        // Aether should be mined 100% of the time now
+        let aetherMined = false;
+
+        await buildingsFacet
+          .connect(randomUser)
+          .mineResources(planetId);
+
+        const aetherBalance = await buildingsFacet.getAetherPlayer(
+          randomUser.address
+        );
+        if (aetherBalance.gt(ethers.BigNumber.from("0"))) {
+          aetherMined = true;
         }
 
         // Check if Aether was mined

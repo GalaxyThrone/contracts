@@ -56,6 +56,7 @@ contract ManagementFacet is Modifiers {
             ];
             price = tech.price;
             cooldown = tech.cooldown;
+            preRequisiteTechId = tech.preRequisiteTech;
             require(
                 cooldown != 0,
                 "ManagementFacet: Research Technology not initialized!"
@@ -72,6 +73,7 @@ contract ManagementFacet is Modifiers {
             ];
             price = tech.price;
             cooldown = tech.cooldown;
+            preRequisiteTechId = tech.preRequisiteTech;
             require(
                 cooldown != 0,
                 "ManagementFacet: Research Technology not initialized!"
@@ -88,6 +90,7 @@ contract ManagementFacet is Modifiers {
             ];
             price = tech.price;
             cooldown = tech.cooldown;
+            preRequisiteTechId = tech.preRequisiteTech;
             require(
                 cooldown != 0,
                 "ManagementFacet: Research Technology not initialized!"
@@ -103,6 +106,7 @@ contract ManagementFacet is Modifiers {
             ];
             price = tech.price;
             cooldown = tech.cooldown;
+            preRequisiteTechId = tech.preRequisiteTech;
             require(
                 cooldown != 0,
                 "ManagementFacet: Research Technology not initialized!"

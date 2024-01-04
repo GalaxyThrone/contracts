@@ -1,14 +1,15 @@
 ### Utility Tech Tree (ID 4)
 
-```markdown
+```typescript
+
 Utility Tech Tree
 ├── 1. Enhanced Planetary Mining (Tech ID: 4)
-│ └── 2. Aether Mining Technology (Tech ID: 5)
-│ └── 3. Advanced Aether Mining (Tech ID: 6)
+│    └── 2. Aether Mining Technology (Tech ID: 5)
+│         └── 3. Advanced Aether Mining (Tech ID: 6)
 └── 4. Enhanced Asteroid Mining Yield (Tech ID: 7)
-└── 5. Rapid Asteroid Mining Procedures (Tech ID: 8)
-└── 6. Advanced Asteroid Resource Extraction (Tech ID: 9)
-└── 7. Miner Ship Combat Deputization (Tech ID: 10)
+     └── 5. Rapid Asteroid Mining Procedures (Tech ID: 8)
+          └── 6. Advanced Asteroid Resource Extraction (Tech ID: 9)
+               └── 7. Miner Ship Combat Deputization (Tech ID: 10)
 ```
 
 #### 1. Enhanced Planetary Mining
