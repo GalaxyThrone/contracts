@@ -56,7 +56,52 @@ contract RegisterFacet is Modifiers {
         finalizeRegister(msg.sender, _randomness, _planetTypeChosen);
     }
 
-    function chooseCommander(uint _commanderChoice) external {
+    function startRegisterWithCommander(
+        uint256 _factionChosen,
+        uint _planetTypeChosen,
+        uint _commanderChoice
+    ) external {
+        require(
+            !s.registrationStarted[msg.sender],
+            "VRFFacet: already registering"
+        );
+        require(!s.registered[msg.sender], "VRFFacet: already registered");
+
+        require(
+            _factionChosen <= s.availableFactions,
+            "Faction does not exist!"
+        );
+
+        require(
+            _planetTypeChosen > 2 && _planetTypeChosen < 7,
+            "planetType not available!"
+        );
+
+        // drawRandomNumbers(msg.sender);
+        uint256[] memory _randomness = new uint256[](1);
+        // generate 5 pseudo random numbers using blockhash, timestamp
+        for (uint256 i = 0; i < 1; i++) {
+            _randomness[i] = uint256(
+                keccak256(
+                    abi.encodePacked(
+                        blockhash(block.number - i),
+                        block.timestamp,
+                        msg.sender,
+                        i
+                    )
+                )
+            );
+        }
+
+        s.playersFaction[msg.sender] = _factionChosen;
+
+        emit playerRegistered(msg.sender, _factionChosen);
+        finalizeRegister(msg.sender, _randomness, _planetTypeChosen);
+
+        chooseCommander(_commanderChoice);
+    }
+
+    function chooseCommander(uint _commanderChoice) internal {
         //@notice, this should have a pay/token/redeem logic in here. for now, its just a boolean mapping, where a player can only claim 1 commander.
 
         require(s.registered[msg.sender], "Not registered!");
@@ -77,9 +122,8 @@ contract RegisterFacet is Modifiers {
             _commanderChoice,
             factionId
         );
-        //@claimed logic:
+
         s.hasClaimedCommander[msg.sender] = true;
-        //mint via the interface @CHATGPT.
     }
 
     function drawRandomNumbers(address _player) internal {

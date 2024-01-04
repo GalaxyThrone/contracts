@@ -17,12 +17,7 @@ import {
   AllianceFacet,
 } from "../typechain-types";
 import { BigNumber, Signer, BigNumberish } from "ethers";
-import { impersonate } from "../scripts/helperFunctions";
-import {
-  upgrade,
-  upgradeTestVersion,
-} from "../scripts/upgradeDiamond";
-import { initPlanets } from "../scripts/initPlanets";
+
 import { Provider } from "@ethersproject/abstract-provider";
 
 import { PromiseOrValue } from "../typechain-types/common";
@@ -32,9 +27,8 @@ const chalk = require("chalk");
 const {
   loadFixture,
 } = require("@nomicfoundation/hardhat-network-helpers");
-// import { upgradeContract } from "../scripts/upgradeContract";
 
-describe("Game", function () {
+describe("Combat Mechanics Testing", function () {
   let g: any;
 
   let vrfFacet: RegisterFacet;
@@ -235,7 +229,7 @@ describe("Game", function () {
   }
   before(async function () {
     // this.timeout(20000000);
-    g = await deployDiamond();
+    g = await deployDiamond(false);
 
     const diamond = g.diamondAddress; //"0xe296a5cf8c15d2a4192670fd12132fc7a2d5f426";
     //await upgrade();

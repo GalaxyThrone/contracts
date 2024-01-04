@@ -36,18 +36,18 @@ const {
 
 // const gasPrice = 35000000000;
 
-export async function deployDiamond() {
+export async function deployDiamond(logOutput: boolean = true) {
   const accounts: Signer[] = await ethers.getSigners();
   const deployer = accounts[0];
   const deployerAddress = await deployer.getAddress();
-  console.log("Deployer:", deployerAddress);
+  log("Deployer:", deployerAddress);
   // deploy DiamondCutFacet
   const DiamondCutFacet = await ethers.getContractFactory(
     "DiamondCutFacet"
   );
   const diamondCutFacet = await DiamondCutFacet.deploy();
   await diamondCutFacet.deployed();
-  console.log("DiamondCutFacet deployed:", diamondCutFacet.address);
+  log("DiamondCutFacet deployed:", diamondCutFacet.address);
 
   // deploy Diamond
   const Diamond = (await ethers.getContractFactory(
@@ -58,7 +58,7 @@ export async function deployDiamond() {
     diamondCutFacet.address
   );
   await diamond.deployed();
-  console.log("Diamond deployed:", diamond.address);
+  log("Diamond deployed:", diamond.address);
 
   // deploy DiamondInit
   const DiamondInit = (await ethers.getContractFactory(
@@ -66,11 +66,11 @@ export async function deployDiamond() {
   )) as DiamondInit__factory;
   const diamondInit = await DiamondInit.deploy();
   await diamondInit.deployed();
-  console.log("DiamondInit deployed:", diamondInit.address);
+  log("DiamondInit deployed:", diamondInit.address);
 
   // deploy facets
-  console.log("");
-  console.log("Deploying facets");
+  log("");
+  log("Deploying facets");
   const FacetNames = [
     "DiamondLoupeFacet",
     "OwnershipFacet",
@@ -90,7 +90,7 @@ export async function deployDiamond() {
     const Facet = await ethers.getContractFactory(FacetName);
     const facet = await Facet.deploy();
     await facet.deployed();
-    console.log(`${FacetName} deployed: ${facet.address}`);
+    log(`${FacetName} deployed: ${facet.address}`);
     cut.push({
       facetAddress: facet.address,
       action: FacetCutAction.Add,
@@ -111,19 +111,19 @@ export async function deployDiamond() {
     diamondInit.address,
     functionCall
   );
-  console.log("Diamond cut tx: ", tx.hash);
+  log("Diamond cut tx: ", tx.hash);
   const receipt = await tx.wait();
   if (!receipt.status) {
     throw Error(`Diamond upgrade failed: ${tx.hash}`);
   }
-  console.log("Completed diamond cut");
+  log("Completed diamond cut");
 
   const ownershipFacet = (await ethers.getContractAt(
     "OwnershipFacet",
     diamond.address
   )) as OwnershipFacet;
   const diamondOwner = await ownershipFacet.owner();
-  console.log("Diamond owner is:", diamondOwner);
+  log("Diamond owner is:", diamondOwner);
 
   if (diamondOwner !== deployerAddress) {
     throw new Error(
@@ -131,35 +131,35 @@ export async function deployDiamond() {
     );
   }
 
-  console.log("deploying Metal");
+  log("deploying Metal");
   const Metal = await ethers.getContractFactory("Metal");
   const metal = (await upgrades.deployProxy(Metal, [
     diamond.address,
   ])) as Metal;
   await metal.deployed();
 
-  console.log("deploying Crystal");
+  log("deploying Crystal");
   const Crystal = await ethers.getContractFactory("Crystal");
   const crystal = (await upgrades.deployProxy(Crystal, [
     diamond.address,
   ])) as Crystal;
   await crystal.deployed();
 
-  console.log("deploying Antimatter");
+  log("deploying Antimatter");
   const Antimatter = await ethers.getContractFactory("Antimatter");
   const antimatter = (await upgrades.deployProxy(Antimatter, [
     diamond.address,
   ])) as Antimatter;
   await antimatter.deployed();
 
-  console.log("deploying Aether");
+  log("deploying Aether");
   const Aether = await ethers.getContractFactory("Aether");
   const aether = (await upgrades.deployProxy(Aether, [
     diamond.address,
   ])) as Aether;
   await aether.deployed();
 
-  console.log("deploying Planets");
+  log("deploying Planets");
   const Planets = await ethers.getContractFactory("Planets");
   const planets = (await upgrades.deployProxy(Planets, [
     diamond.address,
@@ -167,33 +167,33 @@ export async function deployDiamond() {
   await planets.deployed();
 
   //@notice deploy ships contract instead of Ships
-  console.log("deploying Ships");
+  log("deploying Ships");
   const Ships = await ethers.getContractFactory("Ships");
   const ships = (await upgrades.deployProxy(Ships, [
     diamond.address,
   ])) as Ships;
   await ships.deployed();
 
-  console.log("deploying Commanders");
+  log("deploying Commanders");
   const Commanders = await ethers.getContractFactory("Commanders");
   const commanders = (await upgrades.deployProxy(Commanders, [
     diamond.address,
   ])) as Commanders;
   await commanders.deployed();
 
-  console.log(`Metal deployed: ${metal.address}`);
-  console.log(`Crystal deployed: ${crystal.address}`);
-  console.log(`Antimatter deployed: ${antimatter.address}`);
-  console.log(`Aether deployed: ${aether.address}`);
-  console.log(`Planets deployed: ${planets.address}`);
-  console.log(`Ships deployed: ${ships.address}`);
-  console.log(`Commanders deployed: ${commanders.address}`);
+  log(`Metal deployed: ${metal.address}`);
+  log(`Crystal deployed: ${crystal.address}`);
+  log(`Antimatter deployed: ${antimatter.address}`);
+  log(`Aether deployed: ${aether.address}`);
+  log(`Planets deployed: ${planets.address}`);
+  log(`Ships deployed: ${ships.address}`);
+  log(`Commanders deployed: ${commanders.address}`);
   const adminFacet = (await ethers.getContractAt(
     "AdminFacet",
     diamond.address
   )) as AdminFacet;
 
-  // console.log("deploying GovernanceToken");
+  // log("deploying GovernanceToken");
   // const GovernanceToken = await ethers.getContractFactory("GovernanceToken");
   // //founders governance tokens go to multisig addr
   // const deployedGovernanceToken = GovernanceToken.deploy("0xbc1FF4455b21245Df6ca01354d65Aaf9e5334aD8",diamond.address) as GovernanceToken;
@@ -203,7 +203,7 @@ export async function deployDiamond() {
 
   //@notice Chainlink Automation Address
   const chainRunner = "0x420698c552B575ca34F0593915C3A25f77d45b1e";
-  console.log("setting diamond addresses");
+  log("setting diamond addresses");
   const setAddresses = await adminFacet.setAddresses(
     crystal.address,
     antimatter.address,
@@ -216,33 +216,33 @@ export async function deployDiamond() {
   );
   await setAddresses.wait();
 
-  console.log("adding buildings");
+  log("adding buildings");
   await addBuildings(diamond.address);
-  console.log("adding ships");
+  log("adding ships");
   await addFleets(diamond.address);
   await addShipModules(diamond.address);
-  console.log("adding shipTech Research Tree, ID 1");
+  log("adding shipTech Research Tree, ID 1");
   await addShipTechLevels(diamond.address);
-  console.log("adding Military Research Tree, ID 2");
+  log("adding Military Research Tree, ID 2");
   await addMilitaryTechLevels(diamond.address);
 
-  console.log("adding Governance Research Tree, ID 3 ");
+  log("adding Governance Research Tree, ID 3 ");
   await addGovernanceTechLevels(diamond.address);
-  console.log("adding Utility Research Tree, ID 4");
+  log("adding Utility Research Tree, ID 4");
   await addUtilityTechLevels(diamond.address);
-  console.log("adding Factions");
+  log("adding Factions");
   await addFaction(diamond.address, 4);
 
-  console.log("starting init");
+  log("starting init");
 
   //planetType 0 is undiscovered.
 
   //planetType 2 is a Tradehub planet, which cannot be transformed or attacked.
 
-  console.log("Tradehub Planet Gen");
+  log("Tradehub Planet Gen");
   const genesisPlanets = await adminFacet.startInit(1, 2);
 
-  console.log("Starting Planet Gen");
+  log("Starting Planet Gen");
   //main one, first 50 are deterministic
   for (let i = 0; i < 20; i++) {
     const initPlanets = await adminFacet.startInit(8, 0);
@@ -258,18 +258,10 @@ export async function deployDiamond() {
     await initPlanets.wait();
   }
 
-  console.log("ALL DONE");
+  console.log(
+    "Game Diamond,Facets and Game Setup successfully deployed and executed!"
+  );
 
-  //@TODO @notice create some planets to assign
-  //@TODO currently gives a revert error for no apparent reason
-  //@notice added a genesis nft mint to the planet contract instead..
-
-  /*
-  const initPlanets = await adminFacet
-    .connect(deployer)
-    .initPlanets(20);
-  await initPlanets.wait();
-  */
   return {
     diamondAddress: diamond.address,
     metalAddress: metal.address,
@@ -279,6 +271,12 @@ export async function deployDiamond() {
     shipsAddress: ships.address,
     aetherAddress: aether.address,
   };
+
+  function log(message: string): void {
+    if (logOutput) {
+      console.log(message);
+    }
+  }
 }
 
 // We recommend this pattern to be able to use async/await everywhere
@@ -290,7 +288,4 @@ if (require.main === module) {
       console.error(error);
       process.exit(1);
     });
-}
-function addFactions(address: string, arg1: number) {
-  throw new Error("Function not implemented.");
 }

@@ -7,6 +7,41 @@ export async function addMilitaryTechLevels(diamondAddr: string) {
     diamondAddr
   )) as AdminFacet;
 
+  /*
+  
+### Military Tech Tree ( ID 2)
+
+#### 1. Planetary Fortress Upgrade
+- **Tech ID**: 7
+- **Description**: Transform your planets into impregnable fortresses with 'Planetary Fortress Upgrade'. This tech fortifies planetary defense by 300%, deterring even the most aggressive invaders.
+- **Prerequisites**: None
+- **Cooldown**: 120 hours
+- **Military Buff**: 300% boost in planetary defense stats
+
+#### 2. Defensive Infrastructure Enhancement
+- **Tech ID**: 8
+- **Description**: Strengthen your defense lines with 'Defensive Infrastructure Enhancement'. This technology enhances your defense buildings by 10%, ensuring robust protection against hostile forces.
+- **Prerequisites**: Planetary Fortress Upgrade (Tech ID: 7)
+- **Cooldown**: 144 hours
+- **Military Buff**: 10% boost in defense building stats
+
+#### 3. Strategic Fleet Defense
+- **Tech ID**: 9
+- **Description**: Elevate your fleet's defensive tactics with 'Strategic Fleet Defense'. This tech increases the defense stats of your fleets when defending planets by 10%, turning them into formidable guardians.
+- **Prerequisites**: Defensive Infrastructure Enhancement (Tech ID: 8)
+- **Cooldown**: 168 hours
+- **Military Buff**: 10% boost in defense fleet stats
+
+#### 4. Elite Fleet Defense Tactics
+- **Tech ID**: 10
+- **Description**: Master the art of defensive warfare with 'Elite Fleet Defense Tactics'. This advanced tech further boosts your defending fleets' defense stats by 10%, ensuring unmatched planetary protection.
+- **Prerequisites**: Defensive Infrastructure Enhancement (Tech ID: 8)
+- **Cooldown**: 168 hours
+- **Military Buff**: Additional 10% boost in defense fleet stats
+
+
+
+  */
   const militaryTechTrees = [
     {
       techId: 7, // Boost innate defense of planets

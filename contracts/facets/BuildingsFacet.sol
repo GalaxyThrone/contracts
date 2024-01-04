@@ -196,12 +196,12 @@ contract BuildingsFacet is Modifiers {
 
         for (uint256 i = 0; i < 3; i++) {
             uint256 boost = s.boosts[_planetId][i];
-            uint256 baseMiningRatePerHour = 500 ether + (boost * 1e18); // Adjust this rate as per your game mechanics
+            uint256 baseMiningRatePerHour = 500 ether + (boost * 1e18);
             uint256 amountMined = baseMiningRatePerHour * hoursPassed;
 
             IPlanets(s.planetsAddress).mineResource(_planetId, i, amountMined);
 
-            // Check if Enhanced Planetary Mining is researched ( 4 is utility)
+            // Check if Enhanced Planetary Mining is researched ( 4 is Utility)
             if (s.playerTechnologies[msg.sender][4][4]) {
                 UtilityTech memory tech = s.availableResearchTechsUtility[4];
                 uint256 percentageBoost = (amountMined * tech.utilityBoost) /
@@ -209,8 +209,6 @@ contract BuildingsFacet is Modifiers {
 
                 amountMined += percentageBoost;
             }
-
-            //I know its hacky, but loading the resource contract addresses in an array is more gas intensive
 
             if (i == 0) {
                 IResource(s.metalAddress).mint(address(this), amountMined);

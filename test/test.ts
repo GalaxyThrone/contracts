@@ -34,10 +34,10 @@ const {
 } = require("@nomicfoundation/hardhat-network-helpers");
 // import { upgradeContract } from "../scripts/upgradeContract";
 
-describe("Game", function () {
+describe("Game Core Features Testing", function () {
   let g: any;
 
-  let vrfFacet: RegisterFacet;
+  let registerFacet: RegisterFacet;
   let adminFacet: AdminFacet;
   let buildingsFacet: BuildingsFacet;
   let tutorialFacet: TutorialFacet;
@@ -97,7 +97,7 @@ describe("Game", function () {
   };
 
   const registerUser = async (user: string | Signer | Provider) => {
-    return await vrfFacet.connect(user).startRegister(0, 3);
+    return await registerFacet.connect(user).startRegister(0, 3);
   };
 
   const craftBuilding = async (
@@ -246,16 +246,11 @@ describe("Game", function () {
     return shipIds;
   }
   before(async function () {
-    // this.timeout(20000000);
-    g = await deployDiamond();
+    g = await deployDiamond(false);
 
-    const diamond = g.diamondAddress; //"0xe296a5cf8c15d2a4192670fd12132fc7a2d5f426";
-    //await upgrade();
+    const diamond = g.diamondAddress;
 
-    // await upgradeTestVersion(diamond);
-    // await upgradeContract("0xA7902D5fd78e896A1071453D2e24DA41a7fA0004");
-
-    vrfFacet = (await ethers.getContractAt(
+    registerFacet = (await ethers.getContractAt(
       "RegisterFacet",
       diamond
     )) as RegisterFacet;
@@ -1853,9 +1848,11 @@ describe("Game", function () {
       const { randomUser, randomUserTwo, randomUserThree } =
         await loadFixture(deployUsers);
 
-      await vrfFacet.connect(randomUser).startRegister(0, 3);
-      await vrfFacet.connect(randomUserTwo).startRegister(0, 3);
-      await vrfFacet.connect(randomUserThree).startRegister(0, 3);
+      await registerFacet.connect(randomUser).startRegister(0, 3);
+      await registerFacet.connect(randomUserTwo).startRegister(0, 3);
+      await registerFacet
+        .connect(randomUserThree)
+        .startRegister(0, 3);
 
       const allianceNameBytes32 =
         ethers.utils.formatBytes32String("bananarama");
@@ -1901,9 +1898,11 @@ describe("Game", function () {
         AdminUser,
       } = await loadFixture(deployUsers);
 
-      await vrfFacet.connect(randomUser).startRegister(0, 3);
-      await vrfFacet.connect(randomUserTwo).startRegister(0, 3);
-      await vrfFacet.connect(randomUserThree).startRegister(0, 3);
+      await registerFacet.connect(randomUser).startRegister(0, 3);
+      await registerFacet.connect(randomUserTwo).startRegister(0, 3);
+      await registerFacet
+        .connect(randomUserThree)
+        .startRegister(0, 3);
 
       const allianceNameBytes32 =
         ethers.utils.formatBytes32String("bananarama");
@@ -2153,7 +2152,7 @@ describe("Game", function () {
       } = await loadFixture(deployUsers);
 
       //@notice actual register function for Tron Network
-      const registration = await vrfFacet
+      const registration = await registerFacet
         .connect(randomUser)
         .startRegister(0, 3);
 
@@ -2572,7 +2571,7 @@ describe("Game", function () {
       } = await loadFixture(deployUsers);
 
       //@notice actual register function for Tron Network
-      const registration = await vrfFacet
+      const registration = await registerFacet
         .connect(randomUser)
         .startRegister(0, 3);
 
@@ -2646,7 +2645,8 @@ describe("Game", function () {
     });
   });
 
-  describe("Tech Tree Testing", function () {
+  //@TODO to be removed, moved to its own unit test file
+  describe.skip("Tech Tree Testing", function () {
     it("User can research Technology and buff their ships", async function () {
       const {
         owner,
@@ -2657,7 +2657,7 @@ describe("Game", function () {
       } = await loadFixture(deployUsers);
 
       //@notice actual register function for Tron Network
-      const registration = await vrfFacet
+      const registration = await registerFacet
         .connect(randomUser)
         .startRegister(0, 3);
 
@@ -2724,7 +2724,7 @@ describe("Game", function () {
 
       await managementFacet
         .connect(randomUser)
-        .researchTech(1, 1, planetId);
+        .researchTech(1, 1, planetId); // TechId, TechTree, PlanetId
 
       await shipsFacet.connect(randomUser).claimFleet(planetId);
 
@@ -2752,7 +2752,7 @@ describe("Game", function () {
       } = await loadFixture(deployUsers);
 
       //@notice actual register function for Tron Network
-      const registration = await vrfFacet
+      const registration = await registerFacet
         .connect(randomUser)
         .startRegister(0, 3);
 
@@ -2794,7 +2794,7 @@ describe("Game", function () {
       //research first one
       await managementFacet
         .connect(randomUser)
-        .researchTech(2, 1, planetId);
+        .researchTech(2, 1, planetId); // TechId, TechTree, PlanetId
 
       await ethers.provider.send("evm_mine", [
         timestampBefore + 120000 * 2,
@@ -2828,7 +2828,7 @@ describe("Game", function () {
       ]);
       await managementFacet
         .connect(randomUser)
-        .researchTech(3, 1, planetId);
+        .researchTech(3, 1, planetId); // TechId, TechTree, PlanetId
 
       await shipsFacet.connect(randomUser).claimFleet(planetId);
 
@@ -2856,7 +2856,7 @@ describe("Game", function () {
       } = await loadFixture(deployUsers);
 
       //@notice actual register function for Tron Network
-      const registration = await vrfFacet
+      const registration = await registerFacet
         .connect(randomUser)
         .startRegister(0, 3);
 
@@ -2919,7 +2919,7 @@ describe("Game", function () {
       } = await loadFixture(deployUsers);
 
       //@notice actual register function for Tron Network
-      const registration = await vrfFacet
+      const registration = await registerFacet
         .connect(randomUser)
         .startRegister(0, 3);
 
@@ -3020,7 +3020,7 @@ describe("Game", function () {
       // Research the "Efficient Construction Methods" tech
       await managementFacet
         .connect(randomUser)
-        .researchTech(1, 3, planetId); // TechId 1 in Governance Tech Tree
+        .researchTech(1, 3, planetId); // TechId 1 in Governance Tech Tree // TechId, TechTree, PlanetId
 
       // Craft another building after researching the tech
       await buildingsFacet
@@ -3041,8 +3041,6 @@ describe("Game", function () {
         await managementFacet.returnPlayerResearchCooldown(
           randomUser.address
         );
-
-      console.log("the cooldown:", researchCooldown);
 
       // Compare the craft times
       expect(reducedCraftTime.lt(standardCraftTime)).to.be.true;

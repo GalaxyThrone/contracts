@@ -66,7 +66,3 @@ Utility Tech Tree
 - **Prerequisites**: Advanced Asteroid Resource Extraction (Tech ID: 9)
 - **Cooldown**: 120 hours
 - **Utility Buff**: Doubles combat stats of miner ships
-
-```
-
-```
