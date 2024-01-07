@@ -116,8 +116,6 @@ contract ShipsFacet is Modifiers {
             "ShipsFacet: not ready yet"
         );
 
-        //ShipType memory shipToClaim = s.shipType[currentCraft.itemId];
-
         uint interval = currentTimestamp - currentCraft.startTimestamp;
         uint claimableAmount = interval / currentCraft.craftTimeItem;
 
@@ -143,10 +141,28 @@ contract ShipsFacet is Modifiers {
                 planetOwner,
                 currentCraft.itemId
             );
+            shipTypeId = currentCraft.itemId;
 
-            ShipType memory newShipType = s.shipType[currentCraft.itemId];
+            ShipType memory newShipType = s.shipType[shipTypeId];
 
             // Apply each relevant research buff
+
+            //Miner Deputization doubling all combat stats
+            if (shipTypeId == 7) {
+                //Miner Ship Combat Deputization
+                if (s.playerTechnologies[planetOwner][4][10]) {
+                    newShipType.health *= 2;
+
+                    for (uint k = 0; k < 3; k++) {
+                        newShipType.attackTypes[k] *= 2;
+                        newShipType.defenseTypes[k] *= 2;
+                    }
+                }
+            }
+
+            //@notice
+            //ship specific researchtrees disabled for now
+            /*
             uint256[] memory relevantTechIds = s
                 .shipRelevantTechUpgradesMapping[currentCraft.itemId];
             for (uint256 j = 0; j < relevantTechIds.length; j++) {
@@ -164,17 +180,16 @@ contract ShipsFacet is Modifiers {
                         newShipType.defenseTypes[k] += techUpdate
                             .defenseBoostStat[k];
                     }
-
-                    // Add any other modifications based on techUpdate
                 }
             }
+            */
+
             s.SpaceShips[shipId] = newShipType;
 
-            shipTypeId = currentCraft.itemId;
             s.fleets[_planetId][shipTypeId] += 1;
             s.assignedPlanet[shipId] = _planetId;
             s.availableModuleSlots[shipId] += s
-                .shipType[currentCraft.itemId]
+                .shipType[shipTypeId]
                 .moduleSlots;
         }
 
@@ -409,6 +424,12 @@ contract ShipsFacet is Modifiers {
             s.playersFaction[msg.sender]
         );
 
+        uint miningTime = 24 hours;
+
+        //Rapid Asteroid Mining Procedures 25% mining speed buff
+        if (s.playerTechnologies[msg.sender][4][8]) {
+            miningTime -= 6 hours;
+        }
         s.outMiningId++;
 
         OutMining memory newOutMining = OutMining(
@@ -417,7 +438,7 @@ contract ShipsFacet is Modifiers {
             _toPlanetId,
             _shipIds,
             block.timestamp,
-            arrivalTime
+            arrivalTime + miningTime
         );
 
         s.outMining[s.outMiningId] = newOutMining;
@@ -427,7 +448,7 @@ contract ShipsFacet is Modifiers {
             _toPlanetId,
             msg.sender,
             _shipIds,
-            arrivalTime
+            arrivalTime + miningTime
         );
     }
 
@@ -462,18 +483,40 @@ contract ShipsFacet is Modifiers {
 
         require(
             block.timestamp >= s.outMining[_outMiningId].arrivalTime,
-            "ShipsFacet: not arrived yet!"
+            "ShipsFacet: Mining hasnt concluded yet!"
         );
+
+        uint256 buffedAsteroidMiningYield;
+
+        uint destinationPlanetType = this.getPlanetType(
+            s.outMining[_outMiningId].toPlanetId
+        );
+
+        //Asteroid Mining Buffs
+        if (destinationPlanetType == 1) {
+            //Technology Asteroid Mining Buffs
+            if (s.playerTechnologies[msg.sender][4][7]) {
+                buffedAsteroidMiningYield += 2; // representing 10% increase
+
+                if (s.playerTechnologies[msg.sender][4][9]) {
+                    buffedAsteroidMiningYield += 4; // representing another 20% increase
+                }
+            }
+            //Naxian Asteroid Mining Buff
+            if (s.playersFaction[msg.sender] == 1) {
+                buffedAsteroidMiningYield += 2; // representing 10% increase
+            }
+        }
 
         for (uint256 i; i < s.outMining[_outMiningId].shipsIds.length; i++) {
             uint256 cargo = getCargo(s.outMining[_outMiningId].shipsIds[i]);
             // cargo metal
 
-            //@TODO make mining yield random
-            //@TODO refactor
-
             for (uint256 j = 0; j < 4; j++) {
-                uint256 minedAmount = calculatePercentage(cargo, 20);
+                uint256 minedAmount = calculatePercentage(
+                    cargo,
+                    20 + buffedAsteroidMiningYield
+                );
 
                 //mining the resources on the diamond
                 if (j < 3) {
@@ -490,11 +533,7 @@ contract ShipsFacet is Modifiers {
                 //mining aether
                 else {
                     //PlanetType 1 is an Asteroid Belt. Only those are able to redeem aether
-                    if (
-                        this.getPlanetType(
-                            s.outMining[_outMiningId].toPlanetId
-                        ) == 1
-                    ) {
+                    if (destinationPlanetType == 1) {
                         minedAmount = calculatePercentage(cargo, 3);
 
                         s.aetherHeldPlayer[
@@ -849,7 +888,27 @@ contract ShipsFacet is Modifiers {
         uint256 xDist = fromX > toX ? fromX - toX : toX - fromX;
         uint256 yDist = fromY > toY ? fromY - toY : toY - fromY;
 
-        //hardcoded for alpha
+        uint256 arrivalTime = xDist + yDist + 600 + block.timestamp;
+        if (factionOfPlayer == 2) {
+            arrivalTime -= (((xDist + yDist) * 30) / 100);
+        }
+
+        return arrivalTime;
+    }
+
+    function checkTravelTime(
+        uint256 _from,
+        uint256 _to,
+        uint256 factionOfPlayer
+    ) external view returns (uint256) {
+        (uint256 fromX, uint256 fromY) = IPlanets(s.planetsAddress)
+            .getCoordinates(_from);
+        (uint256 toX, uint256 toY) = IPlanets(s.planetsAddress).getCoordinates(
+            _to
+        );
+        uint256 xDist = fromX > toX ? fromX - toX : toX - fromX;
+        uint256 yDist = fromY > toY ? fromY - toY : toY - fromY;
+
         uint256 arrivalTime = xDist + yDist + 600 + block.timestamp;
         if (factionOfPlayer == 2) {
             arrivalTime -= (((xDist + yDist) * 30) / 100);

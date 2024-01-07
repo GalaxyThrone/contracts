@@ -1966,7 +1966,7 @@ describe("Game Core Features Testing", function () {
       await shipsFacet
         .connect(randomUser)
         .startOutMining(planetId, 215, [shipIdPlayer1]);
-      await advanceTimeAndBlock(3);
+      await advanceTimeAndBlockByAmount(60 * 60 * 24 * 2);
 
       const resolveOutmining = await shipsFacet
         .connect(randomUser)
@@ -2014,7 +2014,7 @@ describe("Game Core Features Testing", function () {
         .connect(randomUser)
         .startOutMining(planetId, 5, [shipIdPlayer1]);
 
-      await advanceTimeAndBlock(3);
+      await advanceTimeAndBlockByAmount(60 * 60 * 24 * 2);
 
       const resolveOutmining = await shipsFacet
         .connect(randomUser)
@@ -2067,7 +2067,7 @@ describe("Game Core Features Testing", function () {
         .connect(randomUser)
         .startOutMining(planetId, 5, [shipIdPlayer1]);
 
-      await advanceTimeAndBlock(3);
+      await advanceTimeAndBlockByAmount(60 * 60 * 24 * 2);
 
       const allOutminingPlayer =
         await shipsFacet.getAllOutMiningPlayer(randomUser.address);
@@ -2115,7 +2115,7 @@ describe("Game Core Features Testing", function () {
         .connect(randomUser)
         .startOutMining(planetId, 215, [shipIdPlayer1]);
 
-      await advanceTimeAndBlock(4);
+      await advanceTimeAndBlockByAmount(60 * 60 * 24 * 2);
 
       const planetType = await shipsFacet
         .connect(randomUser)
@@ -2191,9 +2191,7 @@ describe("Game Core Features Testing", function () {
 
       expect(checkOwnershipShipsPlayer).to.equal(0);
 
-      await ethers.provider.send("evm_mine", [
-        timestampBefore + 11111111200 + 12000,
-      ]);
+      await advanceTimeAndBlockByAmount(60 * 60 * 24);
 
       await shipsFacet.connect(randomUser).claimFleet(planetId);
 
@@ -2212,9 +2210,7 @@ describe("Game Core Features Testing", function () {
         .connect(randomUser)
         .startOutMining(planetId, 215, [shipIdPlayer1]);
 
-      await ethers.provider.send("evm_mine", [
-        timestampBefore + 11111111200 + 36000,
-      ]);
+      await advanceTimeAndBlockByAmount(60 * 60 * 24 * 2);
 
       const planetType = await shipsFacet
         .connect(randomUser)
@@ -2321,7 +2317,7 @@ describe("Game Core Features Testing", function () {
 
       await expect(
         shipsFacet.connect(randomUser).resolveOutMining(1) // Attempt to resolve an unmined outmining with ID 2
-      ).to.be.revertedWith("ShipsFacet: not arrived yet!");
+      ).to.be.revertedWith("ShipsFacet: Mining hasnt concluded yet!");
     });
   });
 

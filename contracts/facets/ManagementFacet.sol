@@ -123,13 +123,21 @@ contract ManagementFacet is Modifiers {
         }
 
         // Check if the planet has enough resources
-        for (uint256 i = 0; i < price.length; i++) {
+        for (uint256 i = 0; i < 3; i++) {
             require(
                 s.planetResources[_researchBasePlanet][i] >= price[i],
                 "ManagementFacet: not enough resources"
             );
             s.planetResources[_researchBasePlanet][i] -= price[i];
             burnResource(i, price[i]);
+        }
+        if (price[3] > 0) {
+            require(
+                s.aetherHeldPlayer[msg.sender] >= price[3],
+                "ManagementFacet: Player doesnt hold enough Aether!"
+            );
+
+            s.aetherHeldPlayer[msg.sender] -= price[3];
         }
 
         s.lastResearchTimeCooldown[msg.sender] = block.timestamp + cooldown;
