@@ -330,7 +330,6 @@ describe("Game Core Features Testing", function () {
     it("register user and get planet NFT ", async function () {
       const { randomUser } = await loadFixture(deployUsers);
 
-      //@notice actual register function for Tron Network
       await registerUser(randomUser);
 
       const checkOwnershipAmountPlayer = await planetNfts.balanceOf(
@@ -340,7 +339,7 @@ describe("Game Core Features Testing", function () {
       expect(checkOwnershipAmountPlayer).to.equal(1);
     });
 
-    it("registered user can mine metal every 24hours ", async function () {
+    it("registered user can mine resources every 24hours ", async function () {
       const { randomUser } = await loadFixture(deployUsers);
 
       await registerUser(randomUser);
@@ -363,6 +362,71 @@ describe("Game Core Features Testing", function () {
         await buildingsFacet.getPlanetResources(planetId, 0);
 
       expect(balanceAfterMining).to.be.above(beforeMining);
+    });
+
+    it("User can mine resources from two planets using mineResourcesExtended", async function () {
+      const { randomUser } = await loadFixture(deployUsers);
+
+      // Register the user (Assuming registerUser function does the necessary setup)
+      await registerUser(randomUser);
+
+      // Assuming the user already owns at least one planet
+      const firstPlanetId = await planetNfts.tokenOfOwnerByIndex(
+        randomUser.address,
+        0
+      );
+
+      // Craft, claim and send terraformer and fighter ships for terraforming a new planet
+      await craftAndClaimShipyard(randomUser, firstPlanetId);
+      await craftAndClaimFleet(randomUser, 9, firstPlanetId, 1); // Terraformer
+      await craftAndClaimFleet(randomUser, 6, firstPlanetId, 2); // Fighter ships
+
+      // Terraform a new planet
+      const shipIds = await Promise.all(
+        Array.from(
+          { length: 3 },
+          async (_, i) =>
+            await shipNfts.tokenOfOwnerByIndex(randomUser.address, i)
+        )
+      );
+
+      // Targeting a new planet for terraforming (assuming ID 14 is available)
+      await sendTerraform(randomUser, firstPlanetId, 14, shipIds);
+      await advanceTimeAndBlock(5);
+      await endTerraform(randomUser, 0);
+
+      // Get the ID of the newly terraformed planet
+      const secondPlanetId = await planetNfts.tokenOfOwnerByIndex(
+        randomUser.address,
+        1
+      );
+
+      // Check resources on both planets before mining
+      let firstPlanetResourcesBefore =
+        await buildingsFacet.getPlanetResourcesAll(firstPlanetId);
+      let secondPlanetResourcesBefore =
+        await buildingsFacet.getPlanetResourcesAll(secondPlanetId);
+
+      // Mine resources from both planets
+      await buildingsFacet
+        .connect(randomUser)
+        .mineResourcesExtended([firstPlanetId, secondPlanetId]);
+
+      // Check resources on both planets after mining
+      let firstPlanetResourcesAfter =
+        await buildingsFacet.getPlanetResourcesAll(firstPlanetId);
+      let secondPlanetResourcesAfter =
+        await buildingsFacet.getPlanetResourcesAll(secondPlanetId);
+
+      // Assert that resources were mined on both planets
+      for (let i = 0; i < 3; i++) {
+        expect(firstPlanetResourcesAfter[i]).to.be.above(
+          firstPlanetResourcesBefore[i]
+        );
+        expect(secondPlanetResourcesAfter[i]).to.be.above(
+          secondPlanetResourcesBefore[i]
+        );
+      }
     });
 
     it("registered user can craft & claim buildings", async function () {

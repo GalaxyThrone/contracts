@@ -178,8 +178,6 @@ contract BuildingsFacet is Modifiers {
         }
     }
 
-    //@notice
-    //replaces mineMetal, mineCrystal, mineAntimatter
     function mineResources(
         uint256 _planetId
     ) external onlyPlanetOwnerOrChainRunner(_planetId) {
@@ -243,6 +241,83 @@ contract BuildingsFacet is Modifiers {
 
         s.lastClaimed[_planetId] = block.timestamp;
         emit miningConcluded(_planetId);
+    }
+
+    function mineResourcesExtended(uint256[] calldata _planetIds) external {
+        for (uint256 j = 0; j < _planetIds.length; j++) {
+            require(
+                msg.sender == IERC721(s.planetsAddress).ownerOf(_planetIds[j]),
+                "AppStorage: Not owner"
+            );
+            uint256 _planetId = _planetIds[j];
+
+            uint256 lastClaimed = s.lastClaimed[_planetId];
+            uint256 timePassed = block.timestamp - lastClaimed;
+
+            require(
+                block.timestamp > lastClaimed + 1 hours,
+                "BuildingsFacet: can only claim every hour, accumulating rewards only per hour"
+            );
+
+            uint256 hoursPassed = timePassed / 1 hours; // Calculate hours since last claimed
+
+            for (uint256 i = 0; i < 3; i++) {
+                uint256 boost = s.boosts[_planetId][i];
+                uint256 baseMiningRatePerHour = 500 ether + (boost * 1e18);
+                uint256 amountMined = baseMiningRatePerHour * hoursPassed;
+
+                IPlanets(s.planetsAddress).mineResource(
+                    _planetId,
+                    i,
+                    amountMined
+                );
+
+                // Check if Enhanced Planetary Mining is researched ( 4 is Utility)
+                if (s.playerTechnologies[msg.sender][4][4]) {
+                    UtilityTech memory tech = s.availableResearchTechsUtility[
+                        4
+                    ];
+                    uint256 percentageBoost = (amountMined *
+                        tech.utilityBoost) / 100;
+                    amountMined += percentageBoost;
+                }
+
+                if (i == 0) {
+                    IResource(s.metalAddress).mint(address(this), amountMined);
+                    // Aether Mining Logic
+                    if (s.playerTechnologies[msg.sender][4][5]) {
+                        // Aether Mining Technology
+                        bool isAdvancedAetherTechResearched = s
+                            .playerTechnologies[msg.sender][4][6];
+                        uint256 randomNumber = uint256(
+                            blockhash(block.number - 1)
+                        ) % 2; // 50% chance
+
+                        if (
+                            isAdvancedAetherTechResearched || randomNumber == 0
+                        ) {
+                            uint256 aetherMined = (amountMined * 5) / 100; // 5% of the amountMined
+                            s.aetherHeldPlayer[msg.sender] += aetherMined; // Adding Aether to player's holdings
+                        }
+                    }
+                } else if (i == 1) {
+                    IResource(s.crystalAddress).mint(
+                        address(this),
+                        amountMined
+                    );
+                } else if (i == 2) {
+                    IResource(s.antimatterAddress).mint(
+                        address(this),
+                        amountMined
+                    );
+                }
+
+                s.planetResources[_planetId][i] += amountMined;
+            }
+
+            s.lastClaimed[_planetId] = block.timestamp;
+            emit miningConcluded(_planetId);
+        }
     }
 
     function withdrawAether(uint256 _amount) external {
