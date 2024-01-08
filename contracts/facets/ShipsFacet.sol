@@ -160,6 +160,50 @@ contract ShipsFacet is Modifiers {
                 }
             }
 
+            // Fleet Defense Coordination Drills Defense Buff
+            if (s.playerTechnologies[planetOwner][2][3]) {
+                for (uint k = 0; k < 3; k++) {
+                    newShipType.defenseTypes[k] +=
+                        (s.shipType[shipTypeId].defenseTypes[k] * 10) /
+                        100;
+                }
+
+                //Elite Naval Defense Tactics
+
+                if (s.playerTechnologies[planetOwner][2][4]) {
+                    for (uint k = 0; k < 3; k++) {
+                        newShipType.defenseTypes[k] +=
+                            (s.shipType[shipTypeId].defenseTypes[k] * 10) /
+                            100;
+                    }
+                }
+            }
+
+            // Ship Health Enhancement 10% HP Buff
+            if (s.playerTechnologies[planetOwner][2][5]) {
+                newShipType.health +=
+                    (s.shipType[shipTypeId].health * 10) /
+                    100;
+
+                // Ship Attack Enhancement 10% Atk Buff
+                if (s.playerTechnologies[planetOwner][2][6]) {
+                    for (uint k = 0; k < 3; k++) {
+                        newShipType.attackTypes[k] +=
+                            (s.shipType[shipTypeId].attackTypes[k] * 10) /
+                            100;
+                    }
+
+                    // Advanced Ship Weaponry 10% Atk Buff
+                    if (s.playerTechnologies[planetOwner][2][8]) {
+                        for (uint k = 0; k < 3; k++) {
+                            newShipType.attackTypes[k] +=
+                                (s.shipType[shipTypeId].attackTypes[k] * 10) /
+                                100;
+                        }
+                    }
+                }
+            }
+
             //@notice
             //ship specific researchtrees disabled for now
             /*

@@ -40,14 +40,14 @@ export async function deployDiamond(logOutput: boolean = true) {
   const accounts: Signer[] = await ethers.getSigners();
   const deployer = accounts[0];
   const deployerAddress = await deployer.getAddress();
-  log("Deployer:", deployerAddress);
+  log("Deployer: " + deployerAddress);
   // deploy DiamondCutFacet
   const DiamondCutFacet = await ethers.getContractFactory(
     "DiamondCutFacet"
   );
   const diamondCutFacet = await DiamondCutFacet.deploy();
   await diamondCutFacet.deployed();
-  log("DiamondCutFacet deployed:", diamondCutFacet.address);
+  log("DiamondCutFacet deployed: " + diamondCutFacet.address);
 
   // deploy Diamond
   const Diamond = (await ethers.getContractFactory(
@@ -58,7 +58,7 @@ export async function deployDiamond(logOutput: boolean = true) {
     diamondCutFacet.address
   );
   await diamond.deployed();
-  log("Diamond deployed:", diamond.address);
+  log("Diamond deployed: " + diamond.address);
 
   // deploy DiamondInit
   const DiamondInit = (await ethers.getContractFactory(
@@ -66,7 +66,7 @@ export async function deployDiamond(logOutput: boolean = true) {
   )) as DiamondInit__factory;
   const diamondInit = await DiamondInit.deploy();
   await diamondInit.deployed();
-  log("DiamondInit deployed:", diamondInit.address);
+  log("DiamondInit deployed: " + diamondInit.address);
 
   // deploy facets
   log("");

@@ -1054,7 +1054,397 @@ describe("Research Technology Testing", function () {
       });
     });
 
-    describe("Military Tech Tree", function () {});
+    describe("Military Tech Tree", function () {
+      //@TODO reimplement testing
+      it.skip("Civilian Defense Mobilization Research reduces the malus by 50%", async function () {});
+      //@TODO reimplement testing
+      it.skip("Defensive Infrastructure Enhancement Research increases Users Buildings Defense by 10%", async function () {});
+
+      it("Fleet Defense Coordination Drills Research increases Users newly built Ships Defense by 10%", async function () {
+        const { randomUser } = await loadFixture(deployUsers);
+
+        const registration = await registerFacet
+          .connect(randomUser)
+          .startRegister(0, 3);
+
+        const checkOwnershipAmountPlayer = await planetNfts.balanceOf(
+          randomUser.address
+        );
+
+        const planetId = await planetNfts.tokenOfOwnerByIndex(
+          randomUser.address,
+          0
+        );
+
+        await craftAndClaimShipyard(randomUser, planetId);
+
+        await craftAndClaimFleet(randomUser, 7, planetId, 1);
+        await advanceTimeAndBlock(1);
+        const shipIdPlayer1 = await shipNfts.tokenOfOwnerByIndex(
+          randomUser.address,
+          0
+        );
+
+        //check if prerequisite for Ship Attack Enhancement works correctly
+        expect(
+          managementFacet
+            .connect(randomUser)
+            .researchTech(3, 2, planetId)
+        ).to.be.revertedWith(
+          "ManagementFacet: prerequisite tech not researched"
+        );
+
+        //asteroid mine enough aether for advanced research
+        for (let i = 0; i < 30; i++) {
+          await shipsFacet
+            .connect(randomUser)
+            .startOutMining(planetId, 215, [shipIdPlayer1]);
+          await advanceTimeAndBlock(100);
+
+          await shipsFacet
+            .connect(randomUser)
+            .resolveOutMining(1 + i);
+        }
+
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(1, 2, planetId); // TechId, TechTree, PlanetId
+        await advanceTimeAndBlock(10000);
+
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(2, 2, planetId); // TechId, TechTree, PlanetId
+        await advanceTimeAndBlock(10000);
+
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(3, 2, planetId); // TechId, TechTree, PlanetId
+        await advanceTimeAndBlock(10000);
+
+        //craft buffed  Ship
+        await craftAndClaimFleet(randomUser, 7, planetId, 1);
+
+        const shipIdPlayer1buffed =
+          await shipNfts.tokenOfOwnerByIndex(randomUser.address, 1);
+
+        const statsBeforeResearch =
+          await shipsFacet.getShipStatsDiamond(shipIdPlayer1);
+
+        const statsAfterResearch =
+          await shipsFacet.getShipStatsDiamond(shipIdPlayer1buffed);
+
+        expect(statsAfterResearch.defenseTypes[0]).to.be.above(
+          statsBeforeResearch.defenseTypes[0]
+        );
+
+        //attack should be raised by 10%
+        expect(
+          statsBeforeResearch.defenseTypes[0].mul(110).div(100)
+        ).to.be.equal(statsAfterResearch.defenseTypes[0]);
+      });
+
+      it("Elite Naval Defense Tactics Research increases Users newly built Ships Defense by another 10%, totalling 20%", async function () {
+        const { randomUser } = await loadFixture(deployUsers);
+
+        const registration = await registerFacet
+          .connect(randomUser)
+          .startRegister(0, 3);
+
+        const checkOwnershipAmountPlayer = await planetNfts.balanceOf(
+          randomUser.address
+        );
+
+        const planetId = await planetNfts.tokenOfOwnerByIndex(
+          randomUser.address,
+          0
+        );
+
+        await craftAndClaimShipyard(randomUser, planetId);
+
+        await craftAndClaimFleet(randomUser, 7, planetId, 3);
+        await advanceTimeAndBlock(100);
+        const shipIdPlayer1 = await shipNfts.tokenOfOwnerByIndex(
+          randomUser.address,
+          0
+        );
+
+        //check if prerequisite for Ship Attack Enhancement works correctly
+        expect(
+          managementFacet
+            .connect(randomUser)
+            .researchTech(3, 2, planetId)
+        ).to.be.revertedWith(
+          "ManagementFacet: prerequisite tech not researched"
+        );
+
+        //asteroid mine enough aether for advanced research
+        for (let i = 0; i < 100; i++) {
+          await shipsFacet
+            .connect(randomUser)
+            .startOutMining(planetId, 215, [
+              shipIdPlayer1,
+              shipIdPlayer1.add(1),
+              shipIdPlayer1.add(2),
+            ]);
+          await advanceTimeAndBlock(100);
+
+          await shipsFacet
+            .connect(randomUser)
+            .resolveOutMining(1 + i);
+        }
+
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(1, 2, planetId); // TechId, TechTree, PlanetId
+        await advanceTimeAndBlock(10000);
+
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(2, 2, planetId); // TechId, TechTree, PlanetId
+        await advanceTimeAndBlock(10000);
+
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(3, 2, planetId); // TechId, TechTree, PlanetId
+        await advanceTimeAndBlock(10000);
+
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(4, 2, planetId); // TechId, TechTree, PlanetId
+        await advanceTimeAndBlock(10000);
+
+        //craft buffed  Ship
+        await craftAndClaimFleet(randomUser, 7, planetId, 1);
+
+        const shipIdPlayer1buffed =
+          await shipNfts.tokenOfOwnerByIndex(randomUser.address, 3);
+
+        const statsBeforeResearch =
+          await shipsFacet.getShipStatsDiamond(shipIdPlayer1);
+
+        const statsAfterResearch =
+          await shipsFacet.getShipStatsDiamond(shipIdPlayer1buffed);
+
+        expect(statsAfterResearch.defenseTypes[0]).to.be.above(
+          statsBeforeResearch.defenseTypes[0]
+        );
+
+        //attack should be raised by 10%
+        expect(statsAfterResearch.defenseTypes[0]).to.be.equal(
+          statsBeforeResearch.defenseTypes[0].mul(120).div(100)
+        );
+      });
+
+      it("Ship Health Enhancement Research increases Users newly built Ships Health by 10%", async function () {
+        const { randomUser } = await loadFixture(deployUsers);
+
+        const registration = await registerFacet
+          .connect(randomUser)
+          .startRegister(0, 3);
+
+        const checkOwnershipAmountPlayer = await planetNfts.balanceOf(
+          randomUser.address
+        );
+
+        const planetId = await planetNfts.tokenOfOwnerByIndex(
+          randomUser.address,
+          0
+        );
+
+        await craftAndClaimShipyard(randomUser, planetId);
+
+        await craftAndClaimFleet(randomUser, 1, planetId, 1);
+        await advanceTimeAndBlock(1);
+        const shipIdPlayer1 = await shipNfts.tokenOfOwnerByIndex(
+          randomUser.address,
+          0
+        );
+
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(5, 2, planetId); // TechId, TechTree, PlanetId
+        await advanceTimeAndBlock(10000);
+
+        //craft buffed Miner Ship
+        await craftAndClaimFleet(randomUser, 1, planetId, 1);
+
+        const shipIdPlayer1buffed =
+          await shipNfts.tokenOfOwnerByIndex(randomUser.address, 1);
+
+        const statsBeforeResearch =
+          await shipsFacet.getShipStatsDiamond(shipIdPlayer1);
+
+        const statsAfterResearch =
+          await shipsFacet.getShipStatsDiamond(shipIdPlayer1buffed);
+
+        expect(statsAfterResearch.health).to.be.above(
+          statsBeforeResearch.health
+        );
+      });
+
+      it("Ship Attack Enhancement Research increases Users newly built Ships Attack by 10%", async function () {
+        const { randomUser } = await loadFixture(deployUsers);
+
+        const registration = await registerFacet
+          .connect(randomUser)
+          .startRegister(0, 3);
+
+        const checkOwnershipAmountPlayer = await planetNfts.balanceOf(
+          randomUser.address
+        );
+
+        const planetId = await planetNfts.tokenOfOwnerByIndex(
+          randomUser.address,
+          0
+        );
+
+        await craftAndClaimShipyard(randomUser, planetId);
+
+        await craftAndClaimFleet(randomUser, 1, planetId, 1);
+        await advanceTimeAndBlock(1);
+        const shipIdPlayer1 = await shipNfts.tokenOfOwnerByIndex(
+          randomUser.address,
+          0
+        );
+
+        //check if prerequisite for Ship Attack Enhancement works correctly
+        expect(
+          managementFacet
+            .connect(randomUser)
+            .researchTech(6, 2, planetId)
+        ).to.be.revertedWith(
+          "ManagementFacet: prerequisite tech not researched"
+        );
+
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(5, 2, planetId); // TechId, TechTree, PlanetId
+        await advanceTimeAndBlock(10000);
+
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(6, 2, planetId); // TechId, TechTree, PlanetId
+        await advanceTimeAndBlock(10000);
+
+        //craft buffed Miner Ship
+        await craftAndClaimFleet(randomUser, 1, planetId, 1);
+
+        const shipIdPlayer1buffed =
+          await shipNfts.tokenOfOwnerByIndex(randomUser.address, 1);
+
+        const statsBeforeResearch =
+          await shipsFacet.getShipStatsDiamond(shipIdPlayer1);
+
+        const statsAfterResearch =
+          await shipsFacet.getShipStatsDiamond(shipIdPlayer1buffed);
+
+        expect(statsAfterResearch.attackTypes[0]).to.be.above(
+          statsBeforeResearch.attackTypes[0]
+        );
+
+        //attack should be raised by 10%
+        expect(
+          statsBeforeResearch.attackTypes[0].mul(110).div(100)
+        ).to.be.equal(statsAfterResearch.attackTypes[0]);
+      });
+
+      //@TODO reimplement testing
+      it.skip("Fleetsize Combat Debuff Reduction Research reduces the malus by 50%", async function () {});
+
+      it("Advanced Ship Weaponry Research increases Users newly built Ships Attack by another 10%, total by 20%", async function () {
+        const { randomUser } = await loadFixture(deployUsers);
+
+        const registration = await registerFacet
+          .connect(randomUser)
+          .startRegister(0, 3);
+
+        const checkOwnershipAmountPlayer = await planetNfts.balanceOf(
+          randomUser.address
+        );
+
+        const planetId = await planetNfts.tokenOfOwnerByIndex(
+          randomUser.address,
+          0
+        );
+
+        await craftAndClaimShipyard(randomUser, planetId);
+
+        await craftAndClaimFleet(randomUser, 7, planetId, 1);
+        await craftAndClaimFleet(randomUser, 1, planetId, 1);
+        await advanceTimeAndBlock(1);
+        const shipIdPlayer1Miner = await shipNfts.tokenOfOwnerByIndex(
+          randomUser.address,
+          0
+        );
+
+        const shipIdPlayer1 = await shipNfts.tokenOfOwnerByIndex(
+          randomUser.address,
+          1
+        );
+
+        //check if prerequisite for Ship Attack Enhancement works correctly
+        expect(
+          managementFacet
+            .connect(randomUser)
+            .researchTech(6, 2, planetId)
+        ).to.be.revertedWith(
+          "ManagementFacet: prerequisite tech not researched"
+        );
+
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(5, 2, planetId); // TechId, TechTree, PlanetId
+        await advanceTimeAndBlock(10000);
+
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(6, 2, planetId); // TechId, TechTree, PlanetId
+        await advanceTimeAndBlock(10000);
+
+        //asteroid mine enough aether for advanced research
+        for (let i = 0; i < 30; i++) {
+          await shipsFacet
+            .connect(randomUser)
+            .startOutMining(planetId, 215, [shipIdPlayer1Miner]);
+          await advanceTimeAndBlock(100);
+
+          await shipsFacet
+            .connect(randomUser)
+            .resolveOutMining(1 + i);
+        }
+
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(7, 2, planetId); // TechId, TechTree, PlanetId
+        await advanceTimeAndBlock(10000);
+
+        await buildingsFacet
+          .connect(randomUser)
+          .mineResources(planetId);
+
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(8, 2, planetId); // TechId, TechTree, PlanetId
+        await advanceTimeAndBlock(10000);
+
+        //craft buffed Miner Ship
+        await craftAndClaimFleet(randomUser, 1, planetId, 1);
+
+        const shipIdPlayer1buffed =
+          await shipNfts.tokenOfOwnerByIndex(randomUser.address, 2);
+
+        const statsBeforeResearch =
+          await shipsFacet.getShipStatsDiamond(shipIdPlayer1);
+
+        const statsAfterResearch =
+          await shipsFacet.getShipStatsDiamond(shipIdPlayer1buffed);
+
+        //attack should be raised by 10%
+        expect(
+          statsBeforeResearch.attackTypes[0].mul(120).div(100)
+        ).to.be.equal(statsAfterResearch.attackTypes[0]);
+      });
+    });
 
     describe("Governance Tech Tree", function () {
       it("Efficient Construction Methods reduces building craft time by 10%", async function () {
