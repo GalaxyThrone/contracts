@@ -1447,7 +1447,7 @@ describe("Research Technology Testing", function () {
     });
 
     describe("Governance Tech Tree", function () {
-      it("Efficient Construction Methods reduces building craft time by 10%", async function () {
+      it("Rapid Infrastructure Development Research reduces building craft time by 10%", async function () {
         const { randomUser } = await loadFixture(deployUsers);
 
         await registerUser(randomUser);
@@ -1485,7 +1485,7 @@ describe("Research Technology Testing", function () {
           .connect(randomUser)
           .claimBuilding(planetId);
 
-        // Research the "Efficient Construction Methods" tech
+        // Research the "Rapid Infrastructure Development" tech
         await managementFacet
           .connect(randomUser)
           .researchTech(1, 3, planetId); // TechId 1 in Governance Tech Tree // TechId, TechTree, PlanetId
@@ -1511,6 +1511,219 @@ describe("Research Technology Testing", function () {
 
         // Compare the craft times
         expect(reducedCraftTime.lt(standardCraftTime)).to.be.true;
+      });
+
+      it("Fleet Fabrication Mastery Research reduces building craft time by 10%", async function () {
+        const { randomUser } = await loadFixture(deployUsers);
+
+        await registerUser(randomUser);
+
+        const planetId = await planetNfts.tokenOfOwnerByIndex(
+          randomUser.address,
+          0
+        );
+
+        await craftAndClaimShipyard(randomUser, planetId);
+        const buildingTypeToCraft = 2; // Example building type
+        const buildingAmountToCraft = 1; // Crafting one building
+
+        // Craft a building without the tech
+        await buildingsFacet
+          .connect(randomUser)
+          .craftBuilding(
+            buildingTypeToCraft,
+            planetId,
+            buildingAmountToCraft
+          );
+
+        //resource cost before
+
+        let beforeFleetCraftUnbuffed =
+          await buildingsFacet.getPlanetResources(planetId, 0);
+
+        await shipsFacet
+          .connect(randomUser)
+          .craftFleet(1, planetId, 1);
+
+        let afterFleetCraftUnbuffed =
+          await buildingsFacet.getPlanetResources(planetId, 0);
+
+        let UnbuffedCostMetal = beforeFleetCraftUnbuffed.sub(
+          afterFleetCraftUnbuffed
+        );
+        //resource cost after calc diff
+
+        // Get the craft time for comparison
+        let craftItemWithoutTech = await shipsFacet.getCraftFleets(
+          planetId
+        );
+
+        let standardCraftTime = craftItemWithoutTech.craftTimeItem;
+
+        await advanceTimeAndBlock(100);
+
+        await shipsFacet.connect(randomUser).claimFleet(planetId);
+
+        await buildingsFacet
+          .connect(randomUser)
+          .claimBuilding(planetId);
+
+        // Research the "Rapid Infrastructure Development" tech
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(1, 3, planetId); // TechId 1 in Governance Tech Tree // TechId, TechTree, PlanetId
+
+        await advanceTimeAndBlock(100);
+        await advanceTimeAndBlock(100);
+        // Research the "Fleet Fabrication Mastery" tech
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(2, 3, planetId); // TechId 1 in Governance Tech Tree // TechId, TechTree, PlanetId
+
+        //resource cost before
+
+        let beforeFleetCraftBuffed =
+          await buildingsFacet.getPlanetResources(planetId, 0);
+
+        await shipsFacet
+          .connect(randomUser)
+          .craftFleet(1, planetId, 1);
+        //resource cost after calc diff
+
+        let afterFleetCraftBuffed =
+          await buildingsFacet.getPlanetResources(planetId, 0);
+
+        let BuffedCostMetal = beforeFleetCraftBuffed.sub(
+          afterFleetCraftBuffed
+        );
+
+        // Get the new craft time
+        let craftItemWithTech = await shipsFacet.getCraftFleets(
+          planetId
+        );
+        let reducedCraftTime = craftItemWithTech.craftTimeItem;
+
+        // Compare the craft times
+        expect(reducedCraftTime.lt(standardCraftTime)).to.be.true;
+      });
+
+      it("Resource-Savvy Constructions Research reduces ships resource craft cost by 10%", async function () {
+        const { randomUser } = await loadFixture(deployUsers);
+
+        await registerUser(randomUser);
+
+        const planetId = await planetNfts.tokenOfOwnerByIndex(
+          randomUser.address,
+          0
+        );
+
+        await craftAndClaimShipyard(randomUser, planetId);
+        const buildingTypeToCraft = 2; // Example building type
+        const buildingAmountToCraft = 1; // Crafting one building
+
+        // Craft a building without the tech
+        await buildingsFacet
+          .connect(randomUser)
+          .craftBuilding(
+            buildingTypeToCraft,
+            planetId,
+            buildingAmountToCraft
+          );
+
+        //resource cost before
+
+        let beforeFleetCraftUnbuffed =
+          await buildingsFacet.getPlanetResources(planetId, 0);
+
+        await shipsFacet
+          .connect(randomUser)
+          .craftFleet(7, planetId, 1);
+
+        let afterFleetCraftUnbuffed =
+          await buildingsFacet.getPlanetResources(planetId, 0);
+
+        let UnbuffedCostMetal = beforeFleetCraftUnbuffed.sub(
+          afterFleetCraftUnbuffed
+        );
+        //resource cost after calc diff
+
+        // Get the craft time for comparison
+        let craftItemWithoutTech = await shipsFacet.getCraftFleets(
+          planetId
+        );
+
+        let standardCraftTime = craftItemWithoutTech.craftTimeItem;
+
+        await advanceTimeAndBlock(100);
+
+        await shipsFacet.connect(randomUser).claimFleet(planetId);
+
+        await buildingsFacet
+          .connect(randomUser)
+          .claimBuilding(planetId);
+
+        // Research the "Rapid Infrastructure Development" tech
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(1, 3, planetId); // TechId 1 in Governance Tech Tree // TechId, TechTree, PlanetId
+
+        await advanceTimeAndBlock(200);
+
+        // Research the "Fleet Fabrication Mastery" tech
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(2, 3, planetId); // TechId 2 in Governance Tech Tree // TechId, TechTree, PlanetId
+
+        await advanceTimeAndBlock(200);
+
+        const shipIdPlayer1 = await shipNfts.tokenOfOwnerByIndex(
+          randomUser.address,
+          0
+        );
+        //asteroid mine enough aether for advanced research
+        for (let i = 0; i < 150; i++) {
+          await shipsFacet
+            .connect(randomUser)
+            .startOutMining(planetId, 215, [shipIdPlayer1]);
+          await advanceTimeAndBlock(100);
+
+          await shipsFacet
+            .connect(randomUser)
+            .resolveOutMining(1 + i);
+        }
+
+        // Research the "Resource-Savvy Constructions" tech
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(3, 3, planetId); // TechId 3 in Governance Tech Tree // TechId, TechTree, PlanetId
+
+        //resource cost before
+
+        let beforeFleetCraftBuffed =
+          await buildingsFacet.getPlanetResources(planetId, 0);
+
+        await shipsFacet
+          .connect(randomUser)
+          .craftFleet(7, planetId, 1);
+        //resource cost after calc diff
+
+        let afterFleetCraftBuffed =
+          await buildingsFacet.getPlanetResources(planetId, 0);
+
+        let BuffedCostMetal = beforeFleetCraftBuffed.sub(
+          afterFleetCraftBuffed
+        );
+
+        // Get the new craft time
+        let craftItemWithTech = await shipsFacet.getCraftFleets(
+          planetId
+        );
+        let reducedCraftTime = craftItemWithTech.craftTimeItem;
+
+        // Compare the craft times
+        expect(reducedCraftTime.lt(standardCraftTime)).to.be.true;
+
+        expect(BuffedCostMetal).to.be.below(UnbuffedCostMetal);
       });
     });
 

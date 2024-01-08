@@ -61,6 +61,21 @@ contract ShipsFacet is Modifiers {
         require(buildings > 0, "ShipsFacet: missing building requirement");
         uint256 readyTimestamp = block.timestamp + (craftTime * _amount);
 
+        craftTimeBuffed = craftTime;
+
+        if (s.playerTechnologies[msg.sender][3][2]) {
+            //  Rapid Infrastructure Development, reduce craft time by 10%;
+
+            readyTimestamp -= ((craftTime * _amount) * 10) / 100; // 10% reduction in total craft time
+            craftTimeBuffed = (craftTimeBuffed * 90) / 100; // 10% reduction in craft time per building
+            //Resource-Savvy Constructions, reduce prices by 10%
+            if (s.playerTechnologies[msg.sender][3][3]) {
+                for (uint i = 0; i < price.length; i++) {
+                    price[i] -= (price[i] * 10) / 100; // 10% reduction in costs for all resources
+                }
+            }
+        }
+
         CraftItem memory newFleet = CraftItem(
             _amount,
             _planetId,
@@ -68,9 +83,10 @@ contract ShipsFacet is Modifiers {
             readyTimestamp,
             block.timestamp,
             _amount,
-            craftTime
+            craftTimeBuffed
         );
         s.craftFleets[_planetId] = newFleet;
+
         require(
             s.planetResources[_planetId][0] >= price[0] * _amount,
             "ShipsFacet: not enough metal"
