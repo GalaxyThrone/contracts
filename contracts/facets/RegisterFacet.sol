@@ -117,13 +117,22 @@ contract RegisterFacet is Modifiers {
         );
 
         uint256 factionId = s.playersFaction[msg.sender];
-        ICommanders(s.commandersAddress).mint(
+        uint256 commanderId = ICommanders(s.commandersAddress).mint(
             msg.sender,
             _commanderChoice,
             factionId
         );
 
         s.hasClaimedCommander[msg.sender] = true;
+        s.currentCommanderNft[msg.sender] = commanderId;
+
+        s.CommanderStats[commanderId] = s.presetCommander[factionId][
+            _commanderChoice
+        ];
+
+        s.activeCommanderTraits[msg.sender][
+            s.CommanderStats[commanderId].traits[0]
+        ] = true;
     }
 
     function drawRandomNumbers(address _player) internal {

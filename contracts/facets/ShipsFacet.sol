@@ -220,6 +220,15 @@ contract ShipsFacet is Modifiers {
                 }
             }
 
+            // Apply Commander Buffs
+            //@TODO testing
+            //EM Warfare Mastery Trait [ID 1], 15% extra on EM Attack.
+            if (s.activeCommanderTraits[planetOwner][1]) {
+                newShipType.attackTypes[2] +=
+                    (s.shipType[shipTypeId].attackTypes[2] * 15) /
+                    100;
+            }
+
             //@notice
             //ship specific researchtrees disabled for now
             /*
@@ -436,6 +445,11 @@ contract ShipsFacet is Modifiers {
             s.sendTerraform[_sendTerraformId].toPlanetId,
             IShips(s.shipsAddress).ownerOf(terraformerId)
         );
+
+        //@notice to start mining-timer for accumulating mining rewards
+        s.lastClaimed[s.sendTerraform[_sendTerraformId].toPlanetId] =
+            block.timestamp -
+            1 hours;
 
         //@notice burn terraformer ship from owner
 
@@ -1149,48 +1163,48 @@ contract ShipsFacet is Modifiers {
     //@TODO crafting shipModules.
     //@TODO unequipping shipModules.
 
-    function equipShipModule(uint256 _moduleToEquip, uint256 _shipId) external {
-        require(
-            _moduleToEquip <= s.totalAvailableShipModules,
-            "Module Item Id Doesnt exist!"
-        );
-        require(
-            IShips(s.shipsAddress).ownerOf(_shipId) == msg.sender,
-            "not your ship!"
-        );
+    // function equipShipModule(uint256 _moduleToEquip, uint256 _shipId) external {
+    //     require(
+    //         _moduleToEquip <= s.totalAvailableShipModules,
+    //         "Module Item Id Doesnt exist!"
+    //     );
+    //     require(
+    //         IShips(s.shipsAddress).ownerOf(_shipId) == msg.sender,
+    //         "not your ship!"
+    //     );
 
-        uint256 currAssignedPlanet = s.assignedPlanet[_shipId];
+    //     uint256 currAssignedPlanet = s.assignedPlanet[_shipId];
 
-        require(
-            IERC721(s.planetsAddress).ownerOf(currAssignedPlanet) == msg.sender,
-            "ship is not on an owned planet!"
-        );
-        require(s.availableModuleSlots[_shipId] > 0, "all Module slots taken!");
+    //     require(
+    //         IERC721(s.planetsAddress).ownerOf(currAssignedPlanet) == msg.sender,
+    //         "ship is not on an owned planet!"
+    //     );
+    //     require(s.availableModuleSlots[_shipId] > 0, "all Module slots taken!");
 
-        for (uint256 i = 0; i < 3; i++) {
-            require(
-                s.planetResources[currAssignedPlanet][i] >=
-                    s.shipModuleType[_moduleToEquip].price[i],
-                "ShipsFacet: not enough resources"
-            );
-            s.planetResources[currAssignedPlanet][i] -= s
-                .shipModuleType[_moduleToEquip]
-                .price[i];
-            burnResource(i, s.shipModuleType[_moduleToEquip].price[i]);
-        }
+    //     for (uint256 i = 0; i < 3; i++) {
+    //         require(
+    //             s.planetResources[currAssignedPlanet][i] >=
+    //                 s.shipModuleType[_moduleToEquip].price[i],
+    //             "ShipsFacet: not enough resources"
+    //         );
+    //         s.planetResources[currAssignedPlanet][i] -= s
+    //             .shipModuleType[_moduleToEquip]
+    //             .price[i];
+    //         burnResource(i, s.shipModuleType[_moduleToEquip].price[i]);
+    //     }
 
-        s.equippedShipModuleType[_shipId][
-            s.availableModuleSlots[_shipId] - 1
-        ] = s.shipModuleType[_moduleToEquip];
-        s.availableModuleSlots[_shipId] -= 1;
-        s.SpaceShips[_shipId].health += s
-            .shipModuleType[_moduleToEquip]
-            .healthBoostStat;
+    //     s.equippedShipModuleType[_shipId][
+    //         s.availableModuleSlots[_shipId] - 1
+    //     ] = s.shipModuleType[_moduleToEquip];
+    //     s.availableModuleSlots[_shipId] -= 1;
+    //     s.SpaceShips[_shipId].health += s
+    //         .shipModuleType[_moduleToEquip]
+    //         .healthBoostStat;
 
-        for (uint256 i = 0; i < 3; i++) {
-            modifyShipStats(i, _shipId, _moduleToEquip);
-        }
-    }
+    //     for (uint256 i = 0; i < 3; i++) {
+    //         modifyShipStats(i, _shipId, _moduleToEquip);
+    //     }
+    // }
 
     function burnResource(uint256 i, uint256 amount) internal {
         if (i == 0) {
@@ -1202,18 +1216,18 @@ contract ShipsFacet is Modifiers {
         }
     }
 
-    function modifyShipStats(
-        uint256 i,
-        uint256 _shipId,
-        uint256 _moduleToEquip
-    ) internal {
-        s.SpaceShips[_shipId].attackTypes[i] += s
-            .shipModuleType[_moduleToEquip]
-            .attackBoostStat[i];
-        s.SpaceShips[_shipId].attackTypes[i] += s
-            .shipModuleType[_moduleToEquip]
-            .defenseBoostStat[i];
-    }
+    // function modifyShipStats(
+    //     uint256 i,
+    //     uint256 _shipId,
+    //     uint256 _moduleToEquip
+    // ) internal {
+    //     s.SpaceShips[_shipId].attackTypes[i] += s
+    //         .shipModuleType[_moduleToEquip]
+    //         .attackBoostStat[i];
+    //     s.SpaceShips[_shipId].attackTypes[i] += s
+    //         .shipModuleType[_moduleToEquip]
+    //         .defenseBoostStat[i];
+    // }
 
     //@notice leveling will be instant, but there will be a cooldown afterwards
 
@@ -1262,28 +1276,28 @@ contract ShipsFacet is Modifiers {
     }
     */
 
-    function upgradeShipStats(
-        uint i,
-        uint _shipId,
-        uint shipTypeToLevel,
-        uint currLevel
-    ) internal {
-        s.SpaceShips[_shipId].attackTypes[i] += s.statsUpgradeLeveling[
-            shipTypeToLevel
-        ][currLevel + 1][i];
-        s.SpaceShips[_shipId].defenseTypes[i] += s.statsUpgradeLeveling[
-            shipTypeToLevel
-        ][currLevel + 1][i + 3];
-        if (i == 0) {
-            s.SpaceShips[_shipId].health += s.statsUpgradeLeveling[
-                shipTypeToLevel
-            ][currLevel + 1][6];
-        }
-    }
+    // function upgradeShipStats(
+    //     uint i,
+    //     uint _shipId,
+    //     uint shipTypeToLevel,
+    //     uint currLevel
+    // ) internal {
+    //     s.SpaceShips[_shipId].attackTypes[i] += s.statsUpgradeLeveling[
+    //         shipTypeToLevel
+    //     ][currLevel + 1][i];
+    //     s.SpaceShips[_shipId].defenseTypes[i] += s.statsUpgradeLeveling[
+    //         shipTypeToLevel
+    //     ][currLevel + 1][i + 3];
+    //     if (i == 0) {
+    //         s.SpaceShips[_shipId].health += s.statsUpgradeLeveling[
+    //             shipTypeToLevel
+    //         ][currLevel + 1][6];
+    //     }
+    // }
 
-    function checkCurrentLevelShip(uint _tokenId) internal returns (uint) {
-        return s.currentLevelShip[_tokenId];
-    }
+    // function checkCurrentLevelShip(uint _tokenId) internal returns (uint) {
+    //     return s.currentLevelShip[_tokenId];
+    // }
 
     function checkAvailableModuleSlots(
         uint256 _shipId
@@ -1291,17 +1305,17 @@ contract ShipsFacet is Modifiers {
         return s.availableModuleSlots[_shipId];
     }
 
-    function returnEquippedModuleSlots(
-        uint256 _shipId
-    ) external view returns (ShipModule[] memory) {
-        uint256 maxModules = s.SpaceShips[_shipId].moduleSlots;
-        ShipModule[] memory currentModules = new ShipModule[](maxModules);
-        for (uint256 i = 0; i < s.SpaceShips[_shipId].moduleSlots; i++) {
-            currentModules[i] = s.equippedShipModuleType[_shipId][i];
-        }
+    // function returnEquippedModuleSlots(
+    //     uint256 _shipId
+    // ) external view returns (ShipModule[] memory) {
+    //     uint256 maxModules = s.SpaceShips[_shipId].moduleSlots;
+    //     ShipModule[] memory currentModules = new ShipModule[](maxModules);
+    //     for (uint256 i = 0; i < s.SpaceShips[_shipId].moduleSlots; i++) {
+    //         currentModules[i] = s.equippedShipModuleType[_shipId][i];
+    //     }
 
-        return currentModules;
-    }
+    //     return currentModules;
+    // }
 
     function getShipStatsDiamond(
         uint256 _shipId

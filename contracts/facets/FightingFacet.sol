@@ -275,6 +275,8 @@ contract FightingFacet is Modifiers {
             _attackInstanceId
         ];
 
+        require(!attackToResolve.resolved, "attack resolved!");
+
         //@Retreat Path.
 
         //@notice if the attacked Planet isnt eligible to be attacked on the resolve time, retreat ships
@@ -580,7 +582,8 @@ contract FightingFacet is Modifiers {
             );
         }
 
-        delete s.runningAttacks[_attackInstanceId];
+        s.runningAttacks[_attackInstanceId].resolved = true;
+        //delete s.runningAttacks[_attackInstanceId];
     }
 
     // helper functions for applying debuff and buff

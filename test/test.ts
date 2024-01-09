@@ -2509,6 +2509,7 @@ describe("Game Core Features Testing", function () {
       let checkOwnershipBuildingsbefore =
         await buildingsFacet.getAllBuildings(terraformedPlanetId);
 
+      await advanceTimeAndBlock(1000);
       await buildingsFacet
         .connect(randomUser)
         .mineResources(terraformedPlanetId);
@@ -2620,7 +2621,7 @@ describe("Game Core Features Testing", function () {
     });
   });
 
-  describe("Ship Customization Testing", function () {
+  describe.skip("Ship Customization Testing", function () {
     it("User can equip shipModule on their ship", async function () {
       const {
         owner,

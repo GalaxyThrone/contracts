@@ -84,6 +84,7 @@ export async function deployDiamond(logOutput: boolean = true) {
     "FightingFacet",
     "ManagementFacet",
     "TutorialFacet",
+    "CommanderFacet",
   ];
   const cut = [];
   for (const FacetName of FacetNames) {

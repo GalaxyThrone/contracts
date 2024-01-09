@@ -50,6 +50,7 @@ struct attackStatus {
     address attacker;
     uint256 attackInstanceId;
     uint256[] attackSeed;
+    bool resolved;
 }
 
 struct ShipType {
@@ -156,6 +157,21 @@ struct PeaceDeal {
     uint endTime;
 }
 
+struct Commander {
+    uint faction;
+    string name;
+    uint EXP;
+    uint256[3] traits;
+    uint veteranRank;
+}
+
+struct CommanderTrait {
+    string name;
+    uint value;
+    uint level;
+    uint[5] expRequirementsLevel;
+}
+
 struct AppStorage {
     address crystalAddress;
     address antimatterAddress;
@@ -202,7 +218,13 @@ struct AppStorage {
     mapping(string => bool) playerNameOwnership;
     mapping(uint => DiplomacyDeal) diplomacyDeals;
     mapping(address => mapping(address => PeaceDeal)) activePeaceDeals;
+    // Nested mapping for predefined commanders. Faction -> CommanderType -> CommanderStructPreset
+    mapping(uint => mapping(uint => Commander)) presetCommander;
     mapping(address => bool) hasClaimedCommander;
+    mapping(uint => Commander) CommanderStats;
+    mapping(address => uint) currentCommanderNft;
+    mapping(address => mapping(uint => bool)) activeCommanderTraits;
+    mapping(uint => CommanderTrait) traitMapping;
     uint256 maxTechCount;
     uint256 dealCounter;
     uint256 sendAttackId;

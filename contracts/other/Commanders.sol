@@ -21,6 +21,9 @@ contract Commanders is ERC721EnumerableUpgradeable, OwnableUpgradeable {
     // Nested mapping for predefined commanders
     mapping(uint => mapping(uint => Commander)) private presetCommanders;
 
+    // Mapping for deployed Commanders
+    mapping(uint => bool) private commanderDeploymentStatus;
+
     string private _uri;
 
     modifier onlyGameDiamond() {
@@ -39,18 +42,44 @@ contract Commanders is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         return presetCommanders[_factionId][_commanderId];
     }
 
+    function checkCommanderDeployStatus(
+        uint _commanderId
+    ) public view returns (bool) {
+        return commanderDeploymentStatus[_commanderId];
+    }
+
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 tokenId
+    ) internal override {
+        super._beforeTokenTransfer(from, to, tokenId);
+
+        require(
+            !checkCommanderDeployStatus(tokenId),
+            "Commanders: Commander is deployed"
+        );
+    }
+
+    function unDeployCommander(uint _commanderId) external onlyGameDiamond {
+        commanderDeploymentStatus[_commanderId] = false;
+    }
+
     function mint(
         address _account,
         uint256 _commanderId,
         uint _factionId
     ) external onlyGameDiamond returns (uint256) {
         require(_commanderId >= 0 && _commanderId <= 2, "Invalid commander ID");
+
+        uint nftId = totalSupply() + 1;
         Commander memory newCommander = _presetCommander(
             _factionId,
             _commanderId
         );
         CommandersData[_commanderId] = newCommander;
-        _safeMint(_account, _commanderId);
+        _safeMint(_account, nftId);
+        commanderDeploymentStatus[nftId] = true;
         return _commanderId;
     }
 
