@@ -48,64 +48,64 @@ Each faction has three pre-set Commanders to choose from, each with unique bonus
 
 1. **Commander Vektrix**
 
-   - **Bonus**: +15% to EM Damage.
+   - **Preset-Trait**: +15% to EM Damage.
    - **Lore**: Vektrix, the scientist-turned-cyborg, commands fleets with unrivaled EM warfare expertise.
 
 2. **Commander Seraphel**
 
-   - **Bonus**: +20% to Fleet EM-Defense.
+   - **Preset-Trait**: +20% to Fleet EM-Defense.
    - **Lore**: Cybernetically enhanced Seraphel is a tactical genius, ensuring her fleet's resilience.
 
 3. **Commander Nova**
-   - **Bonus**: Enhanced ShipType production speed by 20%.
+   - **Preset-Trait**: Enhanced ShipType production speed by 20%.
    - **Lore**: The innovative engineer, Nova, leads with advanced ship designs, ensuring fleet supremacy.
 
 ### The Naxians
 
 1. **Commander Korgath**
 
-   - **Bonus**: +15% Kinetic Damage.
+   - **Preset-Trait**: +15% Kinetic Damage.
    - **Lore**: Korgath, a warrior of unmatched efficiency, ensures every shot counts in battle.
 
 2. **Commander Lunara**
 
-   - **Bonus**: +30% to mining yield.
+   - **Preset-Trait**: +30% to mining yield.
    - **Lore**: Lunara, born in the asteroid belts, excels in resource extraction.
 
 3. **Commander Rexar**
-   - **Bonus**: +20% Kinetic Defense.
+   - **Preset-Trait**: +20% Kinetic Defense.
    - **Lore**: The shield expert Rexar is known for his defensive strategies, saving countless fleets.
 
 ### The Netharim
 
 1. **Commander Zethos**
 
-   - **Bonus**: -15% Fleet Travel Time.
+   - **Preset-Trait**: -15% Fleet Travel Time.
    - **Lore**: Zethos, the FTL travel pioneer, ensures his fleets are always strategically positioned.
 
 2. **Commander Illari**
 
-   - **Bonus**: +10% to Research Speed.
+   - **Preset-Trait**: +10% to Research Speed.
    - **Lore**: The curious Illari drives rapid technological advancements.
 
 3. **Commander Raelon**
-   - **Bonus**: +20% Ship Defense.
+   - **Preset-Trait**: +20% Ship Defense.
    - **Lore**: The strategist Raelon focuses on defensive preparations, creating impenetrable fleets.
 
 ### The Xantheans
 
 1. **Commander Sylas**
 
-   - **Bonus**: -15% Crafting Time.
+   - **Preset-Trait**: -15% Crafting Time.
    - **Lore**: Sylas, known for his interconnectedness, streamlines ship and structure formation.
 
 2. **Commander Lyria**
 
-   - **Bonus**: +30% to Ship Speed.
+   - **Preset-Trait**: +30% to Ship Speed.
    - **Lore**: The explorer Lyria ensures her fleets are swift and agile in space.
 
 3. **Commander Phaelon**
-   - **Bonus**: Enhanced planetary defenses by 25%.
+   - **Preset-Trait**: Enhanced planetary defenses by 25%.
    - **Lore**: Phaelon, the protector, focuses on the impregnable defense of Xanthean territories.
 
 ## Additional Notes
