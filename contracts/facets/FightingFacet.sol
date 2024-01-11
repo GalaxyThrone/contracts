@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-import {AppStorage, Modifiers, CraftItem, SendTerraform, attackStatus, ShipType, Building} from "../libraries/AppStorage.sol";
+import {AppStorage, Modifiers, CraftItem, SendTerraform, attackStatus, ShipType, Building, AttackResolveState} from "../libraries/AppStorage.sol";
 import "../interfaces/IPlanets.sol";
 import "../interfaces/IShips.sol";
 import "../interfaces/IERC20.sol";
@@ -275,7 +275,10 @@ contract FightingFacet is Modifiers {
             _attackInstanceId
         ];
 
-        require(!attackToResolve.resolved, "attack resolved!");
+        require(
+            attackToResolve.resolvedStatus == AttackResolveState.Unresolved,
+            "attack resolved!"
+        );
 
         //@Retreat Path.
 
@@ -342,6 +345,13 @@ contract FightingFacet is Modifiers {
         int256 totalDefenseStrength = defenseStrength[0] +
             defenseStrength[1] +
             defenseStrength[2];
+
+        // Apply Commander Buffs
+        //@TODO testing
+        //Admiral's Impenetrable Mustache [ID 11], 5% more total defense strength
+        if (s.activeCommanderTraits[msg.sender][11]) {
+            totalDefenseStrength += (totalDefenseStrength * 5) / 100;
+        }
 
         if (
             (totalDefenseStrength * 100) / totalAttackStrength <
@@ -440,7 +450,15 @@ contract FightingFacet is Modifiers {
         }
 
         //Planets have an inherent defense strength which is type agnostic;
+
         int256 FLAT_PLANETDEFENSE = 1000;
+        // Apply Commander Buffs
+        //@TODO testing
+        //Bunker Philosophy [ID 9], 100% more base planet defense
+        if (s.activeCommanderTraits[msg.sender][9]) {
+            FLAT_PLANETDEFENSE += 1000;
+        }
+
         battleResult -= FLAT_PLANETDEFENSE;
 
         //attacker has higher atk than defender
@@ -489,6 +507,10 @@ contract FightingFacet is Modifiers {
                     attackToResolve.attacker
                 );
 
+                s
+                    .runningAttacks[_attackInstanceId]
+                    .resolvedStatus = AttackResolveState.ResolvedAndConquered;
+
                 emit planetConquered(
                     _attackInstanceId,
                     attackToResolve.toPlanet,
@@ -525,6 +547,10 @@ contract FightingFacet is Modifiers {
                 //sending ships home
 
                 returnShipsToHome(attackToResolve.fromPlanet, attackerShips);
+                s
+                    .runningAttacks[_attackInstanceId]
+                    .resolvedStatus = AttackResolveState
+                    .ResolvedAndWonButNotConquered;
 
                 emit attackLost(
                     _attackInstanceId,
@@ -564,6 +590,9 @@ contract FightingFacet is Modifiers {
 
             returnShipsToHome(attackToResolve.fromPlanet, attackerShips);
 
+            s
+                .runningAttacks[_attackInstanceId]
+                .resolvedStatus = AttackResolveState.ResolvedAndLost;
             emit attackLost(
                 _attackInstanceId,
                 attackToResolve.toPlanet,
@@ -574,7 +603,9 @@ contract FightingFacet is Modifiers {
         //draw -> currently leads to zero losses, only a retreat
         if (battleResult == 0) {
             returnShipsToHome(attackToResolve.fromPlanet, attackerShips);
-
+            s
+                .runningAttacks[_attackInstanceId]
+                .resolvedStatus = AttackResolveState.ResolvedAndLost;
             emit attackLost(
                 _attackInstanceId,
                 attackToResolve.toPlanet,
@@ -582,7 +613,9 @@ contract FightingFacet is Modifiers {
             );
         }
 
-        s.runningAttacks[_attackInstanceId].resolved = true;
+        //update timeToBeResolved to be the time when it was actually resolved for easier historical tracking.
+        s.runningAttacks[_attackInstanceId].timeResolved = block.timestamp;
+
         //delete s.runningAttacks[_attackInstanceId];
     }
 
@@ -747,6 +780,12 @@ contract FightingFacet is Modifiers {
         uint256 arrivalTime = xDist + yDist + block.timestamp;
         if (factionOfPlayer == 2) {
             arrivalTime -= (((xDist + yDist) * 30) / 100);
+        }
+        // Apply Commander Buffs
+        //@TODO testing
+        //Are we there yet? [ID 7], 15% faster ship travel time
+        if (s.activeCommanderTraits[msg.sender][7]) {
+            arrivalTime -= (((xDist + yDist) * 15) / 100);
         }
 
         return arrivalTime;

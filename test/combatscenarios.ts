@@ -28,7 +28,7 @@ const {
   loadFixture,
 } = require("@nomicfoundation/hardhat-network-helpers");
 
-describe.skip("Combat Mechanics Testing", function () {
+describe("Combat Mechanics Testing", function () {
   let g: any;
 
   let vrfFacet: RegisterFacet;

@@ -4,6 +4,13 @@ pragma solidity 0.8.17;
 import {LibDiamond} from "./LibDiamond.sol";
 import "../interfaces/IERC721.sol";
 
+enum AttackResolveState {
+    Unresolved,
+    ResolvedAndConquered,
+    ResolvedAndWonButNotConquered,
+    ResolvedAndLost
+}
+
 struct CraftItem {
     uint256 amount;
     uint256 planetId;
@@ -50,7 +57,8 @@ struct attackStatus {
     address attacker;
     uint256 attackInstanceId;
     uint256[] attackSeed;
-    bool resolved;
+    uint256 timeResolved;
+    AttackResolveState resolvedStatus; // if AttackResolveState is Unresolved this is the Attack arrival timestamp. Otherwise its the Resolve Timestamp of the ATtack.
 }
 
 struct ShipType {

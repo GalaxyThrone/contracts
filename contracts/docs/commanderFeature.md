@@ -57,7 +57,8 @@ Each faction has three pre-set Commanders to choose from, each with unique bonus
    - **Lore**: Cybernetically enhanced Seraphel is a tactical genius, ensuring her fleet's resilience.
 
 3. **Commander Nova**
-   - **Preset-Trait**: Enhanced ShipType production speed by 20%.
+
+   - **Preset-Trait**: -10% Ship Crafting Time.
    - **Lore**: The innovative engineer, Nova, leads with advanced ship designs, ensuring fleet supremacy.
 
 ### The Naxians
@@ -69,11 +70,11 @@ Each faction has three pre-set Commanders to choose from, each with unique bonus
 
 2. **Commander Lunara**
 
-   - **Preset-Trait**: +30% to asteroid mining yield.
+   - **Preset-Trait**: +20% to asteroid mining yield.
    - **Lore**: Lunara, born in the asteroid belts, excels in resource extraction.
 
 3. **Commander Rexar**
-   - **Preset-Trait**: +20% Kinetic Defense.
+   - **Preset-Trait**: +10% Buff to Ships Health
    - **Lore**: The shield expert Rexar is known for his defensive strategies, saving countless fleets.
 
 ### The Netharim
@@ -85,11 +86,11 @@ Each faction has three pre-set Commanders to choose from, each with unique bonus
 
 2. **Commander Illari**
 
-   - **Preset-Trait**: +20% to Research Speed.
+   - **Preset-Trait**: 20% Buff to Research Cooldown
    - **Lore**: The curious Illari drives rapid technological advancements.
 
 3. **Commander Raelon**
-   - **Preset-Trait**: +10% Total Ship Defense.
+   - **Preset-Trait**: +30% Buff to Defensive Buildings Strength
    - **Lore**: The strategist Raelon focuses on defensive preparations, creating impenetrable fleets.
 
 ### The Xantheans
@@ -105,7 +106,7 @@ Each faction has three pre-set Commanders to choose from, each with unique bonus
    - **Lore**: The explorer Lyria ensures her fleets are swift and agile in space.
 
 3. **Commander Phaelon**
-   - **Preset-Trait**: Enhanced planetary structure defenses by 25%.
+   - **Preset-Trait**: 5% Improved Total Defense Strength for Ships and Buildings.
    - **Lore**: Phaelon, the protector, focuses on the impregnable defense of Xanthean territories.
 
 ## Additional Notes

@@ -140,6 +140,14 @@ contract ManagementFacet is Modifiers {
             s.aetherHeldPlayer[msg.sender] -= price[3];
         }
 
+        // Apply Commander Buffs
+        //@TODO testing
+        //Motivational Research Speaker [ID 8], 20% less research cooldown
+
+        if (s.activeCommanderTraits[msg.sender][8]) {
+            cooldown -= (cooldown * 20) / 100;
+        }
+
         s.lastResearchTimeCooldown[msg.sender] = block.timestamp + cooldown;
         s.playerTechnologies[msg.sender][_techTree][_techIdToResearch] = true;
 

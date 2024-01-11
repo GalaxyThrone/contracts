@@ -112,7 +112,7 @@ contract RegisterFacet is Modifiers {
 
         // 0,1,2 commander choices.
         require(
-            _commanderChoice >= 0 && _commanderChoice < 3,
+            _commanderChoice > 0 && _commanderChoice < 4,
             "Invalid commander choice"
         );
 

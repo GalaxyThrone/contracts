@@ -63,17 +63,33 @@ contract ShipsFacet is Modifiers {
 
         craftTimeBuffed = craftTime;
 
-        if (s.playerTechnologies[msg.sender][3][2]) {
-            //  Rapid Infrastructure Development, reduce craft time by 10%;
+        // Apply each relevant research buff
 
+        //  Rapid Infrastructure Development, reduce craft time by 10%;
+        if (s.playerTechnologies[msg.sender][3][2]) {
             readyTimestamp -= ((craftTime * _amount) * 10) / 100; // 10% reduction in total craft time
-            craftTimeBuffed = (craftTimeBuffed * 90) / 100; // 10% reduction in craft time per building
+            craftTimeBuffed = (craftTimeBuffed * 90) / 100; // 10% reduction in craft time per ship
             //Resource-Savvy Constructions, reduce prices by 10%
             if (s.playerTechnologies[msg.sender][3][3]) {
                 for (uint i = 0; i < price.length; i++) {
                     price[i] -= (price[i] * 10) / 100; // 10% reduction in costs for all resources
                 }
             }
+        }
+
+        // Apply Commander Buffs
+
+        //@TODO testing
+        //Ship Production Micromanagement Guru [ID 3], 10% faster ship crafting time
+        if (s.activeCommanderTraits[msg.sender][3]) {
+            readyTimestamp -= ((craftTime * _amount) * 10) / 100; // 10% reduction in total craft time
+            craftTimeBuffed = (craftTimeBuffed * 90) / 100; // 10% reduction in craft time per ship
+        }
+        //@TODO testing
+        //Explorer Mindset [ID 10], 50% faster crafting of terraformers;
+        if (_fleetId == 9 && s.activeCommanderTraits[msg.sender][10]) {
+            readyTimestamp -= ((craftTime * _amount) * 50) / 100; // 50% reduction in total craft time
+            craftTimeBuffed = (craftTimeBuffed * 50) / 100; // 50% reduction in craft time per terraformer
         }
 
         CraftItem memory newFleet = CraftItem(
@@ -222,10 +238,34 @@ contract ShipsFacet is Modifiers {
 
             // Apply Commander Buffs
             //@TODO testing
-            //EM Warfare Mastery Trait [ID 1], 15% extra on EM Attack.
+            //EM Warfare Mastery Trait [ID 1], 20% extra on EM Attack.
             if (s.activeCommanderTraits[planetOwner][1]) {
                 newShipType.attackTypes[2] +=
-                    (s.shipType[shipTypeId].attackTypes[2] * 15) /
+                    (s.shipType[shipTypeId].attackTypes[2] * 20) /
+                    100;
+            }
+
+            //@TODO testing
+            //EM Hardening Mastery Trait [ID 2], 20% extra on EM Defense.
+            if (s.activeCommanderTraits[planetOwner][2]) {
+                newShipType.defenseTypes[2] +=
+                    (s.shipType[shipTypeId].defenseTypes[2] * 20) /
+                    100;
+            }
+
+            //@TODO testing
+            //Kinetic Warfare Mastery Trait [ID 4], 20% extra on Kinetic Attack.
+            if (s.activeCommanderTraits[planetOwner][4]) {
+                newShipType.attackTypes[0] +=
+                    (s.shipType[shipTypeId].attackTypes[0] * 20) /
+                    100;
+            }
+
+            //@TODO testing
+            // More Ship-Hulls Philosophy [ID 6], 10% extra Ship Health.
+            if (s.activeCommanderTraits[planetOwner][6]) {
+                newShipType.health +=
+                    (s.shipType[shipTypeId].health * 10) /
                     100;
             }
 
@@ -579,6 +619,13 @@ contract ShipsFacet is Modifiers {
             //Naxian Asteroid Mining Buff
             if (s.playersFaction[msg.sender] == 1) {
                 buffedAsteroidMiningYield += 2; // representing 10% increase
+            }
+
+            // Apply Commander Buffs
+
+            //Home is where the minerals are[ ID 5], 20% increase on asteroid mining yield
+            if (s.activeCommanderTraits[msg.sender][5]) {
+                buffedAsteroidMiningYield += 4; // representing 20% increase
             }
         }
 
@@ -965,6 +1012,13 @@ contract ShipsFacet is Modifiers {
         uint256 arrivalTime = xDist + yDist + 600 + block.timestamp;
         if (factionOfPlayer == 2) {
             arrivalTime -= (((xDist + yDist) * 30) / 100);
+        }
+
+        // Apply Commander Buffs
+        //@TODO testing
+        //Are we there yet? [ID 7], 15% faster ship travel time
+        if (s.activeCommanderTraits[msg.sender][7]) {
+            arrivalTime -= (((xDist + yDist) * 15) / 100);
         }
 
         return arrivalTime;
