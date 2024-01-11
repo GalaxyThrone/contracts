@@ -19,6 +19,7 @@ import {
   FightingFacet,
   ManagementFacet,
   Aether,
+  CommanderFacet,
 } from "../typechain-types";
 import { addBuildings } from "./addBuildings";
 import { addFleets } from "./addFleets";
@@ -194,6 +195,11 @@ export async function deployDiamond(logOutput: boolean = true) {
     diamond.address
   )) as AdminFacet;
 
+  const commanderFacet = (await ethers.getContractAt(
+    "CommanderFacet",
+    diamond.address
+  )) as CommanderFacet;
+
   // log("deploying GovernanceToken");
   // const GovernanceToken = await ethers.getContractFactory("GovernanceToken");
   // //founders governance tokens go to multisig addr
@@ -233,6 +239,9 @@ export async function deployDiamond(logOutput: boolean = true) {
   await addUtilityTechLevels(diamond.address);
   log("adding Factions");
   await addFaction(diamond.address, 4);
+
+  log("adding commanders");
+  await commanderFacet.setupPresetCommanders();
 
   log("starting init");
 
