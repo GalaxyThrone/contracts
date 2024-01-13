@@ -30,7 +30,12 @@ contract FightingFacet is Modifiers {
         address indexed Attacker
     );
 
-    event BattleResult(int256 result);
+    event BattleResult(
+        uint atkId,
+        uint resolvedTimestamp,
+        uint[] burnedAttackerShips,
+        uint[] burnedDefenderShips
+    );
 
     function sendAttack(
         uint256 _fromPlanetId,
@@ -83,14 +88,9 @@ contract FightingFacet is Modifiers {
             delete s.assignedPlanet[_shipIds[i]];
         }
 
-        //to be deleted later @TODO
-        uint256 distance = 420;
-
         attackStatus memory attackToBeAdded;
 
         attackToBeAdded.attackStarted = block.timestamp;
-
-        attackToBeAdded.distance = distance;
 
         attackToBeAdded.timeToBeResolved = calculateTravelTime(
             _fromPlanetId,
@@ -108,7 +108,6 @@ contract FightingFacet is Modifiers {
 
         s.sendAttackId++;
 
-        attackToBeAdded.attackInstanceId = s.sendAttackId;
         s.runningAttacks[s.sendAttackId] = attackToBeAdded;
 
         AdminFacet(address(this)).drawRandomAttackSeed(s.sendAttackId);
@@ -281,7 +280,6 @@ contract FightingFacet is Modifiers {
         );
 
         //@Retreat Path.
-
         //@notice if the attacked Planet isnt eligible to be attacked on the resolve time, retreat ships
         address attackedOwner = IERC721(s.planetsAddress).ownerOf(
             attackToResolve.toPlanet
@@ -295,8 +293,9 @@ contract FightingFacet is Modifiers {
                 attackToResolve.attackerShipsIds
             );
 
-            delete s.runningAttacks[_attackInstanceId];
-
+            s
+                .runningAttacks[_attackInstanceId]
+                .resolvedStatus = AttackResolveState.ResolvedAndLost;
             return;
         }
 
@@ -306,8 +305,19 @@ contract FightingFacet is Modifiers {
         );
 
         uint256[] memory attackerShips = attackToResolve.attackerShipsIds;
-        uint256[] memory defenderShips = ShipsFacet(address(this))
-            .getDefensePlanetDetailedIds(attackToResolve.toPlanet);
+        uint256[] memory defenderShips = getDefensePlanetFleetIds(
+            attackToResolve.toPlanet
+        );
+
+        uint256[] memory burnedAttackerShips = new uint256[](
+            attackerShips.length
+        );
+        uint256[] memory burnedDefenderShips = new uint256[](
+            defenderShips.length
+        );
+
+        uint256 burnedAttackerShipCount = 0;
+        uint256 burnedDefenderShipCount = 0;
 
         int256[3] memory attackStrength;
         int256 attackHealth;
@@ -316,8 +326,9 @@ contract FightingFacet is Modifiers {
         int256 defenseHealth;
 
         //load defense buildings
-        uint256[] memory buildingsPlanetCount = BuildingsFacet(address(this))
-            .getAllBuildings(attackToResolve.toPlanet);
+        uint256[] memory buildingsPlanetCount = getAllBuildingsDefender(
+            attackToResolve.toPlanet
+        );
 
         //@TODO to be refactored to accomodate new attackTypes / Defense Types
         (attackStrength, attackHealth) = calculateAttackBattleStats(
@@ -349,7 +360,7 @@ contract FightingFacet is Modifiers {
         // Apply Commander Buffs
         //@TODO testing
         //Admiral's Impenetrable Mustache [ID 11], 5% more total defense strength
-        if (s.activeCommanderTraits[msg.sender][11]) {
+        if (s.activeCommanderTraits[attackedOwner][11]) {
             totalDefenseStrength += (totalDefenseStrength * 5) / 100;
         }
 
@@ -455,7 +466,7 @@ contract FightingFacet is Modifiers {
         // Apply Commander Buffs
         //@TODO testing
         //Bunker Philosophy [ID 9], 100% more base planet defense
-        if (s.activeCommanderTraits[msg.sender][9]) {
+        if (s.activeCommanderTraits[attackedOwner][9]) {
             FLAT_PLANETDEFENSE += 1000;
         }
 
@@ -471,19 +482,13 @@ contract FightingFacet is Modifiers {
                 //burn NFTs
                 //remove  shipID assignment to Planet
 
+                IShips(s.shipsAddress).burnShips(defenderShips);
                 for (uint256 i = 0; i < defenderShips.length; i++) {
-                    IShips(s.shipsAddress).burnShip(defenderShips[i]);
-
                     delete s.assignedPlanet[defenderShips[i]];
                 }
 
-                //conquer planet
-                //give new owner the planet
-                address loserAddr = IERC721(s.planetsAddress).ownerOf(
-                    attackToResolve.toPlanet
-                );
-
-                int takenDamageAttackers = totalDefenseStrength / 20;
+                //@notice losing ships despite winning
+                int takenDamageAttackers = totalDefenseStrength / 30;
 
                 for (uint i = 0; i < attackerShips.length; i++) {
                     int256 attackerShipHealth = int256(
@@ -493,8 +498,15 @@ contract FightingFacet is Modifiers {
                     if (takenDamageAttackers > attackerShipHealth) {
                         takenDamageAttackers -= attackerShipHealth;
 
-                        IShips(s.shipsAddress).burnShip(attackerShips[i]);
-                        delete s.assignedPlanet[attackerShips[i]];
+                        // Add ship ID to the array instead of burning it immediately
+                        burnedAttackerShips[
+                            burnedAttackerShipCount
+                        ] = attackerShips[i];
+                        burnedAttackerShipCount++;
+
+                        //@notice GAS OPTIMIZATION FIX:
+                        //@notice the ship was already unassigned, so no need to delete.
+                        //delete s.assignedPlanet[attackerShips[i]];
                         delete attackerShips[i];
                     }
                 }
@@ -503,7 +515,7 @@ contract FightingFacet is Modifiers {
 
                 IPlanets(s.planetsAddress).planetConquestTransfer(
                     attackToResolve.toPlanet,
-                    loserAddr,
+                    attackedOwner,
                     attackToResolve.attacker
                 );
 
@@ -514,7 +526,7 @@ contract FightingFacet is Modifiers {
                 emit planetConquered(
                     _attackInstanceId,
                     attackToResolve.toPlanet,
-                    loserAddr,
+                    attackedOwner,
                     attackToResolve.attacker
                 );
 
@@ -528,19 +540,24 @@ contract FightingFacet is Modifiers {
             //burn killed ships until there are no more left; then reassign attacking fleet to home-planet
             else {
                 //burn nfts and unassign ship from planets
+
                 for (uint256 i = 0; i < defenderShips.length; i++) {
                     int256 defenderShipHealth = int256(
                         s.SpaceShips[defenderShips[i]].health
                     );
-
                     if (battleResult > defenderShipHealth) {
                         battleResult -= defenderShipHealth;
 
-                        IShips(s.shipsAddress).burnShip(defenderShips[i]);
+                        // Add ship ID to the array instead of burning it immediately
+                        burnedDefenderShips[
+                            burnedDefenderShipCount
+                        ] = defenderShips[i];
+                        burnedDefenderShipCount++;
 
                         delete s.assignedPlanet[defenderShips[i]];
 
-                        delete defenderShips[i];
+                        //@notice GAS OPTIMIZATION FIX:
+                        //@notice the ship was already unassigned, so no need to delete.
                     }
                 }
 
@@ -564,11 +581,7 @@ contract FightingFacet is Modifiers {
 
         if (battleResult < 0) {
             if (battleResult + attackHealth < 0) {
-                for (uint256 i = 0; i < attackerShips.length; i++) {
-                    IShips(s.shipsAddress).burnShip(attackerShips[i]);
-
-                    delete s.assignedPlanet[attackerShips[i]];
-                }
+                IShips(s.shipsAddress).burnShips(attackerShips);
             } else {
                 //burn attacker nfts that lost
                 for (uint256 i = 0; i < attackerShips.length; i++) {
@@ -579,10 +592,15 @@ contract FightingFacet is Modifiers {
                     if (battleResult < attackerShipHealth) {
                         battleResult += attackerShipHealth;
 
-                        IShips(s.shipsAddress).burnShip(attackerShips[i]);
+                        // Add ship ID to the array instead of burning it immediately
+                        burnedAttackerShips[
+                            burnedAttackerShipCount
+                        ] = attackerShips[i];
+                        burnedAttackerShipCount++;
 
-                        delete s.assignedPlanet[attackerShips[i]];
-
+                        //@notice GAS OPTIMIZATION FIX:
+                        //@notice the ship was already unassigned, so no need to delete.
+                        //delete s.assignedPlanet[attackerShips[i]];
                         delete attackerShips[i];
                     }
                 }
@@ -613,10 +631,75 @@ contract FightingFacet is Modifiers {
             );
         }
 
-        //update timeToBeResolved to be the time when it was actually resolved for easier historical tracking.
-        s.runningAttacks[_attackInstanceId].timeResolved = block.timestamp;
+        if (burnedAttackerShipCount > 0) {
+            uint256[] memory actualBurnedAttackerShips = new uint256[](
+                burnedAttackerShipCount
+            );
+            for (uint256 i = 0; i < burnedAttackerShipCount; i++) {
+                actualBurnedAttackerShips[i] = burnedAttackerShips[i];
+            }
+            IShips(s.shipsAddress).burnShips(actualBurnedAttackerShips);
+        }
 
+        if (burnedDefenderShipCount > 0) {
+            uint256[] memory actualBurnedDefenderShips = new uint256[](
+                burnedDefenderShipCount
+            );
+            for (uint256 i = 0; i < burnedDefenderShipCount; i++) {
+                actualBurnedDefenderShips[i] = burnedDefenderShips[i];
+            }
+            IShips(s.shipsAddress).burnShips(actualBurnedDefenderShips);
+        }
+
+        //update timeToBeResolved to be the time when it was actually resolved for easier historical tracking.
+        //s.runningAttacks[_attackInstanceId].timeResolved = block.timestamp;
+
+        emit BattleResult(
+            _attackInstanceId,
+            block.timestamp,
+            burnedAttackerShips,
+            burnedDefenderShips
+        );
         //delete s.runningAttacks[_attackInstanceId];
+    }
+
+    function getDefensePlanetFleetIds(
+        uint256 _planetId
+    ) internal view returns (uint256[] memory) {
+        address defenderPlayer = IERC721(s.planetsAddress).ownerOf(_planetId);
+        uint256 totalShips = IERC721(s.shipsAddress).balanceOf(defenderPlayer);
+
+        uint256[] memory defenseFleet = new uint256[](totalShips);
+        uint256 index = 0;
+
+        for (uint256 i = 0; i < totalShips; i++) {
+            uint256 shipId = IERC721(s.shipsAddress).tokenOfOwnerByIndex(
+                defenderPlayer,
+                i
+            );
+            if (s.assignedPlanet[shipId] == _planetId) {
+                defenseFleet[index++] = shipId;
+            }
+        }
+
+        // Truncate the array to the actual number of defender ships found
+        uint256[] memory defenseFleetToReturn = new uint256[](index);
+        for (uint256 i = 0; i < index; i++) {
+            defenseFleetToReturn[i] = defenseFleet[i];
+        }
+
+        return defenseFleetToReturn;
+    }
+
+    function getAllBuildingsDefender(
+        uint256 _planetId
+    ) internal view returns (uint256[] memory) {
+        uint256[] memory buildingsCount = new uint256[](s.totalBuildingTypes);
+
+        for (uint256 i = 0; i < s.totalBuildingTypes; i++) {
+            buildingsCount[i] = s.buildings[_planetId][i];
+        }
+        return buildingsCount;
     }
 
     // helper functions for applying debuff and buff

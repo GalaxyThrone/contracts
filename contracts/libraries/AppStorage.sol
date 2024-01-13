@@ -49,15 +49,12 @@ struct RequestConfig {
 
 struct attackStatus {
     uint256 attackStarted;
-    uint256 distance;
     uint256 timeToBeResolved;
     uint256 fromPlanet;
     uint256 toPlanet;
     uint256[] attackerShipsIds;
     address attacker;
-    uint256 attackInstanceId;
     uint256[] attackSeed;
-    uint256 timeResolved;
     AttackResolveState resolvedStatus; // if AttackResolveState is Unresolved this is the Attack arrival timestamp. Otherwise its the Resolve Timestamp of the ATtack.
 }
 

@@ -127,11 +127,13 @@ contract Ships is ERC721EnumerableUpgradeable, OwnableUpgradeable {
     }
 
     function burnShip(uint256 _shipId) external onlyGameDiamond {
-        _transfer(
-            ownerOf(_shipId),
-            address(0x0000000000000000000000000000000000000001),
-            _shipId
-        );
+        _burn(_shipId);
+    }
+
+    function burnShips(uint256[] calldata _shipIds) external onlyGameDiamond {
+        for (uint256 i = 0; i < _shipIds.length; i++) {
+            _burn(_shipIds[i]);
+        }
     }
 
     function getShipStats(

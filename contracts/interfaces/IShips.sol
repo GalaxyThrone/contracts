@@ -40,7 +40,7 @@ interface IShips {
     function getCargo(uint256 _fleetId) external view returns (uint256);
 
     function burnShip(uint256 _shipId) external;
-
+    function burnShips(uint256[] calldata _shipId) external;
     function assignShipToPlanet(uint256 _shipId, uint256 _toPlanetId) external;
 
     function deleteShipFromPlanet(uint256 _shipId) external;
