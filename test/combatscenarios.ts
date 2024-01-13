@@ -24,7 +24,9 @@ import { PromiseOrValue } from "../typechain-types/common";
 
 const chalk = require("chalk");
 
-const { loadFixture } = require("@nomicfoundation/hardhat-network-helpers");
+const {
+  loadFixture,
+} = require("@nomicfoundation/hardhat-network-helpers");
 
 describe("Combat Mechanics Testing", function () {
   let g: any;
@@ -47,8 +49,13 @@ describe("Combat Mechanics Testing", function () {
   let allianceFacet: AllianceFacet;
 
   async function deployUsers() {
-    const [owner, randomUser, randomUserTwo, randomUserThree, AdminUser] =
-      await ethers.getSigners();
+    const [
+      owner,
+      randomUser,
+      randomUserTwo,
+      randomUserThree,
+      AdminUser,
+    ] = await ethers.getSigners();
 
     return {
       owner,
@@ -76,7 +83,9 @@ describe("Combat Mechanics Testing", function () {
     );
     const timestampBefore = blockBefore.timestamp;
 
-    await ethers.provider.send("evm_mine", [timestampBefore + quantity]);
+    await ethers.provider.send("evm_mine", [
+      timestampBefore + quantity,
+    ]);
   };
 
   const registerUser = async (user: string | Signer | Provider) => {
@@ -87,7 +96,9 @@ describe("Combat Mechanics Testing", function () {
     user: string | Signer | Provider,
     planetId: PromiseOrValue<BigNumberish>
   ) => {
-    return await buildingsFacet.connect(user).craftBuilding(10, planetId, 1);
+    return await buildingsFacet
+      .connect(user)
+      .craftBuilding(10, planetId, 1);
   };
 
   const claimBuilding = async (
@@ -161,7 +172,9 @@ describe("Combat Mechanics Testing", function () {
     user: string | Signer | Provider,
     terraformIndex: PromiseOrValue<BigNumberish>
   ) => {
-    return await shipsFacet.connect(user).endTerraform(terraformIndex);
+    return await shipsFacet
+      .connect(user)
+      .endTerraform(terraformIndex);
   };
 
   async function setupUser(
@@ -175,7 +188,10 @@ describe("Combat Mechanics Testing", function () {
     await registerUser(user);
 
     // Get the user's initial planet
-    const planetId = await planetNfts.tokenOfOwnerByIndex(userAddress, 0);
+    const planetId = await planetNfts.tokenOfOwnerByIndex(
+      userAddress,
+      0
+    );
 
     // Craft and claim buildings
     for (let i = 0; i < buildings; i++) {
@@ -192,13 +208,20 @@ describe("Combat Mechanics Testing", function () {
     }
   }
 
-  async function getShipIdsForOwner(user: Signer): Promise<BigNumber[]> {
+  async function getShipIdsForOwner(
+    user: Signer
+  ): Promise<BigNumber[]> {
     const userAddress = await user.getAddress();
-    const shipCount = (await shipNfts.balanceOf(userAddress)).toNumber();
+    const shipCount = (
+      await shipNfts.balanceOf(userAddress)
+    ).toNumber();
     const shipIds: BigNumber[] = [];
 
     for (let i = 0; i < shipCount; i++) {
-      const shipId = await shipNfts.tokenOfOwnerByIndex(userAddress, i);
+      const shipId = await shipNfts.tokenOfOwnerByIndex(
+        userAddress,
+        i
+      );
       shipIds.push(shipId);
     }
 
@@ -229,9 +252,15 @@ describe("Combat Mechanics Testing", function () {
       g.planetsAddress
     )) as Planets;
 
-    shipNfts = (await ethers.getContractAt("Ships", g.shipsAddress)) as Ships;
+    shipNfts = (await ethers.getContractAt(
+      "Ships",
+      g.shipsAddress
+    )) as Ships;
 
-    metalToken = (await ethers.getContractAt("Metal", g.metalAddress)) as Metal;
+    metalToken = (await ethers.getContractAt(
+      "Metal",
+      g.metalAddress
+    )) as Metal;
 
     crystalToken = (await ethers.getContractAt(
       "Crystal",
@@ -271,9 +300,11 @@ describe("Combat Mechanics Testing", function () {
     await adminFacet.startInit(20, 1);
   });
 
-  describe.only("Combat Balance Testing", function () {
+  describe("Combat Balance Testing", function () {
     it("scenario 1: user1 attacks with 10 Bombers against 1 Capital Destroyer and ? entire fleet", async function () {
-      const { randomUser, randomUserTwo } = await loadFixture(deployUsers);
+      const { randomUser, randomUserTwo } = await loadFixture(
+        deployUsers
+      );
 
       const attackerUnits = 20;
       const defenderUnits = 4;
@@ -362,12 +393,19 @@ describe("Combat Mechanics Testing", function () {
 
       console.log(`Gas Used: ${gasUsed.toString()}`);
       console.log(
-        `Gas Price: ${ethers.utils.formatUnits(gasPrice, "gwei")} Gwei`
+        `Gas Price: ${ethers.utils.formatUnits(
+          gasPrice,
+          "gwei"
+        )} Gwei`
       );
-      console.log(`Total Gas Cost: ${ethers.utils.formatEther(gasCost)} ETH`);
+      console.log(
+        `Total Gas Cost: ${ethers.utils.formatEther(gasCost)} ETH`
+      );
 
       // Assert that user1 has won, and has therefore kept all ships
-      const shipsOwnedByPlayer1 = await getShipIdsForOwner(randomUser);
+      const shipsOwnedByPlayer1 = await getShipIdsForOwner(
+        randomUser
+      );
 
       // Assert player2 still has ships
       const checkOwnershipShipsPlayer = await shipNfts.balanceOf(
@@ -375,14 +413,18 @@ describe("Combat Mechanics Testing", function () {
       );
 
       // Assert that user2 has lost, and has therefore lost all ships
-      const shipsOwnedByPlayer2 = await getShipIdsForOwner(randomUserTwo);
+      const shipsOwnedByPlayer2 = await getShipIdsForOwner(
+        randomUserTwo
+      );
       //expect(shipsOwnedByPlayer2.length).to.equal(3);
 
       // Generate ASCII Art
       console.log(
         `\n${chalk.blue(
           "+----------------- ATTACKERS -----------------+"
-        )}    ${chalk.red("+----------------- DEFENDERS -----------------+")}`
+        )}    ${chalk.red(
+          "+----------------- DEFENDERS -----------------+"
+        )}`
       );
       console.log(
         `|                                             |    |                                             |`
@@ -412,7 +454,9 @@ describe("Combat Mechanics Testing", function () {
       console.log(
         `${chalk.blue(
           "+---------------------------------------------+"
-        )}    ${chalk.red("+---------------------------------------------+")}`
+        )}    ${chalk.red(
+          "+---------------------------------------------+"
+        )}`
       );
 
       const ASCII_Art_Result = (
@@ -421,7 +465,9 @@ describe("Combat Mechanics Testing", function () {
         attackerCost: BigNumber[],
         defenderCost: BigNumber[]
       ) => {
-        console.log(`\n+------------ ${chalk.yellow("RESULT")} -----------+`);
+        console.log(
+          `\n+------------ ${chalk.yellow("RESULT")} -----------+`
+        );
         console.log(
           `|   ${chalk.cyan("Player 1")} | ${chalk.green(
             "Ships Remaining"
@@ -443,7 +489,9 @@ describe("Combat Mechanics Testing", function () {
         console.log(`+-------------------------------+`);
 
         console.log(
-          `\n${chalk.yellow("+------------ GAS DETAILS -----------+")}`
+          `\n${chalk.yellow(
+            "+------------ GAS DETAILS -----------+"
+          )}`
         );
         console.log(
           `|   ${chalk.cyan("Gas Used:")} ${chalk.magenta(
@@ -471,7 +519,9 @@ describe("Combat Mechanics Testing", function () {
     });
 
     it("scenario 1.1: user1 attacks with 10 Bombers against 2 Capital Destroyer and ? entire fleet", async function () {
-      const { randomUser, randomUserTwo } = await loadFixture(deployUsers);
+      const { randomUser, randomUserTwo } = await loadFixture(
+        deployUsers
+      );
 
       const attackerUnits = 10;
       const defenderUnits = 2;
@@ -549,7 +599,9 @@ describe("Combat Mechanics Testing", function () {
       await attackResolveReceipt.wait();
 
       // Assert that user1 has won, and has therefore kept all ships
-      const shipsOwnedByPlayer1 = await getShipIdsForOwner(randomUser);
+      const shipsOwnedByPlayer1 = await getShipIdsForOwner(
+        randomUser
+      );
 
       // Assert player2 still has ships
       const checkOwnershipShipsPlayer = await shipNfts.balanceOf(
@@ -557,14 +609,18 @@ describe("Combat Mechanics Testing", function () {
       );
 
       // Assert that user2 has lost, and has therefore lost all ships
-      const shipsOwnedByPlayer2 = await getShipIdsForOwner(randomUserTwo);
+      const shipsOwnedByPlayer2 = await getShipIdsForOwner(
+        randomUserTwo
+      );
       expect(shipsOwnedByPlayer2.length).to.equal(0);
 
       // Generate ASCII Art
       console.log(
         `\n${chalk.blue(
           "+----------------- ATTACKERS -----------------+"
-        )}    ${chalk.red("+----------------- DEFENDERS -----------------+")}`
+        )}    ${chalk.red(
+          "+----------------- DEFENDERS -----------------+"
+        )}`
       );
       console.log(
         `|                                             |    |                                             |`
@@ -594,7 +650,9 @@ describe("Combat Mechanics Testing", function () {
       console.log(
         `${chalk.blue(
           "+---------------------------------------------+"
-        )}    ${chalk.red("+---------------------------------------------+")}`
+        )}    ${chalk.red(
+          "+---------------------------------------------+"
+        )}`
       );
 
       const ASCII_Art_Result = (
@@ -603,7 +661,9 @@ describe("Combat Mechanics Testing", function () {
         attackerCost: BigNumber[],
         defenderCost: BigNumber[]
       ) => {
-        console.log(`\n+------------ ${chalk.yellow("RESULT")} -----------+`);
+        console.log(
+          `\n+------------ ${chalk.yellow("RESULT")} -----------+`
+        );
         console.log(
           `|   ${chalk.cyan("Player 1")} | ${chalk.green(
             "Ships Remaining"
@@ -633,7 +693,9 @@ describe("Combat Mechanics Testing", function () {
     });
 
     it("scenario 1.2: user1 attacks with 10 Bombers against 3 Capital Destroyer and ? entire fleet", async function () {
-      const { randomUser, randomUserTwo } = await loadFixture(deployUsers);
+      const { randomUser, randomUserTwo } = await loadFixture(
+        deployUsers
+      );
 
       const attackerUnits = 10;
       const defenderUnits = 3;
@@ -711,7 +773,9 @@ describe("Combat Mechanics Testing", function () {
       await attackResolveReceipt.wait();
 
       // Assert that user1 has won, and has therefore kept all ships
-      const shipsOwnedByPlayer1 = await getShipIdsForOwner(randomUser);
+      const shipsOwnedByPlayer1 = await getShipIdsForOwner(
+        randomUser
+      );
 
       // Assert player2 still has ships
       const checkOwnershipShipsPlayer = await shipNfts.balanceOf(
@@ -719,14 +783,18 @@ describe("Combat Mechanics Testing", function () {
       );
 
       // Assert that user2 has lost, and has therefore lost all ships
-      const shipsOwnedByPlayer2 = await getShipIdsForOwner(randomUserTwo);
+      const shipsOwnedByPlayer2 = await getShipIdsForOwner(
+        randomUserTwo
+      );
       expect(shipsOwnedByPlayer2.length).to.be.above(0);
 
       // Generate ASCII Art
       console.log(
         `\n${chalk.blue(
           "+----------------- ATTACKERS -----------------+"
-        )}    ${chalk.red("+----------------- DEFENDERS -----------------+")}`
+        )}    ${chalk.red(
+          "+----------------- DEFENDERS -----------------+"
+        )}`
       );
       console.log(
         `|                                             |    |                                             |`
@@ -756,7 +824,9 @@ describe("Combat Mechanics Testing", function () {
       console.log(
         `${chalk.blue(
           "+---------------------------------------------+"
-        )}    ${chalk.red("+---------------------------------------------+")}`
+        )}    ${chalk.red(
+          "+---------------------------------------------+"
+        )}`
       );
 
       const ASCII_Art_Result = (
@@ -765,7 +835,9 @@ describe("Combat Mechanics Testing", function () {
         attackerCost: BigNumber[],
         defenderCost: BigNumber[]
       ) => {
-        console.log(`\n+------------ ${chalk.yellow("RESULT")} -----------+`);
+        console.log(
+          `\n+------------ ${chalk.yellow("RESULT")} -----------+`
+        );
         console.log(
           `|   ${chalk.cyan("Player 1")} | ${chalk.green(
             "Ships Remaining"
@@ -795,7 +867,9 @@ describe("Combat Mechanics Testing", function () {
     });
 
     it("scenario 1.3: user1 attacks with 10 Bombers against 4 Capital Destroyer and ? entire fleet", async function () {
-      const { randomUser, randomUserTwo } = await loadFixture(deployUsers);
+      const { randomUser, randomUserTwo } = await loadFixture(
+        deployUsers
+      );
 
       const attackerUnits = 10;
       const defenderUnits = 4;
@@ -873,7 +947,9 @@ describe("Combat Mechanics Testing", function () {
       await attackResolveReceipt.wait();
 
       // Assert that user1 has won, and has therefore kept all ships
-      const shipsOwnedByPlayer1 = await getShipIdsForOwner(randomUser);
+      const shipsOwnedByPlayer1 = await getShipIdsForOwner(
+        randomUser
+      );
 
       // Assert player2 still has ships
       const checkOwnershipShipsPlayer = await shipNfts.balanceOf(
@@ -881,14 +957,18 @@ describe("Combat Mechanics Testing", function () {
       );
 
       // Assert that user2 has lost, and has therefore lost all ships
-      const shipsOwnedByPlayer2 = await getShipIdsForOwner(randomUserTwo);
+      const shipsOwnedByPlayer2 = await getShipIdsForOwner(
+        randomUserTwo
+      );
       expect(shipsOwnedByPlayer2.length).to.be.above(0);
 
       // Generate ASCII Art
       console.log(
         `\n${chalk.blue(
           "+----------------- ATTACKERS -----------------+"
-        )}    ${chalk.red("+----------------- DEFENDERS -----------------+")}`
+        )}    ${chalk.red(
+          "+----------------- DEFENDERS -----------------+"
+        )}`
       );
       console.log(
         `|                                             |    |                                             |`
@@ -918,7 +998,9 @@ describe("Combat Mechanics Testing", function () {
       console.log(
         `${chalk.blue(
           "+---------------------------------------------+"
-        )}    ${chalk.red("+---------------------------------------------+")}`
+        )}    ${chalk.red(
+          "+---------------------------------------------+"
+        )}`
       );
 
       const ASCII_Art_Result = (
@@ -927,7 +1009,9 @@ describe("Combat Mechanics Testing", function () {
         attackerCost: BigNumber[],
         defenderCost: BigNumber[]
       ) => {
-        console.log(`\n+------------ ${chalk.yellow("RESULT")} -----------+`);
+        console.log(
+          `\n+------------ ${chalk.yellow("RESULT")} -----------+`
+        );
         console.log(
           `|   ${chalk.cyan("Player 1")} | ${chalk.green(
             "Ships Remaining"
@@ -956,7 +1040,9 @@ describe("Combat Mechanics Testing", function () {
       );
     });
     it("scenario 1.4: user1 attacks with 10 Bombers against 5 Capital Destroyer and ? entire fleet", async function () {
-      const { randomUser, randomUserTwo } = await loadFixture(deployUsers);
+      const { randomUser, randomUserTwo } = await loadFixture(
+        deployUsers
+      );
 
       const attackerUnits = 10;
       const defenderUnits = 5;
@@ -1034,7 +1120,9 @@ describe("Combat Mechanics Testing", function () {
       await attackResolveReceipt.wait();
 
       // Assert that user1 has won, and has therefore kept all ships
-      const shipsOwnedByPlayer1 = await getShipIdsForOwner(randomUser);
+      const shipsOwnedByPlayer1 = await getShipIdsForOwner(
+        randomUser
+      );
 
       // Assert player2 still has ships
       const checkOwnershipShipsPlayer = await shipNfts.balanceOf(
@@ -1042,14 +1130,18 @@ describe("Combat Mechanics Testing", function () {
       );
 
       // Assert that user2 has lost, and has therefore lost all ships
-      const shipsOwnedByPlayer2 = await getShipIdsForOwner(randomUserTwo);
+      const shipsOwnedByPlayer2 = await getShipIdsForOwner(
+        randomUserTwo
+      );
       expect(shipsOwnedByPlayer2.length).to.be.above(0);
 
       // Generate ASCII Art
       console.log(
         `\n${chalk.blue(
           "+----------------- ATTACKERS -----------------+"
-        )}    ${chalk.red("+----------------- DEFENDERS -----------------+")}`
+        )}    ${chalk.red(
+          "+----------------- DEFENDERS -----------------+"
+        )}`
       );
       console.log(
         `|                                             |    |                                             |`
@@ -1079,7 +1171,9 @@ describe("Combat Mechanics Testing", function () {
       console.log(
         `${chalk.blue(
           "+---------------------------------------------+"
-        )}    ${chalk.red("+---------------------------------------------+")}`
+        )}    ${chalk.red(
+          "+---------------------------------------------+"
+        )}`
       );
 
       const ASCII_Art_Result = (
@@ -1088,7 +1182,9 @@ describe("Combat Mechanics Testing", function () {
         attackerCost: BigNumber[],
         defenderCost: BigNumber[]
       ) => {
-        console.log(`\n+------------ ${chalk.yellow("RESULT")} -----------+`);
+        console.log(
+          `\n+------------ ${chalk.yellow("RESULT")} -----------+`
+        );
         console.log(
           `|   ${chalk.cyan("Player 1")} | ${chalk.green(
             "Ships Remaining"
@@ -1117,7 +1213,9 @@ describe("Combat Mechanics Testing", function () {
       );
     });
     it("scenario 1.5: user1 attacks with 10 Bombers against 7 Capital Destroyer and ? entire fleet", async function () {
-      const { randomUser, randomUserTwo } = await loadFixture(deployUsers);
+      const { randomUser, randomUserTwo } = await loadFixture(
+        deployUsers
+      );
 
       const attackerUnits = 10;
       const defenderUnits = 7;
@@ -1195,7 +1293,9 @@ describe("Combat Mechanics Testing", function () {
       await attackResolveReceipt.wait();
 
       // Assert that user1 has won, and has therefore kept all ships
-      const shipsOwnedByPlayer1 = await getShipIdsForOwner(randomUser);
+      const shipsOwnedByPlayer1 = await getShipIdsForOwner(
+        randomUser
+      );
 
       // Assert player2 still has ships
       const checkOwnershipShipsPlayer = await shipNfts.balanceOf(
@@ -1203,14 +1303,18 @@ describe("Combat Mechanics Testing", function () {
       );
 
       // Assert that user2 has lost, and has therefore lost all ships
-      const shipsOwnedByPlayer2 = await getShipIdsForOwner(randomUserTwo);
+      const shipsOwnedByPlayer2 = await getShipIdsForOwner(
+        randomUserTwo
+      );
       expect(shipsOwnedByPlayer2.length).to.be.above(0);
 
       // Generate ASCII Art
       console.log(
         `\n${chalk.blue(
           "+----------------- ATTACKERS -----------------+"
-        )}    ${chalk.red("+----------------- DEFENDERS -----------------+")}`
+        )}    ${chalk.red(
+          "+----------------- DEFENDERS -----------------+"
+        )}`
       );
       console.log(
         `|                                             |    |                                             |`
@@ -1240,7 +1344,9 @@ describe("Combat Mechanics Testing", function () {
       console.log(
         `${chalk.blue(
           "+---------------------------------------------+"
-        )}    ${chalk.red("+---------------------------------------------+")}`
+        )}    ${chalk.red(
+          "+---------------------------------------------+"
+        )}`
       );
 
       const ASCII_Art_Result = (
@@ -1249,7 +1355,9 @@ describe("Combat Mechanics Testing", function () {
         attackerCost: BigNumber[],
         defenderCost: BigNumber[]
       ) => {
-        console.log(`\n+------------ ${chalk.yellow("RESULT")} -----------+`);
+        console.log(
+          `\n+------------ ${chalk.yellow("RESULT")} -----------+`
+        );
         console.log(
           `|   ${chalk.cyan("Player 1")} | ${chalk.green(
             "Ships Remaining"
@@ -1278,7 +1386,9 @@ describe("Combat Mechanics Testing", function () {
       );
     });
     it("scenario 2: user1 attacks with 10 Raiders against 10 Bombers and ? entire fleet", async function () {
-      const { randomUser, randomUserTwo } = await loadFixture(deployUsers);
+      const { randomUser, randomUserTwo } = await loadFixture(
+        deployUsers
+      );
 
       const attackerUnits = 10;
       const defenderUnits = 10;
@@ -1353,7 +1463,9 @@ describe("Combat Mechanics Testing", function () {
       await attackResolveReceipt.wait();
 
       // Assert that user1 has won, and has therefore kept all ships
-      const shipsOwnedByPlayer1 = await getShipIdsForOwner(randomUser);
+      const shipsOwnedByPlayer1 = await getShipIdsForOwner(
+        randomUser
+      );
 
       // Assert player2 still has ships
       const checkOwnershipShipsPlayer = await shipNfts.balanceOf(
@@ -1361,14 +1473,18 @@ describe("Combat Mechanics Testing", function () {
       );
 
       // Assert that user2 has lost, and has therefore lost all ships
-      const shipsOwnedByPlayer2 = await getShipIdsForOwner(randomUserTwo);
+      const shipsOwnedByPlayer2 = await getShipIdsForOwner(
+        randomUserTwo
+      );
       expect(shipsOwnedByPlayer2.length).to.equal(0);
 
       // Generate ASCII Art
       console.log(
         `\n${chalk.blue(
           "+----------------- ATTACKERS -----------------+"
-        )}    ${chalk.red("+----------------- DEFENDERS -----------------+")}`
+        )}    ${chalk.red(
+          "+----------------- DEFENDERS -----------------+"
+        )}`
       );
       console.log(
         `|                                             |    |                                             |`
@@ -1398,7 +1514,9 @@ describe("Combat Mechanics Testing", function () {
       console.log(
         `${chalk.blue(
           "+---------------------------------------------+"
-        )}    ${chalk.red("+---------------------------------------------+")}`
+        )}    ${chalk.red(
+          "+---------------------------------------------+"
+        )}`
       );
 
       const ASCII_Art_Result = (
@@ -1407,7 +1525,9 @@ describe("Combat Mechanics Testing", function () {
         attackerCost: BigNumber[],
         defenderCost: BigNumber[]
       ) => {
-        console.log(`\n+------------ ${chalk.yellow("RESULT")} -----------+`);
+        console.log(
+          `\n+------------ ${chalk.yellow("RESULT")} -----------+`
+        );
         console.log(
           `|   ${chalk.cyan("Player 1")} | ${chalk.green(
             "Ships Remaining"
@@ -1437,7 +1557,9 @@ describe("Combat Mechanics Testing", function () {
     });
 
     it("scenario 3: user1 attacks with 10 Raiders against 3 warships and ? entire fleet", async function () {
-      const { randomUser, randomUserTwo } = await loadFixture(deployUsers);
+      const { randomUser, randomUserTwo } = await loadFixture(
+        deployUsers
+      );
 
       const attackerUnits = 10;
       const defenderUnits = 3;
@@ -1512,7 +1634,9 @@ describe("Combat Mechanics Testing", function () {
       await attackResolveReceipt.wait();
 
       // Assert that user1 has won, and has therefore kept all ships
-      const shipsOwnedByPlayer1 = await getShipIdsForOwner(randomUser);
+      const shipsOwnedByPlayer1 = await getShipIdsForOwner(
+        randomUser
+      );
 
       // Assert player2 still has ships
       const checkOwnershipShipsPlayer = await shipNfts.balanceOf(
@@ -1520,14 +1644,18 @@ describe("Combat Mechanics Testing", function () {
       );
 
       // Assert that user2 has lost, and has therefore lost all ships
-      const shipsOwnedByPlayer2 = await getShipIdsForOwner(randomUserTwo);
+      const shipsOwnedByPlayer2 = await getShipIdsForOwner(
+        randomUserTwo
+      );
       expect(shipsOwnedByPlayer2.length).to.be.above(0);
 
       // Generate ASCII Art
       console.log(
         `\n${chalk.blue(
           "+----------------- ATTACKERS -----------------+"
-        )}    ${chalk.red("+----------------- DEFENDERS -----------------+")}`
+        )}    ${chalk.red(
+          "+----------------- DEFENDERS -----------------+"
+        )}`
       );
       console.log(
         `|                                             |    |                                             |`
@@ -1557,7 +1685,9 @@ describe("Combat Mechanics Testing", function () {
       console.log(
         `${chalk.blue(
           "+---------------------------------------------+"
-        )}    ${chalk.red("+---------------------------------------------+")}`
+        )}    ${chalk.red(
+          "+---------------------------------------------+"
+        )}`
       );
 
       const ASCII_Art_Result = (
@@ -1566,7 +1696,9 @@ describe("Combat Mechanics Testing", function () {
         attackerCost: BigNumber[],
         defenderCost: BigNumber[]
       ) => {
-        console.log(`\n+------------ ${chalk.yellow("RESULT")} -----------+`);
+        console.log(
+          `\n+------------ ${chalk.yellow("RESULT")} -----------+`
+        );
         console.log(
           `|   ${chalk.cyan("Player 1")} | ${chalk.green(
             "Ships Remaining"
@@ -1596,7 +1728,9 @@ describe("Combat Mechanics Testing", function () {
     });
 
     it("scenario 3.1: user1 attacks with 10 Raiders against 4 warships and ? entire fleet", async function () {
-      const { randomUser, randomUserTwo } = await loadFixture(deployUsers);
+      const { randomUser, randomUserTwo } = await loadFixture(
+        deployUsers
+      );
 
       const attackerUnits = 10;
       const defenderUnits = 4;
@@ -1671,7 +1805,9 @@ describe("Combat Mechanics Testing", function () {
       await attackResolveReceipt.wait();
 
       // Assert that user1 has won, and has therefore kept all ships
-      const shipsOwnedByPlayer1 = await getShipIdsForOwner(randomUser);
+      const shipsOwnedByPlayer1 = await getShipIdsForOwner(
+        randomUser
+      );
 
       // Assert player2 still has ships
       const checkOwnershipShipsPlayer = await shipNfts.balanceOf(
@@ -1679,14 +1815,18 @@ describe("Combat Mechanics Testing", function () {
       );
 
       // Assert that user2 has lost, and has therefore lost all ships
-      const shipsOwnedByPlayer2 = await getShipIdsForOwner(randomUserTwo);
+      const shipsOwnedByPlayer2 = await getShipIdsForOwner(
+        randomUserTwo
+      );
       expect(shipsOwnedByPlayer2.length).to.be.above(0);
 
       // Generate ASCII Art
       console.log(
         `\n${chalk.blue(
           "+----------------- ATTACKERS -----------------+"
-        )}    ${chalk.red("+----------------- DEFENDERS -----------------+")}`
+        )}    ${chalk.red(
+          "+----------------- DEFENDERS -----------------+"
+        )}`
       );
       console.log(
         `|                                             |    |                                             |`
@@ -1716,7 +1856,9 @@ describe("Combat Mechanics Testing", function () {
       console.log(
         `${chalk.blue(
           "+---------------------------------------------+"
-        )}    ${chalk.red("+---------------------------------------------+")}`
+        )}    ${chalk.red(
+          "+---------------------------------------------+"
+        )}`
       );
 
       const ASCII_Art_Result = (
@@ -1725,7 +1867,9 @@ describe("Combat Mechanics Testing", function () {
         attackerCost: BigNumber[],
         defenderCost: BigNumber[]
       ) => {
-        console.log(`\n+------------ ${chalk.yellow("RESULT")} -----------+`);
+        console.log(
+          `\n+------------ ${chalk.yellow("RESULT")} -----------+`
+        );
         console.log(
           `|   ${chalk.cyan("Player 1")} | ${chalk.green(
             "Ships Remaining"
