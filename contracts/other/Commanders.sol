@@ -36,7 +36,7 @@ contract Commanders is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         uint _commanderId
     ) private view returns (Commander memory) {
         require(
-            _factionId <= 3 && _commanderId <= 2,
+            _factionId <= 3 && _commanderId < 4,
             "Invalid faction or commander ID"
         );
         return presetCommanders[_factionId][_commanderId];
@@ -70,7 +70,7 @@ contract Commanders is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         uint256 _commanderId,
         uint _factionId
     ) external onlyGameDiamond returns (uint256) {
-        require(_commanderId >= 0 && _commanderId <= 2, "Invalid commander ID");
+        require(_commanderId > 0 && _commanderId < 4, "Invalid commander ID");
 
         uint nftId = totalSupply() + 1;
         Commander memory newCommander = _presetCommander(
