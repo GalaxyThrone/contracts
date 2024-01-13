@@ -86,6 +86,16 @@ describe("Research Technology Testing", function () {
     return await registerFacet.connect(user).startRegister(0, 3);
   };
 
+  const registerUserWithCommander = async (
+    user: string | Signer | Provider,
+    factionId: PromiseOrValue<BigNumberish>,
+    commanderId: PromiseOrValue<BigNumberish>
+  ) => {
+    return await registerFacet
+      .connect(user)
+      .startRegisterWithCommander(factionId, 3, commanderId);
+  };
+
   const craftBuilding = async (
     user: string | Signer | Provider,
     planetId: PromiseOrValue<BigNumberish>

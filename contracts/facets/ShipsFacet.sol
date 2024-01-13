@@ -237,7 +237,7 @@ contract ShipsFacet is Modifiers {
             }
 
             // Apply Commander Buffs
-            //@TODO testing
+
             //EM Warfare Mastery Trait [ID 1], 20% extra on EM Attack.
             if (s.activeCommanderTraits[planetOwner][1]) {
                 newShipType.attackTypes[2] +=

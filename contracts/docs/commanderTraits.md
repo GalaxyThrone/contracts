@@ -19,7 +19,7 @@ struct CommanderTrait {
 
 ## Traits
 
-### EM Warfare Mastery Trait [ID 1]
+### EM Warfare Mastery Trait [ID 1] [Tested]
 
 - **Trait ID**: 1
 - **Description**: 20% Buff to Ships Electromagnetic Damage
