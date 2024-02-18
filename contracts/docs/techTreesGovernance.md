@@ -1,7 +1,7 @@
 ### Governance Tech Tree (ID 3)
 
 ```typescript
-Military Tech Tree
+Governance Tech Tree
 ├── 1. Rapid Infrastructure Development  (Tech ID: 1)
 │    └── 2. Fleet Fabrication Mastery  (Tech ID: 2)
 │         ├── 3. Resource-Savvy Constructions  (Tech ID: 3)
