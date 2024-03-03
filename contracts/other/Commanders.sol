@@ -51,9 +51,10 @@ contract Commanders is ERC721EnumerableUpgradeable, OwnableUpgradeable {
     function _beforeTokenTransfer(
         address from,
         address to,
-        uint256 tokenId
+        uint256 tokenId,
+        uint256 amount
     ) internal override {
-        super._beforeTokenTransfer(from, to, tokenId);
+    super._beforeTokenTransfer(from, to, tokenId, amount);
 
         require(
             !checkCommanderDeployStatus(tokenId),
