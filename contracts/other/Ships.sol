@@ -6,8 +6,12 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {IERC20} from "../interfaces/IERC20.sol";
 import "@openzeppelin/contracts/utils/Base64.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
 
 contract Ships is ERC721EnumerableUpgradeable, OwnableUpgradeable {
+
+    using Counters for Counters.Counter;
+    Counters.Counter private _tokenIdCounter;
     address public gameDiamond;
 
     struct ShipType {
@@ -77,11 +81,11 @@ contract Ships is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         address _account,
         uint256 _shipTypeId
     ) external onlyGameDiamond returns (uint256) {
-        uint256 shipId = totalSupply() + 1;
+        _tokenIdCounter.increment();
+       uint256 shipId = _tokenIdCounter.current();
         SpaceShips[shipId] = shipType[_shipTypeId];
-
         _safeMint(_account, shipId);
-        return (shipId);
+        return shipId;
     }
 
     function addShipType(

@@ -104,7 +104,7 @@ contract AdminFacet is Modifiers {
 
         uint256[] memory _randomness = new uint256[](5);
         // generate 5 pseudo random numbers using blockhash, timestamp
-        for (uint256 i = 0; i < 5; i++) {
+        for (uint256 i = 0; i < 5; ++i) {
             _randomness[i] = uint256(
                 keccak256(
                     abi.encodePacked(
@@ -129,7 +129,7 @@ contract AdminFacet is Modifiers {
         // drawRandomNumbers();
         uint256[] memory _randomness = new uint256[](5);
         // generate 5 pseudo random numbers using blockhash, timestamp
-        for (uint256 i = 0; i < 5; i++) {
+        for (uint256 i = 0; i < 5; ++i) {
             _randomness[i] = uint256(
                 keccak256(
                     abi.encodePacked(
@@ -150,7 +150,7 @@ contract AdminFacet is Modifiers {
         uint256[] memory _randomness,
         uint256 typeOfPlanet
     ) internal {
-        for (uint256 i = 0; i < _amount; i++) {
+        for (uint256 i = 0; i < _amount; ++i) {
             _randomness[0] = uint256(keccak256(abi.encode(_randomness[0], i)));
             _randomness[1] = uint256(keccak256(abi.encode(_randomness[0], i)));
             _randomness[2] = uint256(keccak256(abi.encode(_randomness[0], i)));

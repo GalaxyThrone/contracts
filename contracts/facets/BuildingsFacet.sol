@@ -131,7 +131,7 @@ contract BuildingsFacet is Modifiers {
 
         uint256[3] memory boosts = getBoosts(currentCraft.itemId);
         s.buildings[_planetId][currentCraft.itemId] += claimableAmount;
-        for (uint256 i = 0; i < 3; i++) {
+        for (uint256 i = 0; i < 3; ++i) {
             if (boosts[i] > 0) {
                 s.boosts[_planetId][i] += boosts[i] * claimableAmount;
             }
@@ -159,7 +159,7 @@ contract BuildingsFacet is Modifiers {
         Building memory buildingToRecycle = s.buildingTypes[_buildingId];
 
         //uint RECYCLE_MALUS = 50;
-        for (uint i = 0; i < 3; i++) {
+        for (uint i = 0; i < 3; ++i) {
             s.planetResources[_planetId][i] +=
                 (buildingToRecycle.price[i] * 50) /
                 100;
@@ -192,7 +192,7 @@ contract BuildingsFacet is Modifiers {
 
         uint256 hoursPassed = timePassed / 1 hours; // Calculate hours since last claimed
 
-        for (uint256 i = 0; i < 3; i++) {
+        for (uint256 i = 0; i < 3; ++i) {
             uint256 boost = s.boosts[_planetId][i];
             uint256 baseMiningRatePerHour = 500 ether + (boost * 1e18);
             uint256 amountMined = baseMiningRatePerHour * hoursPassed;
@@ -261,7 +261,7 @@ contract BuildingsFacet is Modifiers {
 
             uint256 hoursPassed = timePassed / 1 hours; // Calculate hours since last claimed
 
-            for (uint256 i = 0; i < 3; i++) {
+            for (uint256 i = 0; i < 3; ++i) {
                 uint256 boost = s.boosts[_planetId][i];
                 uint256 baseMiningRatePerHour = 500 ether + (boost * 1e18);
                 uint256 amountMined = baseMiningRatePerHour * hoursPassed;
@@ -375,14 +375,14 @@ contract BuildingsFacet is Modifiers {
 
         uint256[] memory ownedPlanets = new uint256[](totalCount);
 
-        for (uint256 i = 0; i < totalCount; i++) {
+        for (uint256 i = 0; i < totalCount; ++i) {
             ownedPlanets[i] = IERC721(s.planetsAddress).tokenOfOwnerByIndex(
                 _player,
                 i
             );
         }
 
-        for (uint256 i = 0; i < totalCount; i++) {
+        for (uint256 i = 0; i < totalCount; ++i) {
             currentlyCraftedBuildings[counter] = s.craftBuildings[
                 ownedPlanets[i]
             ];
@@ -425,7 +425,7 @@ contract BuildingsFacet is Modifiers {
             _buildingId.length
         );
 
-        for (uint256 i = 0; i < _buildingId.length; i++) {
+        for (uint256 i = 0; i < _buildingId.length; ++i) {
             buildingTypesArray[i] = s.buildingTypes[i];
         }
 
@@ -444,7 +444,7 @@ contract BuildingsFacet is Modifiers {
     ) external view returns (uint256[] memory) {
         uint256[] memory buildingsCount = new uint256[](s.totalBuildingTypes);
 
-        for (uint256 i = 0; i < s.totalBuildingTypes; i++) {
+        for (uint256 i = 0; i < s.totalBuildingTypes; ++i) {
             buildingsCount[i] = s.buildings[_planetId][i];
         }
         return buildingsCount;

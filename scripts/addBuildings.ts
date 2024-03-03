@@ -101,7 +101,7 @@ export async function addBuildings(diamondAddr: string) {
       ethers.utils.parseEther("1000"),
       ethers.utils.parseEther("1000"),
     ],
-    boosts: [1000, 0, 0],
+    boosts: [100, 0, 0],
 
     defenseTypes: [0, 0, 0],
     health: 50,
@@ -111,11 +111,11 @@ export async function addBuildings(diamondAddr: string) {
 
   const building8: Building = {
     price: [
+      ethers.utils.parseEther("1000"),
       ethers.utils.parseEther("3000"),
       ethers.utils.parseEther("1000"),
-      ethers.utils.parseEther("1000"),
     ],
-    boosts: [0, 1000, 0],
+    boosts: [0, 100, 0],
 
     defenseTypes: [0, 0, 0],
     health: 50,
@@ -125,11 +125,11 @@ export async function addBuildings(diamondAddr: string) {
 
   const building9: Building = {
     price: [
+      ethers.utils.parseEther("1000"),
+      ethers.utils.parseEther("1000"),
       ethers.utils.parseEther("3000"),
-      ethers.utils.parseEther("1000"),
-      ethers.utils.parseEther("1000"),
     ],
-    boosts: [0, 0, 1000],
+    boosts: [0, 0, 100],
 
     defenseTypes: [0, 0, 0],
     health: 50,

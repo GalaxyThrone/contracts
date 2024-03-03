@@ -123,7 +123,7 @@ contract ManagementFacet is Modifiers {
         }
 
         // Check if the planet has enough resources
-        for (uint256 i = 0; i < 3; i++) {
+        for (uint256 i = 0; i < 3; ++i) {
             require(
                 s.planetResources[_researchBasePlanet][i] >= price[i],
                 "ManagementFacet: not enough resources"
@@ -184,7 +184,7 @@ contract ManagementFacet is Modifiers {
         address _playerAddr
     ) external view returns (bool[4][14] memory techStatuses) {
         // Iterate over tech trees and tech IDs using zero-based indexing
-        for (uint i = 0; i < 4; i++) {
+        for (uint i = 0; i < 4; ++i) {
             for (uint j = 0; j < 14; j++) {
                 // Check if the tech is researched and handle missing mapping entries
                 if (isTechResearched(_playerAddr, i + 1, j + 1)) {
@@ -269,7 +269,7 @@ contract ManagementFacet is Modifiers {
     ) internal {
         // If resources are offered, transfer from the initiator to the contract
 
-        for (uint i = 0; i < 3; i++) {
+        for (uint i = 0; i < 3; ++i) {
             require(
                 s.planetResources[_planetId][i] >= _resourceToLock[i],
                 "Not enough resources"
@@ -282,7 +282,7 @@ contract ManagementFacet is Modifiers {
         uint[3] memory _resourceToUnlock,
         uint _planetId
     ) internal {
-        for (uint i = 0; i < 3; i++) {
+        for (uint i = 0; i < 3; ++i) {
             s.planetResources[_planetId][i] += _resourceToUnlock[i];
         }
     }
@@ -291,7 +291,7 @@ contract ManagementFacet is Modifiers {
         uint[3] memory _offeredResources,
         uint _planetId
     ) internal {
-        for (uint i = 0; i < 3; i++) {
+        for (uint i = 0; i < 3; ++i) {
             s.planetResources[_planetId][i] += _offeredResources[i];
         }
     }
@@ -301,7 +301,7 @@ contract ManagementFacet is Modifiers {
         uint _planetIdPayer,
         uint _planetIdReceiver
     ) internal {
-        for (uint i = 0; i < 3; i++) {
+        for (uint i = 0; i < 3; ++i) {
             require(
                 s.planetResources[_planetIdPayer][i] >= _demandedResources[i],
                 "Not enough resources"

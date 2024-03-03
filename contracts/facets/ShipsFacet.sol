@@ -71,7 +71,7 @@ contract ShipsFacet is Modifiers {
             craftTimeBuffed = (craftTimeBuffed * 90) / 100; // 10% reduction in craft time per ship
             //Resource-Savvy Constructions, reduce prices by 10%
             if (s.playerTechnologies[msg.sender][3][3]) {
-                for (uint i = 0; i < price.length; i++) {
+                for (uint i = 0; i < price.length; ++i) {
                     price[i] -= (price[i] * 10) / 100; // 10% reduction in costs for all resources
                 }
             }
@@ -168,7 +168,7 @@ contract ShipsFacet is Modifiers {
 
         address planetOwner = IERC721(s.planetsAddress).ownerOf(_planetId);
 
-        for (uint256 i = 0; i < claimableAmount; i++) {
+        for (uint256 i = 0; i < claimableAmount; ++i) {
             shipId = IShips(s.shipsAddress).mint(
                 planetOwner,
                 currentCraft.itemId
@@ -333,14 +333,14 @@ contract ShipsFacet is Modifiers {
 
         uint256[] memory ownedPlanets = new uint256[](totalCount);
 
-        for (uint256 i = 0; i < totalCount; i++) {
+        for (uint256 i = 0; i < totalCount; ++i) {
             ownedPlanets[i] = IERC721(s.planetsAddress).tokenOfOwnerByIndex(
                 _player,
                 i
             );
         }
 
-        for (uint256 i = 0; i < totalCount; i++) {
+        for (uint256 i = 0; i < totalCount; ++i) {
             currentlyCraftedBuildings[counter] = s.craftFleets[ownedPlanets[i]];
             counter++;
         }
@@ -388,7 +388,7 @@ contract ShipsFacet is Modifiers {
 
         bool includeTerraform;
 
-        for (uint256 i = 0; i < _shipIds.length; i++) {
+        for (uint256 i = 0; i < _shipIds.length; ++i) {
             require(
                 IShips(s.shipsAddress).ownerOf(_shipIds[i]) == msg.sender,
                 "not your ship!"
@@ -449,7 +449,7 @@ contract ShipsFacet is Modifiers {
         for (
             uint256 i = 0;
             i < s.sendTerraform[_sendTerraformId].shipsIds.length;
-            i++
+            ++i
         ) {
             if (
                 this
@@ -496,6 +496,8 @@ contract ShipsFacet is Modifiers {
         IShips(s.shipsAddress).burnShip(terraformerId);
 
         emit resolvedTerraforming(_sendTerraformId);
+
+        //@TODO dont delete, put into resolved instead.
         delete s.sendTerraform[_sendTerraformId];
     }
 
@@ -515,7 +517,7 @@ contract ShipsFacet is Modifiers {
 
         //@notice, can be refactored to less calls to external contract
 
-        for (uint256 i; i < _shipIds.length; i++) {
+        for (uint256 i; i < _shipIds.length; ++i) {
             require(
                 s.assignedPlanet[_shipIds[i]] == _fromPlanetId,
                 "ship is not assigned to this planet!"
@@ -629,7 +631,7 @@ contract ShipsFacet is Modifiers {
             }
         }
 
-        for (uint256 i; i < s.outMining[_outMiningId].shipsIds.length; i++) {
+        for (uint256 i; i < s.outMining[_outMiningId].shipsIds.length; ++i) {
             uint256 cargo = getCargo(s.outMining[_outMiningId].shipsIds[i]);
             // cargo metal
 
@@ -702,7 +704,7 @@ contract ShipsFacet is Modifiers {
 
         address shipOwner = IERC721(s.shipsAddress).ownerOf(_shipIds[0]);
         if (shipOwner == IERC721(s.planetsAddress).ownerOf(_fromPlanet)) {
-            for (uint256 i = 0; i < _shipIds.length; i++) {
+            for (uint256 i = 0; i < _shipIds.length; ++i) {
                 s.assignedPlanet[_shipIds[i]] = _fromPlanet;
             }
         }
@@ -710,14 +712,14 @@ contract ShipsFacet is Modifiers {
         else if (IERC721(s.planetsAddress).balanceOf(shipOwner) == 0) {
             uint tradeHubPlanet = 1;
 
-            for (uint256 i = 0; i < _shipIds.length; i++) {
+            for (uint256 i = 0; i < _shipIds.length; ++i) {
                 s.assignedPlanet[_shipIds[i]] = tradeHubPlanet;
             }
         } else {
             uint256 alternativeHomePlanet = IERC721(s.planetsAddress)
                 .tokenOfOwnerByIndex(shipOwner, 0);
 
-            for (uint256 i = 0; i < _shipIds.length; i++) {
+            for (uint256 i = 0; i < _shipIds.length; ++i) {
                 s.assignedPlanet[_shipIds[i]] = alternativeHomePlanet;
             }
         }
@@ -825,7 +827,7 @@ contract ShipsFacet is Modifiers {
 
         uint256 carriedAmount;
 
-        for (uint256 i; i < cargoShipIds.length; i++) {
+        for (uint256 i; i < cargoShipIds.length; ++i) {
             /*
             require(
                 IShips(s.shipsAddress).ownerOf(cargoShipIds[i]) == msg.sender,
@@ -878,7 +880,7 @@ contract ShipsFacet is Modifiers {
         uint256 totalCount = IERC721(s.shipsAddress).balanceOf(_player);
 
         uint256[] memory ownedShips = new uint256[](totalCount);
-        for (uint256 i = 0; i < totalCount; i++) {
+        for (uint256 i = 0; i < totalCount; ++i) {
             ownedShips[i] = IERC721(s.shipsAddress).tokenOfOwnerByIndex(
                 _player,
                 i
@@ -887,7 +889,7 @@ contract ShipsFacet is Modifiers {
 
         uint256 currShipType;
         uint256 currShipCargo;
-        for (uint256 i = 0; i < totalCount; i++) {
+        for (uint256 i = 0; i < totalCount; ++i) {
             currShipType = s.SpaceShips[ownedShips[i]].shipType;
 
             currShipCargo = s.SpaceShips[ownedShips[i]].cargo;
@@ -916,14 +918,14 @@ contract ShipsFacet is Modifiers {
         uint256 currShipType;
         uint256 currShipCargo;
 
-        for (uint256 i = 0; i < totalCount; i++) {
+        for (uint256 i = 0; i < totalCount; ++i) {
             ownedShips[i] = IERC721(s.shipsAddress).tokenOfOwnerByIndex(
                 _player,
                 i
             );
         }
 
-        for (uint256 i = 0; i < totalCount; i++) {
+        for (uint256 i = 0; i < totalCount; ++i) {
             currShipType = s.SpaceShips[ownedShips[i]].shipType;
 
             if (s.assignedPlanet[ownedShips[i]] == _planetId) {
@@ -978,7 +980,7 @@ contract ShipsFacet is Modifiers {
         for (
             uint256 i;
             i < s.transferResource[_transferResourceId].shipsIds.length;
-            i++
+            ++i
         ) {
             //@TODO can create new function that batch-assigns ships to save gas
 
@@ -1049,7 +1051,7 @@ contract ShipsFacet is Modifiers {
         uint256 _planetId
     ) external view returns (SendTerraform[] memory) {
         uint256 totalCount;
-        for (uint256 i = 0; i < s.sendTerraformId; i++) {
+        for (uint256 i = 0; i < s.sendTerraformId; ++i) {
             if (s.sendTerraform[i].toPlanetId == _planetId) {
                 totalCount++;
             }
@@ -1061,7 +1063,7 @@ contract ShipsFacet is Modifiers {
 
         uint256 counter = 0;
 
-        for (uint256 i = 0; i < s.sendTerraformId; i++) {
+        for (uint256 i = 0; i < s.sendTerraformId; ++i) {
             if (s.sendTerraform[i].toPlanetId == _planetId) {
                 incomingTerraformers[counter] = s.sendTerraform[i];
                 counter++;
@@ -1075,7 +1077,7 @@ contract ShipsFacet is Modifiers {
         address _playerToCheck
     ) external view returns (SendTerraform[] memory) {
         uint256 totalCount;
-        for (uint256 i = 0; i < s.sendTerraformId; i++) {
+        for (uint256 i = 0; i < s.sendTerraformId; ++i) {
             if (s.sendTerraform[i].toPlanetId == 0) {
                 continue;
             }
@@ -1094,7 +1096,7 @@ contract ShipsFacet is Modifiers {
 
         uint256 counter = 0;
 
-        for (uint256 i = 0; i < s.sendTerraformId; i++) {
+        for (uint256 i = 0; i < s.sendTerraformId; ++i) {
             if (s.sendTerraform[i].toPlanetId == 0) {
                 continue;
             }
@@ -1128,7 +1130,7 @@ contract ShipsFacet is Modifiers {
         uint256 _planetId
     ) external view returns (OutMining[] memory) {
         uint256 totalCount;
-        for (uint256 i = 0; i <= s.outMiningId + 1; i++) {
+        for (uint256 i = 0; i <= s.outMiningId + 1; ++i) {
             if (s.outMining[i].toPlanetId == _planetId) {
                 totalCount++;
             }
@@ -1138,7 +1140,7 @@ contract ShipsFacet is Modifiers {
 
         uint256 counter = 0;
 
-        for (uint256 i = 0; i <= s.outMiningId + 1; i++) {
+        for (uint256 i = 0; i <= s.outMiningId + 1; ++i) {
             if (s.outMining[i].toPlanetId == _planetId) {
                 allOutMinings[counter] = s.outMining[i];
                 counter++;
@@ -1152,7 +1154,7 @@ contract ShipsFacet is Modifiers {
         address _player
     ) external view returns (OutMining[] memory) {
         uint256 totalCount;
-        for (uint256 i = 0; i <= s.outMiningId + 1; i++) {
+        for (uint256 i = 0; i <= s.outMiningId + 1; ++i) {
             if (s.outMining[i].fromPlanetId == 0) {
                 continue;
             }
@@ -1170,7 +1172,7 @@ contract ShipsFacet is Modifiers {
 
         uint256 counter = 0;
 
-        for (uint256 i = 0; i <= s.outMiningId + 1; i++) {
+        for (uint256 i = 0; i <= s.outMiningId + 1; ++i) {
             if (s.outMining[i].fromPlanetId == 0) {
                 continue;
             }
@@ -1192,7 +1194,7 @@ contract ShipsFacet is Modifiers {
         uint256 _planetId
     ) external view returns (TransferResource[] memory) {
         uint256 totalCount;
-        for (uint256 i = 1; i <= s.transferResourceId + 1; i++) {
+        for (uint256 i = 1; i <= s.transferResourceId + 1; ++i) {
             if (s.transferResource[i].fromPlanetId == _planetId) {
                 totalCount++;
             }
@@ -1204,7 +1206,7 @@ contract ShipsFacet is Modifiers {
 
         uint256 counter = 0;
 
-        for (uint256 i = 1; i <= s.transferResourceId + 1; i++) {
+        for (uint256 i = 1; i <= s.transferResourceId + 1; ++i) {
             if (s.transferResource[i].fromPlanetId == _planetId) {
                 allSendResources[counter] = s.transferResource[i];
                 counter++;
@@ -1235,7 +1237,7 @@ contract ShipsFacet is Modifiers {
     //     );
     //     require(s.availableModuleSlots[_shipId] > 0, "all Module slots taken!");
 
-    //     for (uint256 i = 0; i < 3; i++) {
+    //     for (uint256 i = 0; i < 3; ++i) {
     //         require(
     //             s.planetResources[currAssignedPlanet][i] >=
     //                 s.shipModuleType[_moduleToEquip].price[i],
@@ -1255,7 +1257,7 @@ contract ShipsFacet is Modifiers {
     //         .shipModuleType[_moduleToEquip]
     //         .healthBoostStat;
 
-    //     for (uint256 i = 0; i < 3; i++) {
+    //     for (uint256 i = 0; i < 3; ++i) {
     //         modifyShipStats(i, _shipId, _moduleToEquip);
     //     }
     // }
@@ -1308,7 +1310,7 @@ contract ShipsFacet is Modifiers {
             "cannot level further!"
         );
 
-        for (uint i = 0; i < 3; i++) {
+        for (uint i = 0; i < 3; ++i) {
             require(
                 s.planetResources[currAssignedPlanet][i] >=
                     s.resourceCostLeveling[shipTypeToLevel][currLevel][i],
@@ -1324,7 +1326,7 @@ contract ShipsFacet is Modifiers {
         //@TODO cooldown leveling (? Design question still)
 
         //@TODO less obtuse way of upgrading
-        for (uint i = 0; i < 3; i++) {
+        for (uint i = 0; i < 3; ++i) {
             upgradeShipStats(i, _shipId, shipTypeToLevel, currLevel);
         }
     }
@@ -1364,7 +1366,7 @@ contract ShipsFacet is Modifiers {
     // ) external view returns (ShipModule[] memory) {
     //     uint256 maxModules = s.SpaceShips[_shipId].moduleSlots;
     //     ShipModule[] memory currentModules = new ShipModule[](maxModules);
-    //     for (uint256 i = 0; i < s.SpaceShips[_shipId].moduleSlots; i++) {
+    //     for (uint256 i = 0; i < s.SpaceShips[_shipId].moduleSlots; ++i) {
     //         currentModules[i] = s.equippedShipModuleType[_shipId][i];
     //     }
 
@@ -1388,7 +1390,7 @@ contract ShipsFacet is Modifiers {
     ) external view returns (uint256[] memory, ShipType[] memory) {
         //@TODO to be refactored / removed / fixed / solved differently
         uint256 totalFleetSize;
-        for (uint256 i = 0; i < IShips(s.shipsAddress).totalSupply() + 1; i++) {
+        for (uint256 i = 0; i < IShips(s.shipsAddress).totalSupply() + 1; ++i) {
             if (s.assignedPlanet[i] == _planetId) {
                 totalFleetSize += 1;
             }
@@ -1398,7 +1400,7 @@ contract ShipsFacet is Modifiers {
             totalFleetSize
         );
 
-        for (uint256 i = 0; i < IShips(s.shipsAddress).totalSupply() + 1; i++) {
+        for (uint256 i = 0; i < IShips(s.shipsAddress).totalSupply() + 1; ++i) {
             if (s.assignedPlanet[i] == _planetId) {
                 defenseFleetToReturn[totalFleetSize - 1] = i;
                 totalFleetSize--;
@@ -1432,7 +1434,7 @@ contract ShipsFacet is Modifiers {
 
         uint256 index = 0;
 
-        for (uint256 i = 0; i < totalShips; i++) {
+        for (uint256 i = 0; i < totalShips; ++i) {
             uint256 shipId = IERC721(s.shipsAddress).tokenOfOwnerByIndex(
                 defenderPlayer,
                 i
@@ -1448,7 +1450,7 @@ contract ShipsFacet is Modifiers {
         uint256[] memory defenseFleetToReturn;
 
         defenseFleetToReturn = new uint256[](index);
-        for (uint256 i = 0; i < index; i++) {
+        for (uint256 i = 0; i < index; ++i) {
             defenseFleetToReturn[i] = defenseFleet[i];
         }
 

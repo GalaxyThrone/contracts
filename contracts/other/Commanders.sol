@@ -362,7 +362,7 @@ contract Commanders is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         Commander storage commander = CommandersData[_commanderId];
         commander.EXP = _newEXP;
 
-        for (uint i = 0; i < _newTraits.length; i++) {
+        for (uint i = 0; i < _newTraits.length; ++i) {
             commander.Traits[i] = _newTraits[i];
         }
     }

@@ -70,7 +70,7 @@ contract FightingFacet is Modifiers {
         );
 
         //check if ships are assigned to the planet
-        for (uint256 i = 0; i < _shipIds.length; i++) {
+        for (uint256 i = 0; i < _shipIds.length; ++i) {
             require(
                 s.assignedPlanet[_shipIds[i]] == _fromPlanetId,
                 "ship is not assigned to this planet!"
@@ -128,7 +128,7 @@ contract FightingFacet is Modifiers {
             "not a friendly target!"
         );
 
-        for (uint256 i = 0; i < _shipIds.length; i++) {
+        for (uint256 i = 0; i < _shipIds.length; ++i) {
             require(
                 s.assignedPlanet[_shipIds[i]] == _fromPlanetId,
                 "ship is not assigned to this planet!"
@@ -142,7 +142,7 @@ contract FightingFacet is Modifiers {
             delete s.assignedPlanet[_shipIds[i]];
         }
 
-        for (uint256 i = 0; i < _shipIds.length; i++) {
+        for (uint256 i = 0; i < _shipIds.length; ++i) {
             s.assignedPlanet[_shipIds[i]] = _toPlanetId;
         }
     }
@@ -154,7 +154,7 @@ contract FightingFacet is Modifiers {
         int256[3] memory attackStrength;
         int256 attackHealth;
 
-        for (uint256 i = 0; i < shipIds.length; i++) {
+        for (uint256 i = 0; i < shipIds.length; ++i) {
             attackStrength[0] += int256(
                 s.SpaceShips[shipIds[i]].attackTypes[0]
             );
@@ -168,7 +168,7 @@ contract FightingFacet is Modifiers {
             attackHealth += int256(s.SpaceShips[shipIds[i]].health);
         }
 
-        for (uint256 i = 0; i < attackStrength.length; i++) {
+        for (uint256 i = 0; i < attackStrength.length; ++i) {
             attackStrength[i] +=
                 (attackStrength[i] * int256((attackSeed[0] % 5))) /
                 100;
@@ -189,7 +189,7 @@ contract FightingFacet is Modifiers {
         int256[3] memory defenseStrength;
         int256 defenseHealth;
 
-        for (uint256 i = 0; i < shipIds.length; i++) {
+        for (uint256 i = 0; i < shipIds.length; ++i) {
             defenseStrength[0] += int256(
                 s.SpaceShips[shipIds[i]].defenseTypes[0]
             );
@@ -207,7 +207,7 @@ contract FightingFacet is Modifiers {
         Building[] memory buildingTypesArray = BuildingsFacet(address(this))
             .getBuildingTypes(buildingsPlanetCount);
 
-        for (uint256 i = 0; i < buildingsPlanetCount.length; i++) {
+        for (uint256 i = 0; i < buildingsPlanetCount.length; ++i) {
             defenseStrength[0] += int256(
                 buildingsPlanetCount[i] * buildingTypesArray[i].defenseTypes[0]
             );
@@ -221,7 +221,7 @@ contract FightingFacet is Modifiers {
             );
         }
 
-        for (uint256 i = 0; i < defenseStrength.length; i++) {
+        for (uint256 i = 0; i < defenseStrength.length; ++i) {
             defenseStrength[i] +=
                 (defenseStrength[i] * int256((attackSeed[2] % 5))) /
                 100;
@@ -243,7 +243,7 @@ contract FightingFacet is Modifiers {
         //origin planet is still owned by the shipOwner Player
 
         if (shipOwner == IERC721(s.planetsAddress).ownerOf(_fromPlanet)) {
-            for (uint256 i = 0; i < _shipIds.length; i++) {
+            for (uint256 i = 0; i < _shipIds.length; ++i) {
                 s.assignedPlanet[_shipIds[i]] = _fromPlanet;
             }
         }
@@ -251,14 +251,14 @@ contract FightingFacet is Modifiers {
         else if (IERC721(s.planetsAddress).balanceOf(shipOwner) == 0) {
             uint tradeHubPlanet = 42;
 
-            for (uint256 i = 0; i < _shipIds.length; i++) {
+            for (uint256 i = 0; i < _shipIds.length; ++i) {
                 s.assignedPlanet[_shipIds[i]] = tradeHubPlanet;
             }
         } else {
             uint256 alternativeHomePlanet = IERC721(s.planetsAddress)
                 .tokenOfOwnerByIndex(shipOwner, 0);
 
-            for (uint256 i = 0; i < _shipIds.length; i++) {
+            for (uint256 i = 0; i < _shipIds.length; ++i) {
                 s.assignedPlanet[_shipIds[i]] = alternativeHomePlanet;
             }
         }
@@ -441,7 +441,7 @@ contract FightingFacet is Modifiers {
         }
 
         //type weakness modifier
-        for (uint256 i = 0; i < 3; i++) {
+        for (uint256 i = 0; i < 3; ++i) {
             //if (attackStrength[i] - defenseStrength[i] > 0) { }
 
             //weakness modifier by, 15% if the difference between the two is 30% in favour of the attacker
@@ -476,14 +476,14 @@ contract FightingFacet is Modifiers {
                 //remove  shipID assignment to Planet
 
                 IShips(s.shipsAddress).burnShips(defenderShips);
-                for (uint256 i = 0; i < defenderShips.length; i++) {
+                for (uint256 i = 0; i < defenderShips.length; ++i) {
                     delete s.assignedPlanet[defenderShips[i]];
                 }
 
                 //@notice losing ships despite winning
                 int takenDamageAttackers = totalDefenseStrength / 30;
 
-                for (uint i = 0; i < attackerShips.length; i++) {
+                for (uint i = 0; i < attackerShips.length; ++i) {
                     int256 attackerShipHealth = int256(
                         s.SpaceShips[attackerShips[i]].health
                     );
@@ -519,7 +519,7 @@ contract FightingFacet is Modifiers {
                     attackToResolve.attacker
                 );
 
-                for (uint256 i = 0; i < attackerShips.length; i++) {
+                for (uint256 i = 0; i < attackerShips.length; ++i) {
                     if (attackerShips[i] != 0) {
                         s.assignedPlanet[attackerShips[i]] = attackToResolve
                             .toPlanet;
@@ -530,7 +530,7 @@ contract FightingFacet is Modifiers {
             else {
                 //burn nfts and unassign ship from planets
 
-                for (uint256 i = 0; i < defenderShips.length; i++) {
+                for (uint256 i = 0; i < defenderShips.length; ++i) {
                     int256 defenderShipHealth = int256(
                         s.SpaceShips[defenderShips[i]].health
                     );
@@ -573,7 +573,7 @@ contract FightingFacet is Modifiers {
                 IShips(s.shipsAddress).burnShips(attackerShips);
             } else {
                 //burn attacker nfts that lost
-                for (uint256 i = 0; i < attackerShips.length; i++) {
+                for (uint256 i = 0; i < attackerShips.length; ++i) {
                     int256 attackerShipHealth = int256(
                         s.SpaceShips[attackerShips[i]].health
                     );
@@ -642,7 +642,7 @@ contract FightingFacet is Modifiers {
         uint256[] memory defenseFleet = new uint256[](totalShips);
         uint256 index = 0;
 
-        for (uint256 i = 0; i < totalShips; i++) {
+        for (uint256 i = 0; i < totalShips; ++i) {
             uint256 shipId = IERC721(s.shipsAddress).tokenOfOwnerByIndex(
                 defenderPlayer,
                 i
@@ -654,7 +654,7 @@ contract FightingFacet is Modifiers {
 
         // Truncate the array to the actual number of defender ships found
         uint256[] memory defenseFleetToReturn = new uint256[](index);
-        for (uint256 i = 0; i < index; i++) {
+        for (uint256 i = 0; i < index; ++i) {
             defenseFleetToReturn[i] = defenseFleet[i];
         }
 
@@ -666,7 +666,7 @@ contract FightingFacet is Modifiers {
     ) internal view returns (uint256[] memory) {
         uint256[] memory buildingsCount = new uint256[](s.totalBuildingTypes);
 
-        for (uint256 i = 0; i < s.totalBuildingTypes; i++) {
+        for (uint256 i = 0; i < s.totalBuildingTypes; ++i) {
             buildingsCount[i] = s.buildings[_planetId][i];
         }
         return buildingsCount;
@@ -719,7 +719,7 @@ contract FightingFacet is Modifiers {
 
         uint256 counter = 0;
 
-        for (uint256 i = _startRange; i < _endRange; i++) {
+        for (uint256 i = _startRange; i < _endRange; ++i) {
             queriedAttacks[counter] = s.runningAttacks[i];
 
             counter++;
@@ -733,7 +733,7 @@ contract FightingFacet is Modifiers {
     ) external view returns (attackStatus[] memory) {
         uint256 counter = 0;
 
-        for (uint256 i = 1; i < s.sendAttackId + 1; i++) {
+        for (uint256 i = 1; i < s.sendAttackId + 1; ++i) {
             if (s.runningAttacks[i].toPlanet == 0) {
                 continue;
             }
@@ -752,7 +752,7 @@ contract FightingFacet is Modifiers {
 
         uint256 insertIndex = 0;
 
-        for (uint256 i = 1; i < s.sendAttackId + 1; i++) {
+        for (uint256 i = 1; i < s.sendAttackId + 1; ++i) {
             if (s.runningAttacks[i].toPlanet == 0) {
                 continue;
             }
@@ -774,7 +774,7 @@ contract FightingFacet is Modifiers {
     ) external view returns (attackStatus[] memory) {
         uint256 counter = 0;
 
-        for (uint256 i = 1; i <= s.sendAttackId + 1; i++) {
+        for (uint256 i = 1; i <= s.sendAttackId + 1; ++i) {
             if (s.runningAttacks[i].attacker == _player) {
                 counter++;
             }
@@ -783,7 +783,7 @@ contract FightingFacet is Modifiers {
         attackStatus[] memory outgoingAttacks = new attackStatus[](counter);
 
         uint256 insertIndex = 0;
-        for (uint256 i = 1; i <= s.sendAttackId + 1; i++) {
+        for (uint256 i = 1; i <= s.sendAttackId + 1; ++i) {
             if (s.runningAttacks[i].attacker == _player) {
                 outgoingAttacks[insertIndex] = s.runningAttacks[i];
                 insertIndex++;
@@ -797,7 +797,7 @@ contract FightingFacet is Modifiers {
         uint256 _planetId
     ) external view returns (attackStatus[] memory) {
         uint256 counter = 0;
-        for (uint256 i = 1; i < s.sendAttackId + 1; i++) {
+        for (uint256 i = 1; i < s.sendAttackId + 1; ++i) {
             if (s.runningAttacks[i].toPlanet == _planetId) {
                 counter++;
             }
@@ -807,7 +807,7 @@ contract FightingFacet is Modifiers {
 
         uint256 insertIndex = 0;
 
-        for (uint256 i = 1; i < s.sendAttackId + 1; i++) {
+        for (uint256 i = 1; i < s.sendAttackId + 1; ++i) {
             if (s.runningAttacks[i].toPlanet == _planetId) {
                 incomingAttacks[insertIndex] = s.runningAttacks[i];
                 insertIndex++;

@@ -37,7 +37,7 @@ contract RegisterFacet is Modifiers {
         // drawRandomNumbers(msg.sender);
         uint256[] memory _randomness = new uint256[](1);
         // generate 5 pseudo random numbers using blockhash, timestamp
-        for (uint256 i = 0; i < 1; i++) {
+        for (uint256 i = 0; i < 1; ++i) {
             _randomness[i] = uint256(
                 keccak256(
                     abi.encodePacked(
@@ -80,7 +80,7 @@ contract RegisterFacet is Modifiers {
         // drawRandomNumbers(msg.sender);
         uint256[] memory _randomness = new uint256[](1);
         // generate 5 pseudo random numbers using blockhash, timestamp
-        for (uint256 i = 0; i < 1; i++) {
+        for (uint256 i = 0; i < 1; ++i) {
             _randomness[i] = uint256(
                 keccak256(
                     abi.encodePacked(
@@ -156,7 +156,7 @@ contract RegisterFacet is Modifiers {
         uint _planetTypeChosen
     ) internal {
         uint256 totalSupply = IERC721(s.planetsAddress).totalSupply();
-        for (uint256 i; i < totalSupply; i++) {
+        for (uint256 i; i < totalSupply; ++i) {
             uint256 tokenId = (uint256(
                 keccak256(abi.encodePacked(_randomness[0], i))
             ) % totalSupply) + 1;

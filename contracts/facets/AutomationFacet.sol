@@ -42,7 +42,7 @@ contract AutomationFacet is Modifiers {
 
         //@notice check claim metal
         if (keccak256(checkData) == keccak256(abi.encode(resourceId))) {
-            for (uint256 i = 0; i < totalPlanetAmount; i++) {
+            for (uint256 i = 0; i < totalPlanetAmount; ++i) {
                 uint256 lastClaimed = s.lastClaimed[i];
                 if (
                     block.timestamp > lastClaimed + 8 hours && lastClaimed != 0
@@ -54,7 +54,7 @@ contract AutomationFacet is Modifiers {
 
         //@notice check  claim buildings
         if (keccak256(checkData) == keccak256(abi.encode(craftBuildingId))) {
-            for (uint256 i = 0; i < totalPlanetAmount; i++) {
+            for (uint256 i = 0; i < totalPlanetAmount; ++i) {
                 if (
                     block.timestamp >= s.craftBuildings[i].readyTimestamp &&
                     s.craftBuildings[i].readyTimestamp != 0
@@ -65,7 +65,7 @@ contract AutomationFacet is Modifiers {
         }
         //@notice check  claim ships
         if (keccak256(checkData) == keccak256(abi.encode(craftShipsId))) {
-            for (uint256 i = 0; i < totalPlanetAmount; i++) {
+            for (uint256 i = 0; i < totalPlanetAmount; ++i) {
                 if (
                     block.timestamp >= s.craftFleets[i].readyTimestamp &&
                     s.craftFleets[i].readyTimestamp != 0
@@ -76,7 +76,7 @@ contract AutomationFacet is Modifiers {
         }
         //@notice check resolve attacks
         if (keccak256(checkData) == keccak256(abi.encode(resolveAttacksPath))) {
-            for (uint256 i = 0; i < s.sendAttackId; i++) {
+            for (uint256 i = 0; i < s.sendAttackId; ++i) {
                 if (s.runningAttacks[i].timeToBeResolved >= block.timestamp) {
                     return (true, abi.encode(i));
                 }

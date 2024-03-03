@@ -127,7 +127,7 @@ contract AllianceFacet is Modifiers {
             s.allianceOfPlayer[msg.sender]
         ];
 
-        for (uint256 i = 0; i < allianceMemberCount; i++) {
+        for (uint256 i = 0; i < allianceMemberCount; ++i) {
             if (
                 s.membersAlliance[s.allianceOfPlayer[msg.sender]][i] ==
                 msg.sender
@@ -194,7 +194,7 @@ contract AllianceFacet is Modifiers {
             s.allianceOfPlayer[msg.sender]
         ];
 
-        for (uint256 i = 0; i < allianceMemberCount; i++) {
+        for (uint256 i = 0; i < allianceMemberCount; ++i) {
             if (
                 s.membersAlliance[s.allianceOfPlayer[msg.sender]][i] == _player
             ) {
@@ -226,7 +226,7 @@ contract AllianceFacet is Modifiers {
 
     function _removeInvitation(address _member, bytes32 _alliance) internal {
         uint256 numInvitations = s.outstandingInvitations[_member].length;
-        for (uint256 i = 0; i < numInvitations; i++) {
+        for (uint256 i = 0; i < numInvitations; ++i) {
             if (s.outstandingInvitations[_member][i] == _alliance) {
                 s.outstandingInvitations[_member][i] = s.outstandingInvitations[
                     _member
@@ -246,7 +246,7 @@ contract AllianceFacet is Modifiers {
     function returnAllAlliances() external view returns (bytes32[] memory) {
         bytes32[] memory allAllianceNames = new bytes32[](s.totalAllianceCount);
 
-        for (uint256 i = 0; i < s.totalAllianceCount; i++) {
+        for (uint256 i = 0; i < s.totalAllianceCount; ++i) {
             allAllianceNames[i] = s.registeredAlliances[i];
         }
 
@@ -259,7 +259,7 @@ contract AllianceFacet is Modifiers {
         uint256 allianceMemberCount = s.allianceMemberCount[_allianceToCheck];
 
         address[] memory allianceMembers = new address[](allianceMemberCount);
-        for (uint256 i = 0; i < allianceMemberCount; i++) {
+        for (uint256 i = 0; i < allianceMemberCount; ++i) {
             allianceMembers[i] = s.membersAlliance[_allianceToCheck][i];
         }
 
