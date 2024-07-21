@@ -1,15 +1,14 @@
 import { ethers } from "hardhat";
-import { AdminFacet, Ships } from "../typechain-types";
+import { Ships } from "../typechain-types";
 import { ship } from "../types";
 
 export async function addFleets(fleetsAddress: string) {
-  // const gasPrice = 35000000000;
   let fleetsContract = (await ethers.getContractAt(
     "Ships",
     fleetsAddress
   )) as Ships;
 
-  const CRAFT_TIME_FACTOR = 40; // 20;
+  const CRAFT_TIME_FACTOR = 20;
 
   const fleet1: ship = {
     shipType: 1,

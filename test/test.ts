@@ -160,8 +160,16 @@ describe("Game Core Features Testing", function () {
     quantity: PromiseOrValue<BigNumberish>
   ) => {
     await craftFleet(user, fleetType, planetId, quantity);
-    await advanceTimeAndBlock(1);
+    const craftTime = await getCraftTime(fleetType);
+    await advanceTimeAndBlock(craftTime.toNumber());
     await claimFleet(user, planetId);
+  };
+
+  const getCraftTime = async (
+    fleetType: PromiseOrValue<BigNumberish>
+  ) => {
+    const shipStats = await shipsFacet.getShipTypeStats(fleetType);
+    return shipStats.craftTime;
   };
 
   const sendAttack = async (
@@ -319,7 +327,9 @@ describe("Game Core Features Testing", function () {
       "TutorialFacet",
       diamond
     )) as TutorialFacet;
-    await adminFacet.startInit(20, 1);
+
+    this.asteroidBeltId = await findSpecificPlanetType("1");
+    this.uninhabitedPlanetId = await findSpecificPlanetType("0");
   });
 
   describe("User Registration & All PlanetFunctions Tests", function () {
@@ -390,8 +400,13 @@ describe("Game Core Features Testing", function () {
         )
       );
 
-      // Targeting a new planet for terraforming (assuming ID 14 is available)
-      await sendTerraform(randomUser, firstPlanetId, 14, shipIds);
+      // Targeting a new planet for terraforming (assuming ID this.uninhabitedPlanetId is available)
+      await sendTerraform(
+        randomUser,
+        firstPlanetId,
+        this.uninhabitedPlanetId,
+        shipIds
+      );
       await advanceTimeAndBlock(5);
       await endTerraform(randomUser, 0);
 
@@ -471,19 +486,19 @@ describe("Game Core Features Testing", function () {
     });
 
     it("registered user can craft & partially claim buildings", async function () {
-      const { randomUser } = await loadFixture(deployUsers);
+      const { randomUserTwo } = await loadFixture(deployUsers);
 
-      await registerUser(randomUser);
+      await registerUser(randomUserTwo);
 
       const planetId = await planetNfts.tokenOfOwnerByIndex(
-        randomUser.address,
+        randomUserTwo.address,
         0
       );
       const buildingTypeToCraft = 1;
       const buildingAmountToCraft = 5;
 
       await buildingsFacet
-        .connect(randomUser)
+        .connect(randomUserTwo)
         .craftBuilding(
           buildingTypeToCraft,
           planetId,
@@ -495,7 +510,7 @@ describe("Game Core Features Testing", function () {
       );
 
       const craftTime = buildingTypeStruct.craftTime;
-      const newPlayerCraftTime = craftTime.mul(20).div(100); // 80% time reduction for new players
+      const newPlayerCraftTime = craftTime.mul(5).div(100); // 95% time reduction for new players
 
       await advanceTimeAndBlockByAmount(
         newPlayerCraftTime.toNumber() * 2
@@ -510,7 +525,7 @@ describe("Game Core Features Testing", function () {
       );
 
       await buildingsFacet
-        .connect(randomUser)
+        .connect(randomUserTwo)
         .claimBuilding(planetId);
 
       checkOwnershipBuildings = await buildingsFacet.getAllBuildings(
@@ -527,7 +542,7 @@ describe("Game Core Features Testing", function () {
       ); // Let's claim the remaining 3 buildings
 
       await buildingsFacet
-        .connect(randomUser)
+        .connect(randomUserTwo)
         .claimBuilding(planetId);
 
       checkOwnershipBuildings = await buildingsFacet.getAllBuildings(
@@ -2029,7 +2044,9 @@ describe("Game Core Features Testing", function () {
 
       await shipsFacet
         .connect(randomUser)
-        .startOutMining(planetId, 215, [shipIdPlayer1]);
+        .startOutMining(planetId, this.asteroidBeltId, [
+          shipIdPlayer1,
+        ]);
       await advanceTimeAndBlockByAmount(60 * 60 * 24 * 2);
 
       const resolveOutmining = await shipsFacet
@@ -2177,7 +2194,9 @@ describe("Game Core Features Testing", function () {
 
       const sendOutmining = await shipsFacet
         .connect(randomUser)
-        .startOutMining(planetId, 215, [shipIdPlayer1]);
+        .startOutMining(planetId, this.asteroidBeltId, [
+          shipIdPlayer1,
+        ]);
 
       await advanceTimeAndBlockByAmount(60 * 60 * 24 * 2);
 
@@ -2272,7 +2291,9 @@ describe("Game Core Features Testing", function () {
 
       const sendOutmining = await shipsFacet
         .connect(randomUser)
-        .startOutMining(planetId, 215, [shipIdPlayer1]);
+        .startOutMining(planetId, this.asteroidBeltId, [
+          shipIdPlayer1,
+        ]);
 
       await advanceTimeAndBlockByAmount(60 * 60 * 24 * 2);
 
@@ -2412,7 +2433,12 @@ describe("Game Core Features Testing", function () {
           await shipNfts.tokenOfOwnerByIndex(randomUser.address, i)
       );
 
-      await sendTerraform(randomUser, planetId, 14, shipIds);
+      await sendTerraform(
+        randomUser,
+        planetId,
+        this.uninhabitedPlanetId,
+        shipIds
+      );
       await advanceTimeAndBlock(5);
 
       await endTerraform(randomUser, 0);
@@ -2451,7 +2477,12 @@ describe("Game Core Features Testing", function () {
           await shipNfts.tokenOfOwnerByIndex(randomUser.address, i)
       );
 
-      await sendTerraform(randomUser, planetId, 14, shipIds);
+      await sendTerraform(
+        randomUser,
+        planetId,
+        this.uninhabitedPlanetId,
+        shipIds
+      );
       await advanceTimeAndBlock(5);
 
       await endTerraform(randomUser, 0);
@@ -2491,7 +2522,12 @@ describe("Game Core Features Testing", function () {
         )
       );
 
-      await sendTerraform(randomUser, planetId, 14, shipIds); // Targeting planetId: 14
+      await sendTerraform(
+        randomUser,
+        planetId,
+        this.uninhabitedPlanetId,
+        shipIds
+      ); // Targeting planetId: this.uninhabitedPlanetId
       await advanceTimeAndBlock(5);
 
       await endTerraform(randomUser, 0);
@@ -2576,7 +2612,7 @@ describe("Game Core Features Testing", function () {
         );
       }
 
-      const planetToTerraform = 14;
+      const planetToTerraform = this.uninhabitedPlanetId;
       await sendTerraform(
         randomUser,
         planetId,
@@ -3215,7 +3251,7 @@ describe("Game Core Features Testing", function () {
     });
     it.skip("debug", async function () {
       buildingsFacet = await impersonate(
-        "0xf2381dD8B282669C139C2d227bAb5314B5E9EBC7",
+        "0xf2381dD8B282669C139C2d227bAb53this.uninhabitedPlanetIdB5E9EBC7",
         buildingsFacet,
         ethers,
         network
@@ -3224,4 +3260,18 @@ describe("Game Core Features Testing", function () {
       await buildingsFacet.mineResources(16);
     });
   });
+
+  // Function to find a planet of a specific type
+  async function findSpecificPlanetType(planetTypeToFind: string) {
+    const maxPlanetId = 200;
+    for (let planetId = 1; planetId <= maxPlanetId; planetId++) {
+      const planetType = await shipsFacet.getPlanetType(planetId);
+      if (planetType.toString() == planetTypeToFind) {
+        return planetId;
+      }
+    }
+    throw new Error(
+      `No specific planet type found within the first ${maxPlanetId} planets.`
+    );
+  }
 });

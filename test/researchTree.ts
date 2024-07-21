@@ -330,6 +330,8 @@ describe("Research Technology Testing", function () {
       diamond
     )) as TutorialFacet;
     await adminFacet.startInit(20, 1);
+
+    this.asteroidBeltId = await findAsteroidBelt();
   });
 
   describe("Tech Tree Testing", function () {
@@ -622,7 +624,9 @@ describe("Research Technology Testing", function () {
 
         await shipsFacet
           .connect(randomUser)
-          .startOutMining(planetId, 215, [shipIdPlayer1]);
+          .startOutMining(planetId, this.asteroidBeltId, [
+            shipIdPlayer1,
+          ]);
         await advanceTimeAndBlock(10);
 
         const resolveOutmining = await shipsFacet
@@ -667,7 +671,9 @@ describe("Research Technology Testing", function () {
 
         await shipsFacet
           .connect(randomUser)
-          .startOutMining(planetId, 215, [shipIdPlayer1]);
+          .startOutMining(planetId, this.asteroidBeltId, [
+            shipIdPlayer1,
+          ]);
         await advanceTimeAndBlock(10000);
 
         const resolveOutminingBuffed = await shipsFacet
@@ -724,7 +730,9 @@ describe("Research Technology Testing", function () {
 
         await shipsFacet
           .connect(randomUser)
-          .startOutMining(planetId, 215, [shipIdPlayer1]);
+          .startOutMining(planetId, this.asteroidBeltId, [
+            shipIdPlayer1,
+          ]);
 
         //advance by 22hours, should revert since mining time alone is 24h
         await advanceTimeAndBlockByAmount(60 * 60 * 22);
@@ -736,7 +744,11 @@ describe("Research Technology Testing", function () {
         );
 
         let travelTime = Number(
-          await shipsFacet.checkTravelTime(planetId, 215, 0)
+          await shipsFacet.checkTravelTime(
+            planetId,
+            this.asteroidBeltId,
+            0
+          )
         );
 
         //advance by 2hours + travelTime ( 24h mining time+ travelTime)
@@ -774,7 +786,9 @@ describe("Research Technology Testing", function () {
 
         await shipsFacet
           .connect(randomUser)
-          .startOutMining(planetId, 215, [shipIdPlayer1]);
+          .startOutMining(planetId, this.asteroidBeltId, [
+            shipIdPlayer1,
+          ]);
 
         //advance by 10hours, should revert ( pure mining time should be 18h )
         await advanceTimeAndBlockByAmount(60 * 60 * 10);
@@ -837,7 +851,9 @@ describe("Research Technology Testing", function () {
 
         await shipsFacet
           .connect(randomUser)
-          .startOutMining(planetId, 215, [shipIdPlayer1]);
+          .startOutMining(planetId, this.asteroidBeltId, [
+            shipIdPlayer1,
+          ]);
         await advanceTimeAndBlock(10);
 
         const resolveOutmining = await shipsFacet
@@ -864,7 +880,9 @@ describe("Research Technology Testing", function () {
 
         await shipsFacet
           .connect(randomUser)
-          .startOutMining(planetId, 215, [shipIdPlayer1]);
+          .startOutMining(planetId, this.asteroidBeltId, [
+            shipIdPlayer1,
+          ]);
         await advanceTimeAndBlock(10000);
 
         const resolveOutminingBuffed = await shipsFacet
@@ -912,7 +930,9 @@ describe("Research Technology Testing", function () {
 
         await shipsFacet
           .connect(randomUser)
-          .startOutMining(planetId, 215, [shipIdPlayer1]);
+          .startOutMining(planetId, this.asteroidBeltId, [
+            shipIdPlayer1,
+          ]);
         await advanceTimeAndBlock(10000);
 
         await shipsFacet.connect(randomUser).resolveOutMining(3);
@@ -969,7 +989,9 @@ describe("Research Technology Testing", function () {
 
         await shipsFacet
           .connect(randomUser)
-          .startOutMining(planetId, 215, [shipIdPlayer1]);
+          .startOutMining(planetId, this.asteroidBeltId, [
+            shipIdPlayer1,
+          ]);
         await advanceTimeAndBlock(10);
 
         const resolveOutmining = await shipsFacet
@@ -996,7 +1018,9 @@ describe("Research Technology Testing", function () {
 
         await shipsFacet
           .connect(randomUser)
-          .startOutMining(planetId, 215, [shipIdPlayer1]);
+          .startOutMining(planetId, this.asteroidBeltId, [
+            shipIdPlayer1,
+          ]);
         await advanceTimeAndBlock(10000);
 
         const resolveOutminingBuffed = await shipsFacet
@@ -1108,7 +1132,9 @@ describe("Research Technology Testing", function () {
         for (let i = 0; i < 30; i++) {
           await shipsFacet
             .connect(randomUser)
-            .startOutMining(planetId, 215, [shipIdPlayer1]);
+            .startOutMining(planetId, this.asteroidBeltId, [
+              shipIdPlayer1,
+            ]);
           await advanceTimeAndBlock(100);
 
           await shipsFacet
@@ -1191,7 +1217,7 @@ describe("Research Technology Testing", function () {
         for (let i = 0; i < 100; i++) {
           await shipsFacet
             .connect(randomUser)
-            .startOutMining(planetId, 215, [
+            .startOutMining(planetId, this.asteroidBeltId, [
               shipIdPlayer1,
               shipIdPlayer1.add(1),
               shipIdPlayer1.add(2),
@@ -1415,7 +1441,9 @@ describe("Research Technology Testing", function () {
         for (let i = 0; i < 30; i++) {
           await shipsFacet
             .connect(randomUser)
-            .startOutMining(planetId, 215, [shipIdPlayer1Miner]);
+            .startOutMining(planetId, this.asteroidBeltId, [
+              shipIdPlayer1Miner,
+            ]);
           await advanceTimeAndBlock(100);
 
           await shipsFacet
@@ -1694,7 +1722,9 @@ describe("Research Technology Testing", function () {
         for (let i = 0; i < 150; i++) {
           await shipsFacet
             .connect(randomUser)
-            .startOutMining(planetId, 215, [shipIdPlayer1]);
+            .startOutMining(planetId, this.asteroidBeltId, [
+              shipIdPlayer1,
+            ]);
           await advanceTimeAndBlock(100);
 
           await shipsFacet
@@ -1942,4 +1972,17 @@ describe("Research Technology Testing", function () {
       });
     });
   });
+
+  async function findAsteroidBelt() {
+    const maxPlanetId = 200;
+    for (let planetId = 1; planetId <= maxPlanetId; planetId++) {
+      const planetType = await shipsFacet.getPlanetType(planetId);
+      if (planetType.toString() == "1") {
+        return planetId;
+      }
+    }
+    throw new Error(
+      `No asteroid belt found within the first ${maxPlanetId} planets.`
+    );
+  }
 });

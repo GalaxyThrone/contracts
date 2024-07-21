@@ -789,11 +789,7 @@ contract ShipsFacet is Modifiers {
 
     */
 
-    //@TODO @NOTICE TEMP FIX BECAUSE OF WRONG ARRAY INSERT IN FINALZE REGISTER
     function getPlanetType(uint256 _planetId) external view returns (uint256) {
-        if (_planetId == 1) {
-            return 2;
-        }
         return s.planetType[_planetId];
     }
 
@@ -1250,8 +1246,8 @@ contract ShipsFacet is Modifiers {
         return allSendResources;
     }
 
-    //@TODO crafting shipModules.
-    //@TODO unequipping shipModules.
+    //@notice disabled crafting shipModules.
+    //@notice disabled  unequipping shipModules.
 
     // function equipShipModule(uint256 _moduleToEquip, uint256 _shipId) external {
     //     require(

@@ -256,7 +256,7 @@ export async function deployDiamond(logOutput: boolean = true) {
 
   log("Starting Planet Gen");
 
-  for (let i = 0; i < 99; i++) {
+  for (let i = 0; i < 20; i++) {
     const initPlanets = await adminFacet.startInit(8, 0);
 
     //@notice this the chance for an asteroid belt hub to appear
