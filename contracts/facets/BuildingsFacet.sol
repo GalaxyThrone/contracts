@@ -10,9 +10,23 @@ import "../interfaces/IResource.sol";
 import "./ShipsFacet.sol";
 
 contract BuildingsFacet is Modifiers {
-    event buildingsStartedCrafting(uint planetId);
-    event buildingsFinishedCrafting(uint planetId);
-    event miningConcluded(uint planetId);
+    event buildingsStartedCrafting(
+        uint planetId,
+        uint itemId,
+        uint amount,
+        uint readyTimestamp
+    );
+    event buildingsFinishedCrafting(
+        uint planetId,
+        uint itemId,
+        uint claimedAmount,
+        uint remainingAmount
+    );
+    event miningConcluded(
+        uint planetId,
+        uint256[] resourcesMined,
+        uint256 timestamp
+    );
 
     function craftBuilding(
         uint256 _buildingId,
@@ -38,8 +52,8 @@ contract BuildingsFacet is Modifiers {
         craftTimeBuffed = craftTime;
         // new player crafting buff by 80% for the first 10 buildings
         if (s.totalBuiltBuildingsPlanet[_planetId] <= 10) {
-            readyTimestamp -= ((craftTime * _amount) * 80) / 100;
-            craftTimeBuffed = ((craftTime * 20) / 100);
+            readyTimestamp -= ((craftTime * _amount) * 95) / 100;
+            craftTimeBuffed = ((craftTime * 5) / 100);
         }
         //Hivemind  Craft-Time Buff.
         else if (s.playersFaction[msg.sender] == 3) {
@@ -86,7 +100,12 @@ contract BuildingsFacet is Modifiers {
         IERC20(s.crystalAddress).burnFrom(address(this), price[1] * _amount);
         IERC20(s.antimatterAddress).burnFrom(address(this), price[2] * _amount);
 
-        emit buildingsStartedCrafting(_planetId);
+        emit buildingsStartedCrafting(
+            _planetId,
+            _buildingId,
+            _amount,
+            readyTimestamp
+        );
     }
 
     function claimBuilding(
@@ -109,8 +128,6 @@ contract BuildingsFacet is Modifiers {
             currentTimestamp >= nextReadyTimestamp,
             "BuildingsFacet: not ready yet"
         );
-
-        Building memory buildingToClaim = s.buildingTypes[currentCraft.itemId];
 
         uint interval = currentTimestamp - currentCraft.startTimestamp;
         uint claimableAmount = interval /
@@ -137,11 +154,16 @@ contract BuildingsFacet is Modifiers {
             }
         }
 
+        emit buildingsFinishedCrafting(
+            _planetId,
+            currentCraft.itemId,
+            claimableAmount,
+            currentCraft.unclaimedAmount
+        );
+
         if (currentCraft.unclaimedAmount == 0) {
             delete s.craftBuildings[_planetId];
         }
-
-        emit buildingsFinishedCrafting(_planetId);
     }
 
     function recycleBuildings(
@@ -184,7 +206,7 @@ contract BuildingsFacet is Modifiers {
         uint256 lastClaimed = s.lastClaimed[_planetId];
 
         uint256 timePassed = block.timestamp - lastClaimed;
-
+        uint256[] memory resourcesMined = new uint256[](3); // Assuming 3 types of resources
         require(
             block.timestamp > lastClaimed + 1 hours,
             "BuildingsFacet: can only claim every hour, accumulating rewards only per hour"
@@ -194,7 +216,7 @@ contract BuildingsFacet is Modifiers {
 
         for (uint256 i = 0; i < 3; ++i) {
             uint256 boost = s.boosts[_planetId][i];
-            uint256 baseMiningRatePerHour = 500 ether + (boost * 1e18);
+            uint256 baseMiningRatePerHour = 200 ether + (boost * 1e18);
             uint256 amountMined = baseMiningRatePerHour * hoursPassed;
 
             IPlanets(s.planetsAddress).mineResource(_planetId, i, amountMined);
@@ -237,10 +259,15 @@ contract BuildingsFacet is Modifiers {
             }
 
             s.planetResources[_planetId][i] += amountMined;
+
+            for (uint256 i = 0; i < 3; ++i) {
+                // Existing resource mining and enhancement logic...
+                resourcesMined[i] = amountMined; // Capture the mined amount for each resource
+            }
         }
 
         s.lastClaimed[_planetId] = block.timestamp;
-        emit miningConcluded(_planetId);
+        emit miningConcluded(_planetId, resourcesMined, block.timestamp);
     }
 
     function mineResourcesExtended(uint256[] calldata _planetIds) external {
@@ -250,6 +277,7 @@ contract BuildingsFacet is Modifiers {
                 "AppStorage: Not owner"
             );
             uint256 _planetId = _planetIds[j];
+            uint256[] memory resourcesMined = new uint256[](3);
 
             uint256 lastClaimed = s.lastClaimed[_planetId];
             uint256 timePassed = block.timestamp - lastClaimed;
@@ -313,10 +341,20 @@ contract BuildingsFacet is Modifiers {
                 }
 
                 s.planetResources[_planetId][i] += amountMined;
-            }
 
-            s.lastClaimed[_planetId] = block.timestamp;
-            emit miningConcluded(_planetId);
+                for (uint256 i = 0; i < 3; ++i) {
+                    // Existing resource mining and enhancement logic...
+                    resourcesMined[i] = amountMined; // Capture the mined amount for each resource
+                }
+
+                // Emitting the event with resources and timestamp
+                emit miningConcluded(
+                    _planetId,
+                    resourcesMined,
+                    block.timestamp
+                );
+                s.lastClaimed[_planetId] = block.timestamp;
+            }
         }
     }
 

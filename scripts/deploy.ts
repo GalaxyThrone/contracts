@@ -41,7 +41,9 @@ export async function deployDiamond(logOutput: boolean = true) {
   const accounts: Signer[] = await ethers.getSigners();
   const deployer = accounts[0];
   const deployerAddress = await deployer.getAddress();
+
   log("Deployer: " + deployerAddress);
+
   // deploy DiamondCutFacet
   const DiamondCutFacet = await ethers.getContractFactory(
     "DiamondCutFacet"
@@ -253,8 +255,8 @@ export async function deployDiamond(logOutput: boolean = true) {
   const genesisPlanets = await adminFacet.startInit(1, 2);
 
   log("Starting Planet Gen");
-  //main one, first 50 are deterministic
-  for (let i = 0; i < 20; i++) {
+
+  for (let i = 0; i < 99; i++) {
     const initPlanets = await adminFacet.startInit(8, 0);
 
     //@notice this the chance for an asteroid belt hub to appear

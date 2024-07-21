@@ -33,11 +33,29 @@ contract ShipsFacet is Modifiers {
         uint256 arrivalTime
     );
 
-    event resolvedOutmining(uint id);
+    // Event to emit outmining resolution details
+    event resolvedOutmining(
+        uint id,
+        uint256[] resourcesMined,
+        uint256 timestamp
+    );
+
     event resolvedTerraforming(uint id);
 
-    event shipsStartedCrafting(uint planetId);
-    event shipsFinishedCrafting(uint planetId);
+    event planetTerraformed(uint256 indexed tokenId, address indexed newOwner);
+
+    event shipsStartedCrafting(
+        uint planetId,
+        uint itemId,
+        uint amount,
+        uint readyTimestamp
+    );
+    event shipsFinishedCrafting(
+        uint planetId,
+        uint itemId,
+        uint claimedAmount,
+        uint remainingAmount
+    );
 
     function craftFleet(
         uint256 _fleetId,
@@ -82,8 +100,8 @@ contract ShipsFacet is Modifiers {
         //@TODO testing
         //Ship Production Micromanagement Guru [ID 3], 10% faster ship crafting time
         if (s.activeCommanderTraits[msg.sender][3]) {
-            readyTimestamp -= ((craftTime * _amount) * 10) / 100; // 10% reduction in total craft time
-            craftTimeBuffed = (craftTimeBuffed * 90) / 100; // 10% reduction in craft time per ship
+            readyTimestamp -= ((craftTime * _amount) * 5) / 100; // 10% reduction in total craft time
+            craftTimeBuffed = (craftTimeBuffed * 95) / 100; // 10% reduction in craft time per ship
         }
         //@TODO testing
         //Explorer Mindset [ID 10], 50% faster crafting of terraformers;
@@ -130,7 +148,7 @@ contract ShipsFacet is Modifiers {
         IERC20(s.antimatterAddress).burnFrom(address(this), price[2] * _amount);
         IERC20(s.aetherAddress).burnFrom(address(this), price[3] * _amount);
 
-        emit shipsStartedCrafting(_planetId);
+        emit shipsStartedCrafting(_planetId, _fleetId, _amount, readyTimestamp);
     }
 
     function claimFleet(
@@ -302,13 +320,18 @@ contract ShipsFacet is Modifiers {
                 .moduleSlots;
         }
 
+        emit shipsFinishedCrafting(
+            _planetId,
+            shipTypeId,
+            claimableAmount,
+            currentCraft.unclaimedAmount
+        );
+
         if (currentCraft.unclaimedAmount == 0) {
             delete s.craftFleets[_planetId];
         }
         //@notice for the alpha, you are PVP enabled once you are claiming your first spaceship
         IPlanets(s.planetsAddress).enablePVP(_planetId);
-
-        emit shipsFinishedCrafting(_planetId);
     }
 
     function getCraftFleets(
@@ -481,6 +504,7 @@ contract ShipsFacet is Modifiers {
             3;
 
         //@notice transferring planet to terraformer owner. Event on Planet contract
+
         IPlanets(s.planetsAddress).planetTerraform(
             s.sendTerraform[_sendTerraformId].toPlanetId,
             IShips(s.shipsAddress).ownerOf(terraformerId)
@@ -493,9 +517,12 @@ contract ShipsFacet is Modifiers {
 
         //@notice burn terraformer ship from owner
 
-        IShips(s.shipsAddress).burnShip(terraformerId);
-
         emit resolvedTerraforming(_sendTerraformId);
+        emit planetTerraformed(
+            s.sendTerraform[_sendTerraformId].toPlanetId,
+            IShips(s.shipsAddress).ownerOf(terraformerId)
+        );
+        IShips(s.shipsAddress).burnShip(terraformerId);
 
         //@TODO dont delete, put into resolved instead.
         delete s.sendTerraform[_sendTerraformId];
@@ -575,7 +602,7 @@ contract ShipsFacet is Modifiers {
     function resolveOutMining(uint256 _outMiningId) external {
         //if the destinationPlanet has changed to be non-outminable,
         //return the ships to the origin or, if conquered, to another owned planet
-
+        uint256[] memory resourcesMined = new uint256[](4);
         if (
             IERC721(s.planetsAddress).ownerOf(
                 s.outMining[_outMiningId].toPlanetId
@@ -592,7 +619,11 @@ contract ShipsFacet is Modifiers {
                 s.outMining[_outMiningId].fromPlanetId,
                 s.outMining[_outMiningId].shipsIds
             );
-            emit resolvedOutmining(_outMiningId);
+            emit resolvedOutmining(
+                _outMiningId,
+                resourcesMined,
+                block.timestamp
+            );
             delete s.outMining[_outMiningId];
             return;
         }
@@ -652,6 +683,8 @@ contract ShipsFacet is Modifiers {
                         j,
                         minedAmount
                     );
+
+                    resourcesMined[j] += minedAmount;
                 }
                 //mining aether
                 else {
@@ -664,6 +697,7 @@ contract ShipsFacet is Modifiers {
                                 s.outMining[_outMiningId].shipsIds[0]
                             )
                         ] += minedAmount;
+                        resourcesMined[j] += minedAmount;
                     }
                 }
 
@@ -692,7 +726,7 @@ contract ShipsFacet is Modifiers {
                 .fromPlanetId;
         }
 
-        emit resolvedOutmining(_outMiningId);
+        emit resolvedOutmining(_outMiningId, resourcesMined, block.timestamp);
         delete s.outMining[_outMiningId];
     }
 

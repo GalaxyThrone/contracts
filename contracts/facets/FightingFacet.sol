@@ -35,8 +35,10 @@ contract FightingFacet is Modifiers {
     function sendAttack(
         uint256 _fromPlanetId,
         uint256 _toPlanetId,
-        uint256[] memory _shipIds //tokenId's of ships to send
+        uint256[] memory _shipIds
     ) external onlyPlanetOwner(_fromPlanetId) {
+        require(block.timestamp >= 1713258846, "PVP Grace Period");
+
         require(
             msg.sender != IERC721(s.planetsAddress).ownerOf(_toPlanetId),
             "you cannot attack your own planets!"
@@ -61,8 +63,6 @@ contract FightingFacet is Modifiers {
             ),
             "Peace Treaty is in place!"
         );
-
-        //@notice PVP is always enabled for alpha
 
         require(
             IPlanets(s.planetsAddress).getPVPStatus(_toPlanetId),
@@ -110,9 +110,7 @@ contract FightingFacet is Modifiers {
         emit AttackSent(s.sendAttackId, _toPlanetId, msg.sender);
     }
 
-    //@TODO currently instantenous for pre-alpha
-    //@notice perhaps require a specific building for instantenous travel / normal travel for others>
-
+    //@TODO currently instantenous for beta
     function sendFriendlies(
         uint256 _fromPlanetId,
         uint256 _toPlanetId,
@@ -323,7 +321,6 @@ contract FightingFacet is Modifiers {
             attackToResolve.toPlanet
         );
 
-        //@TODO to be refactored to accomodate new attackTypes / Defense Types
         (attackStrength, attackHealth) = calculateAttackBattleStats(
             attackerShips,
             attackToResolve.attackSeed
@@ -391,7 +388,7 @@ contract FightingFacet is Modifiers {
                 (attackerShips.length * 100) /
                 defenderShips.length;
         } else {
-            fleetSizeDifferencePercent = 0; // Or another value that makes sense in your use case.
+            fleetSizeDifferencePercent = 0;
         }
 
         if (fleetSizeDifferencePercent >= 100) {

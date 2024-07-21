@@ -2424,7 +2424,7 @@ describe("Game Core Features Testing", function () {
       expect(planetsOwnedPlayer1).to.equal(2);
     });
 
-    it("User can terraform uninhabited planet with 1terraformer and 2 fighter ships", async function () {
+    it("User can terraform uninhabited planet with 1 terraformer and 2 fighter ships", async function () {
       const { randomUser } = await loadFixture(deployUsers);
 
       await registerUser(randomUser);

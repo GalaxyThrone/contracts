@@ -61,6 +61,31 @@ const config: HardhatUserConfig = {
           : [],
       blockGasLimit: 150000000, //90000000,
     },
+
+    BaseSepolia: {
+      url: process.env.BASESEPOLIA_URL || "",
+      accounts:
+        process.env.PRIVATE_KEY !== undefined
+          ? [process.env.PRIVATE_KEY]
+          : [],
+      blockGasLimit: 150000000, //90000000,
+    },
+    Sepolia: {
+      url: process.env.SEPOLIA_URL || "",
+      accounts:
+        process.env.PRIVATE_KEY !== undefined
+          ? [process.env.PRIVATE_KEY]
+          : [],
+      blockGasLimit: 150000000, //90000000,
+    },
+    ArbitrumSepolia: {
+      url: process.env.ARBITRUM_SEPOLIA_URL || "",
+      accounts:
+        process.env.PRIVATE_KEY !== undefined
+          ? [process.env.PRIVATE_KEY]
+          : [],
+      blockGasLimit: 150000000, //90000000,
+    },
   },
   gasReporter: {
     enabled: false,

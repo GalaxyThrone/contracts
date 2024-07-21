@@ -12,7 +12,11 @@ import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 import "../interfaces/IPlanets.sol";
 
 contract RegisterFacet is Modifiers {
-    event playerRegistered(address indexed playerAddress, uint indexed faction);
+    event playerRegistered(
+        address indexed playerAddress,
+        uint indexed faction,
+        uint indexed planetReceived
+    );
 
     function startRegister(
         uint256 _factionChosen,
@@ -30,7 +34,7 @@ contract RegisterFacet is Modifiers {
         );
 
         require(
-            _planetTypeChosen > 2 && _planetTypeChosen < 7,
+            _planetTypeChosen > 2 && _planetTypeChosen < 8,
             "planetType not available!"
         );
 
@@ -52,8 +56,12 @@ contract RegisterFacet is Modifiers {
 
         s.playersFaction[msg.sender] = _factionChosen;
 
-        emit playerRegistered(msg.sender, _factionChosen);
-        finalizeRegister(msg.sender, _randomness, _planetTypeChosen);
+        finalizeRegister(
+            msg.sender,
+            _randomness,
+            _planetTypeChosen,
+            _factionChosen
+        );
     }
 
     function startRegisterWithCommander(
@@ -73,7 +81,7 @@ contract RegisterFacet is Modifiers {
         );
 
         require(
-            _planetTypeChosen > 2 && _planetTypeChosen < 7,
+            _planetTypeChosen > 2 && _planetTypeChosen < 8,
             "planetType not available!"
         );
 
@@ -95,8 +103,12 @@ contract RegisterFacet is Modifiers {
 
         s.playersFaction[msg.sender] = _factionChosen;
 
-        emit playerRegistered(msg.sender, _factionChosen);
-        finalizeRegister(msg.sender, _randomness, _planetTypeChosen);
+        finalizeRegister(
+            msg.sender,
+            _randomness,
+            _planetTypeChosen,
+            _factionChosen
+        );
 
         chooseCommander(_commanderChoice);
     }
@@ -153,7 +165,8 @@ contract RegisterFacet is Modifiers {
     function finalizeRegister(
         address _player,
         uint256[] memory _randomness,
-        uint _planetTypeChosen
+        uint _planetTypeChosen,
+        uint _factionChosen
     ) internal {
         uint256 totalSupply = IERC721(s.planetsAddress).totalSupply();
         for (uint256 i; i < totalSupply; ++i) {
@@ -231,6 +244,7 @@ contract RegisterFacet is Modifiers {
                     s.planetResources[tokenId][2]
                 );
 
+                emit playerRegistered(msg.sender, _factionChosen, tokenId);
                 break;
             }
         }

@@ -9,7 +9,7 @@ export async function addBuildings(diamondAddr: string) {
     diamondAddr
   )) as AdminFacet;
 
-  const CRAFT_TIME_FACTOR = 20; // 20;
+  const CRAFT_TIME_FACTOR = 40;
 
   const building1: Building = {
     price: [

@@ -15,7 +15,8 @@ contract TutorialFacet is Modifiers {
 
     event buildingsStartedCrafting(uint planetId);
     event buildingTutorialConcluded(address player);
-
+    event TutorialCraftBuildingCompleted(address player);
+    event TutorialCraftShipCompleted(address player);
     //@notice, claim can stay the same. This is just instant instead, and slimmed down to reduce gas costs.
     function TUTORIALcraftBuilding(
         uint256 _buildingId,
@@ -44,12 +45,12 @@ contract TutorialFacet is Modifiers {
         craftTimeBuffed = 5 seconds; //only takes 5 seconds to resolve
 
         CraftItem memory newBuilding = CraftItem(
-            1, //only craft 1 of the first buildingType, hardcoded amount
+            _amount, //only craft 1 of the first buildingType, hardcoded amount
             _planetId,
             _buildingId,
             readyTimestamp,
             block.timestamp,
-            1, //only craft 1 of the first buildingType, hardcoded amount
+            _amount, //only craft 1 of the first buildingType, hardcoded amount
             craftTimeBuffed
         );
         s.craftBuildings[_planetId] = newBuilding;
@@ -102,12 +103,12 @@ contract TutorialFacet is Modifiers {
         uint256 readyTimestamp = block.timestamp + 5 seconds;
 
         CraftItem memory newFleet = CraftItem(
-            1, //only craft 1 of the first shipType, hardcoded amount
+            _amount,
             _planetId,
             _fleetId,
             readyTimestamp,
             block.timestamp,
-            1, //only craft 1 of the first shipType, hardcoded amount
+            _amount,
             craftTime
         );
         s.craftFleets[_planetId] = newFleet;
@@ -147,8 +148,8 @@ contract TutorialFacet is Modifiers {
         address _playerToCheck
     ) external view returns (bool, bool) {
         return (
-            s.tutorialStageBuildingDone[msg.sender],
-            s.tutorialStageShipDone[msg.sender]
+            s.tutorialStageBuildingDone[_playerToCheck],
+            s.tutorialStageShipDone[_playerToCheck]
         );
     }
 }

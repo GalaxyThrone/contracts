@@ -11,7 +11,12 @@ import "../interfaces/IResource.sol";
 import "./AdminFacet.sol";
 
 contract ManagementFacet is Modifiers {
-    event techResearched(uint techId, address playerAddress);
+    event techResearched(
+        uint techId,
+        uint techTree,
+        address playerAddress,
+        uint nextAvailableResearch
+    );
     event playerNameChosen(address playerAddress, string newName);
     event DealCreated(
         uint indexed dealID,
@@ -162,7 +167,12 @@ contract ManagementFacet is Modifiers {
             s.counterPlayerTechnologiesUtility[msg.sender]++;
         }
 
-        emit techResearched(_techIdToResearch, msg.sender);
+        emit techResearched(
+            _techIdToResearch,
+            _techTree,
+            msg.sender,
+            s.lastResearchTimeCooldown[msg.sender]
+        );
     }
 
     function returnPlayerResearchedTech(

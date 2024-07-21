@@ -9,7 +9,6 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
 contract Ships is ERC721EnumerableUpgradeable, OwnableUpgradeable {
-
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIdCounter;
     address public gameDiamond;
@@ -61,6 +60,7 @@ contract Ships is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         __ERC721_init("Ships", "SHIP");
         __Ownable_init();
         gameDiamond = _gameDiamond;
+        _tokenIdCounter.increment();
     }
 
     function setUri(string calldata __uri) external onlyOwner {
@@ -81,10 +81,10 @@ contract Ships is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         address _account,
         uint256 _shipTypeId
     ) external onlyGameDiamond returns (uint256) {
-        _tokenIdCounter.increment();
-       uint256 shipId = _tokenIdCounter.current();
+        uint256 shipId = _tokenIdCounter.current();
         SpaceShips[shipId] = shipType[_shipTypeId];
         _safeMint(_account, shipId);
+        _tokenIdCounter.increment();
         return shipId;
     }
 

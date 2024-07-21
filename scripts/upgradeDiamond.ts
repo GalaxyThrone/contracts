@@ -8,7 +8,7 @@ import {
 export async function upgrade() {
   const diamondUpgrader =
     "0x9Fdd6069b4DBb60cE882066dF7E11F0f12B7aFC7";
-  const diamondAddress = "0xb07030a61e4d257d9dd72C3872Bb959449592e4A";
+  const diamondAddress = "0x56A32993Df42045cbF88539b0E88F9a6fE5Ee127";
 
   const facets: FacetsAndAddSelectors[] = [
     {

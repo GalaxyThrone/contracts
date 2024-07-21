@@ -40,14 +40,6 @@ contract Planets is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         address indexed newOwner
     );
 
-    event planetTerraformed(uint256 indexed tokenId, address indexed newOwner);
-    event attackInitated(
-        uint256 attackedPlanet,
-        address indexed Attacker,
-        uint256 indexed timeToArrive,
-        uint256 indexed arrayIndex
-    );
-
     function initialize(address _gameDiamond) public initializer {
         __ERC721_init("Planets", "PLN");
         __Ownable_init();
@@ -146,7 +138,6 @@ contract Planets is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         address _newOwner
     ) external onlyGameDiamond {
         _safeTransfer(gameDiamond, _newOwner, _tokenId, "");
-        emit planetTerraformed(_tokenId, _newOwner);
     }
 
     function getPVPStatus(uint256 _planetId) external view returns (bool) {

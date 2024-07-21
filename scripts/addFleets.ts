@@ -9,7 +9,7 @@ export async function addFleets(fleetsAddress: string) {
     fleetsAddress
   )) as Ships;
 
-  const CRAFT_TIME_FACTOR = 20; // 20;
+  const CRAFT_TIME_FACTOR = 40; // 20;
 
   const fleet1: ship = {
     shipType: 1,
@@ -175,7 +175,7 @@ export async function addFleets(fleetsAddress: string) {
     defenseTypes: [20, 10, 10],
     health: 500,
     cargo: 30,
-    craftTime: 360 * CRAFT_TIME_FACTOR,
+    craftTime: 720 * CRAFT_TIME_FACTOR,
     craftedFrom: 10,
     name: "Terraformer",
     moduleSlots: 1,

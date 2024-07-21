@@ -12,7 +12,10 @@ import { Signer } from "@ethersproject/abstract-signer";
 
 import { OwnershipFacet } from "../typechain-types";
 import { IDiamondCut } from "../typechain-types";
-import { getSelectors, getSighashes } from "../scripts/helperFunctions";
+import {
+  getSelectors,
+  getSighashes,
+} from "../scripts/helperFunctions";
 
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
@@ -23,7 +26,11 @@ export interface FacetsAndAddSelectors {
 }
 
 type FacetCutType = { Add: 0; Replace: 1; Remove: 2 };
-const FacetCutAction: FacetCutType = { Add: 0, Replace: 1, Remove: 2 };
+const FacetCutAction: FacetCutType = {
+  Add: 0,
+  Replace: 1,
+  Remove: 2,
+};
 
 export interface DeployUpgradeTaskArgs {
   diamondUpgrader: string;
@@ -90,17 +97,26 @@ task(
     "facetsAndAddSelectors",
     "Stringified array of facet names to upgrade, along with an array of add Selectors"
   )
-  .addOptionalParam("initAddress", "The facet address to call init function on")
+  .addOptionalParam(
+    "initAddress",
+    "The facet address to call init function on"
+  )
   .addOptionalParam("initCalldata", "The calldata for init function")
   .addFlag(
     "useMultisig",
     "Set to true if multisig should be used for deploying"
   )
-  .addFlag("useLedger", "Set to true if Ledger should be used for signing")
+  .addFlag(
+    "useLedger",
+    "Set to true if Ledger should be used for signing"
+  )
   // .addFlag("verifyFacets","Set to true if facets should be verified after deployment")
 
   .setAction(
-    async (taskArgs: DeployUpgradeTaskArgs, hre: HardhatRuntimeEnvironment) => {
+    async (
+      taskArgs: DeployUpgradeTaskArgs,
+      hre: HardhatRuntimeEnvironment
+    ) => {
       const facets: string = taskArgs.facetsAndAddSelectors;
       const facetsAndAddSelectors: FacetsAndAddSelectors[] =
         convertStringToFacetAndSelectors(facets);
@@ -119,7 +135,9 @@ task(
           diamondAddress
         )) as OwnershipFacet
       ).owner();
-      const testing = ["hardhat", "localhost"].includes(hre.network.name);
+      const testing = ["hardhat", "localhost"].includes(
+        hre.network.name
+      );
 
       if (testing) {
         await hre.network.provider.request({
@@ -130,7 +148,8 @@ task(
       } else if (
         hre.network.name === "matic" ||
         hre.network.name === "mumbai" ||
-        hre.network.name === "gcopt"
+        hre.network.name === "gcopt" ||
+        hre.network.name === "ArbitrumSepolia"
       ) {
         signer = (await hre.ethers.getSigners())[0];
       } else {
@@ -141,7 +160,11 @@ task(
       const deployedFacets = [];
       const cut: Cut[] = [];
 
-      for (let index = 0; index < facetsAndAddSelectors.length; index++) {
+      for (
+        let index = 0;
+        index < facetsAndAddSelectors.length;
+        index++
+      ) {
         const facet = facetsAndAddSelectors[index];
 
         console.log("facet:", facet);
@@ -156,13 +179,21 @@ task(
         );
         deployedFacets.push(deployedFacet);
 
-        const newSelectors = getSighashes(facet.addSelectors, hre.ethers);
-        const removeSelectors = getSighashes(facet.removeSelectors, hre.ethers);
+        const newSelectors = getSighashes(
+          facet.addSelectors,
+          hre.ethers
+        );
+        const removeSelectors = getSighashes(
+          facet.removeSelectors,
+          hre.ethers
+        );
 
         //debug
         let existingFuncs = getSelectors(deployedFacet);
         for (const selector of newSelectors) {
-          const index = newSelectors.findIndex((val) => val == selector);
+          const index = newSelectors.findIndex(
+            (val) => val == selector
+          );
           console.log(
             `selector: ${selector}, function: ${facet.addSelectors[index]}`
           );
@@ -218,7 +249,9 @@ task(
         console.log("Diamond cut");
         const tx: ContractTransaction = await diamondCut.diamondCut(
           cut,
-          initAddress ? initAddress : hre.ethers.constants.AddressZero,
+          initAddress
+            ? initAddress
+            : hre.ethers.constants.AddressZero,
           initCalldata ? initCalldata : "0x",
           { gasLimit: 8000000 }
         );
@@ -235,7 +268,9 @@ task(
           const tx: PopulatedTransaction =
             await diamondCut.populateTransaction.diamondCut(
               cut,
-              initAddress ? initAddress : hre.ethers.constants.AddressZero,
+              initAddress
+                ? initAddress
+                : hre.ethers.constants.AddressZero,
               initCalldata ? initCalldata : "0x",
               { gasLimit: 800000 }
             );
@@ -244,7 +279,9 @@ task(
           console.log("Sending upgrade to Ledger...");
           const tx: ContractTransaction = await diamondCut.diamondCut(
             cut,
-            initAddress ? initAddress : hre.ethers.constants.AddressZero,
+            initAddress
+              ? initAddress
+              : hre.ethers.constants.AddressZero,
             initCalldata ? initCalldata : "0x"
           );
 

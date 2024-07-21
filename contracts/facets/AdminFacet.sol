@@ -158,14 +158,14 @@ contract AdminFacet is Modifiers {
             _randomness[4] = uint256(keccak256(abi.encode(_randomness[0], i)));
             uint256 coordinateX = _randomness[0] % 10000;
             uint256 coordinateY = _randomness[1] % 10000;
-            uint256 antimatter = ((_randomness[2] % 100000) * 1e18) +
-                (100000 * 1e18);
-            uint256 metal = ((_randomness[3] % 100000)) *
+            uint256 antimatter = ((_randomness[2] % 1000000) * 1e18) +
+                (1000000 * 1e18);
+            uint256 metal = ((_randomness[3] % 1000000)) *
                 1e18 +
-                (100000 * 1e18);
-            uint256 crystal = ((_randomness[4] % 100000)) *
+                (1000000 * 1e18);
+            uint256 crystal = ((_randomness[4] % 1000000)) *
                 1e18 +
-                (100000 * 1e18);
+                (1000000 * 1e18);
             IPlanets(s.planetsAddress).mint(
                 IPlanets.Planet({
                     coordinateX: coordinateX,

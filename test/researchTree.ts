@@ -24,7 +24,9 @@ import { Provider } from "@ethersproject/abstract-provider";
 
 import { PromiseOrValue } from "../typechain-types/common";
 
-const { loadFixture } = require("@nomicfoundation/hardhat-network-helpers");
+const {
+  loadFixture,
+} = require("@nomicfoundation/hardhat-network-helpers");
 // import { upgradeContract } from "../scripts/upgradeContract";
 
 describe("Research Technology Testing", function () {
@@ -50,8 +52,13 @@ describe("Research Technology Testing", function () {
   let allianceFacet: AllianceFacet;
 
   async function deployUsers() {
-    const [owner, randomUser, randomUserTwo, randomUserThree, AdminUser] =
-      await ethers.getSigners();
+    const [
+      owner,
+      randomUser,
+      randomUserTwo,
+      randomUserThree,
+      AdminUser,
+    ] = await ethers.getSigners();
 
     return {
       owner,
@@ -79,7 +86,9 @@ describe("Research Technology Testing", function () {
     );
     const timestampBefore = blockBefore.timestamp;
 
-    await ethers.provider.send("evm_mine", [timestampBefore + quantity]);
+    await ethers.provider.send("evm_mine", [
+      timestampBefore + quantity,
+    ]);
   };
 
   const registerUser = async (user: string | Signer | Provider) => {
@@ -100,7 +109,9 @@ describe("Research Technology Testing", function () {
     user: string | Signer | Provider,
     planetId: PromiseOrValue<BigNumberish>
   ) => {
-    return await buildingsFacet.connect(user).craftBuilding(10, planetId, 1);
+    return await buildingsFacet
+      .connect(user)
+      .craftBuilding(10, planetId, 1);
   };
 
   const craftBuildingSpecific = async (
@@ -184,7 +195,9 @@ describe("Research Technology Testing", function () {
     user: string | Signer | Provider,
     terraformIndex: PromiseOrValue<BigNumberish>
   ) => {
-    return await shipsFacet.connect(user).endTerraform(terraformIndex);
+    return await shipsFacet
+      .connect(user)
+      .endTerraform(terraformIndex);
   };
 
   async function setupUser(
@@ -198,7 +211,10 @@ describe("Research Technology Testing", function () {
     await registerUser(user);
 
     // Get the user's initial planet
-    const planetId = await planetNfts.tokenOfOwnerByIndex(userAddress, 0);
+    const planetId = await planetNfts.tokenOfOwnerByIndex(
+      userAddress,
+      0
+    );
 
     // Craft and claim buildings
     for (let i = 0; i < buildings; i++) {
@@ -215,13 +231,20 @@ describe("Research Technology Testing", function () {
     }
   }
 
-  async function getShipIdsForOwner(user: Signer): Promise<BigNumber[]> {
+  async function getShipIdsForOwner(
+    user: Signer
+  ): Promise<BigNumber[]> {
     const userAddress = await user.getAddress();
-    const shipCount = (await shipNfts.balanceOf(userAddress)).toNumber();
+    const shipCount = (
+      await shipNfts.balanceOf(userAddress)
+    ).toNumber();
     const shipIds: BigNumber[] = [];
 
     for (let i = 0; i < shipCount; i++) {
-      const shipId = await shipNfts.tokenOfOwnerByIndex(userAddress, i);
+      const shipId = await shipNfts.tokenOfOwnerByIndex(
+        userAddress,
+        i
+      );
       shipIds.push(shipId);
     }
 
@@ -252,9 +275,15 @@ describe("Research Technology Testing", function () {
       g.planetsAddress
     )) as Planets;
 
-    shipNfts = (await ethers.getContractAt("Ships", g.shipsAddress)) as Ships;
+    shipNfts = (await ethers.getContractAt(
+      "Ships",
+      g.shipsAddress
+    )) as Ships;
 
-    metalToken = (await ethers.getContractAt("Metal", g.metalAddress)) as Metal;
+    metalToken = (await ethers.getContractAt(
+      "Metal",
+      g.metalAddress
+    )) as Metal;
 
     crystalToken = (await ethers.getContractAt(
       "Crystal",
@@ -307,8 +336,13 @@ describe("Research Technology Testing", function () {
     // ID of Utility Tech Tree is 4.
     describe("Utility Tech Tree", function () {
       it("Enhanced Planetary Mining increases Users planetary mining output by 20%", async function () {
-        const { owner, randomUser, randomUserTwo, randomUserThree, AdminUser } =
-          await loadFixture(deployUsers);
+        const {
+          owner,
+          randomUser,
+          randomUserTwo,
+          randomUserThree,
+          AdminUser,
+        } = await loadFixture(deployUsers);
 
         const registration = await registerFacet
           .connect(randomUser)
@@ -324,38 +358,59 @@ describe("Research Technology Testing", function () {
         );
 
         // Check if the user has already researched the tech
-        let hasResearched = await managementFacet.returnPlayerResearchedTech(
-          4,
-          4,
-          randomUser.address
-        );
+        let hasResearched =
+          await managementFacet.returnPlayerResearchedTech(
+            4,
+            4,
+            randomUser.address
+          );
         expect(hasResearched).to.be.false;
 
         //mining without buff
-        let beforeMining = await buildingsFacet.getPlanetResources(planetId, 0);
-        await buildingsFacet.connect(randomUser).mineResources(planetId);
-        let afterMining = await buildingsFacet.getPlanetResources(planetId, 0);
+        let beforeMining = await buildingsFacet.getPlanetResources(
+          planetId,
+          0
+        );
+        await buildingsFacet
+          .connect(randomUser)
+          .mineResources(planetId);
+        let afterMining = await buildingsFacet.getPlanetResources(
+          planetId,
+          0
+        );
 
-        const minedAmountMetalUnbuffed = afterMining.sub(beforeMining);
+        const minedAmountMetalUnbuffed =
+          afterMining.sub(beforeMining);
 
         //advance by one hour to mine again
         await advanceTimeAndBlockByAmount(60 * 60);
 
         // User researches Enhanced Planetary Mining
-        await managementFacet.connect(randomUser).researchTech(4, 4, planetId); // TechId, TechTree, PlanetId
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(4, 4, planetId); // TechId, TechTree, PlanetId
 
         // Verify the tech is now researched
-        hasResearched = await managementFacet.returnPlayerResearchedTech(
-          4,
-          4,
-          randomUser.address
-        );
+        hasResearched =
+          await managementFacet.returnPlayerResearchedTech(
+            4,
+            4,
+            randomUser.address
+          );
         expect(hasResearched).to.be.true;
 
         //mining without buff
-        beforeMining = await buildingsFacet.getPlanetResources(planetId, 0);
-        await buildingsFacet.connect(randomUser).mineResources(planetId);
-        afterMining = await buildingsFacet.getPlanetResources(planetId, 0);
+        beforeMining = await buildingsFacet.getPlanetResources(
+          planetId,
+          0
+        );
+        await buildingsFacet
+          .connect(randomUser)
+          .mineResources(planetId);
+        afterMining = await buildingsFacet.getPlanetResources(
+          planetId,
+          0
+        );
 
         const minedAmountMetalBuffed = afterMining.sub(beforeMining);
 
@@ -366,8 +421,13 @@ describe("Research Technology Testing", function () {
       });
 
       it("User can research Aether Mining Technology and mine Aether on their Planets 50% of the time", async function () {
-        const { owner, randomUser, randomUserTwo, randomUserThree, AdminUser } =
-          await loadFixture(deployUsers);
+        const {
+          owner,
+          randomUser,
+          randomUserTwo,
+          randomUserThree,
+          AdminUser,
+        } = await loadFixture(deployUsers);
 
         const registration = await registerFacet
           .connect(randomUser)
@@ -386,19 +446,25 @@ describe("Research Technology Testing", function () {
 
         //fail if trying to research before researching prerequisite
         await expect(
-          managementFacet.connect(randomUser).researchTech(5, 4, planetId)
+          managementFacet
+            .connect(randomUser)
+            .researchTech(5, 4, planetId)
         ).to.be.revertedWith(
           "ManagementFacet: prerequisite tech not researched"
         ); // TechId, TechTree, PlanetId
 
         // Research prerequisite technlogy [Enhanced Planetary Mining [ID 4]] first
-        await managementFacet.connect(randomUser).researchTech(4, 4, planetId); // Enhanced Planetary Mining
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(4, 4, planetId); // Enhanced Planetary Mining
 
         //advance 24hours research cooldown
         await advanceTimeAndBlockByAmount(60 * 60 * 24 + 60);
 
         // Research Aether Mining Technology
-        await managementFacet.connect(randomUser).researchTech(5, 4, planetId); // TechId, TechTree, PlanetId
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(5, 4, planetId); // TechId, TechTree, PlanetId
 
         // Verify the tech is now researched
         const hasResearchedAetherTech =
@@ -412,7 +478,9 @@ describe("Research Technology Testing", function () {
         // Simulate mining multiple times to account for 50% chance
         let aetherMined = false;
         for (let i = 0; i < 20; i++) {
-          await buildingsFacet.connect(randomUser).mineResources(planetId);
+          await buildingsFacet
+            .connect(randomUser)
+            .mineResources(planetId);
 
           await ethers.provider.send("evm_mine", [
             1200000 * 444485 + (i + 1) * 10000,
@@ -432,8 +500,13 @@ describe("Research Technology Testing", function () {
       });
 
       it("User can research Enhanced Aether Mining Technology and mine Aether on their Planets 100% of the time", async function () {
-        const { owner, randomUser, randomUserTwo, randomUserThree, AdminUser } =
-          await loadFixture(deployUsers);
+        const {
+          owner,
+          randomUser,
+          randomUserTwo,
+          randomUserThree,
+          AdminUser,
+        } = await loadFixture(deployUsers);
 
         const registration = await registerFacet
           .connect(randomUser)
@@ -449,12 +522,16 @@ describe("Research Technology Testing", function () {
         );
 
         // Research prerequisite technlogy [Enhanced Planetary Mining [ID 4]] first
-        await managementFacet.connect(randomUser).researchTech(4, 4, planetId); // Enhanced Planetary Mining
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(4, 4, planetId); // Enhanced Planetary Mining
         //advance 24hours cooldown
         await advanceTimeAndBlockByAmount(60 * 60 * 24 + 60);
 
         // Research  prerequisite technlogy [Aether Mining Technology [ID 5]] first
-        await managementFacet.connect(randomUser).researchTech(5, 4, planetId); // TechId, TechTree, PlanetId
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(5, 4, planetId); // TechId, TechTree, PlanetId
 
         //advance 72hours cooldown
         await advanceTimeAndBlockByAmount(60 * 60 * 72 + 60);
@@ -462,7 +539,9 @@ describe("Research Technology Testing", function () {
         // Simulate mining multiple times to account for 50% chance
         let aetherMined = false;
         for (let i = 0; i < 30; i++) {
-          await buildingsFacet.connect(randomUser).mineResources(planetId);
+          await buildingsFacet
+            .connect(randomUser)
+            .mineResources(planetId);
 
           await ethers.provider.send("evm_mine", [
             1200000 * 444485 + (i + 1) * 10000,
@@ -476,7 +555,9 @@ describe("Research Technology Testing", function () {
           }
         }
 
-        await managementFacet.connect(randomUser).researchTech(6, 4, planetId); // TechId, TechTree, PlanetId
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(6, 4, planetId); // TechId, TechTree, PlanetId
 
         // Verify the tech is now researched
         const hasResearchedAetherTech =
@@ -489,7 +570,9 @@ describe("Research Technology Testing", function () {
 
         // Aether should be mined 100% of the time now
 
-        await buildingsFacet.connect(randomUser).mineResources(planetId);
+        await buildingsFacet
+          .connect(randomUser)
+          .mineResources(planetId);
 
         const aetherBalance = await buildingsFacet.getAetherPlayer(
           randomUser.address
@@ -503,8 +586,13 @@ describe("Research Technology Testing", function () {
       });
 
       it("Enhanced Asteroid Mining Yield increases Users asteroid mining output by 10%", async function () {
-        const { owner, randomUser, randomUserTwo, randomUserThree, AdminUser } =
-          await loadFixture(deployUsers);
+        const {
+          owner,
+          randomUser,
+          randomUserTwo,
+          randomUserThree,
+          AdminUser,
+        } = await loadFixture(deployUsers);
 
         const registration = await registerFacet
           .connect(randomUser)
@@ -529,10 +617,8 @@ describe("Research Technology Testing", function () {
         );
 
         //outmining without buff:
-        let beforeAsteroidMining = await buildingsFacet.getPlanetResources(
-          planetId,
-          0
-        );
+        let beforeAsteroidMining =
+          await buildingsFacet.getPlanetResources(planetId, 0);
 
         await shipsFacet
           .connect(randomUser)
@@ -543,40 +629,41 @@ describe("Research Technology Testing", function () {
           .connect(randomUser)
           .resolveOutMining(1);
 
-        let afterAsteroidMining = await buildingsFacet.getPlanetResources(
-          planetId,
-          0
-        );
+        let afterAsteroidMining =
+          await buildingsFacet.getPlanetResources(planetId, 0);
 
-        let unbuffedAsteroidMetalGain =
-          afterAsteroidMining.sub(beforeAsteroidMining);
+        let unbuffedAsteroidMetalGain = afterAsteroidMining.sub(
+          beforeAsteroidMining
+        );
 
         // check that asteroid mining was successful
 
         // Check if the user has already researched the tech
-        let hasResearched = await managementFacet.returnPlayerResearchedTech(
-          7,
-          4,
-          randomUser.address
-        );
+        let hasResearched =
+          await managementFacet.returnPlayerResearchedTech(
+            7,
+            4,
+            randomUser.address
+          );
         expect(hasResearched).to.be.false;
 
         // User researches Enhanced Planetary Mining
-        await managementFacet.connect(randomUser).researchTech(7, 4, planetId); // TechId, TechTree, PlanetId
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(7, 4, planetId); // TechId, TechTree, PlanetId
 
         // Verify the tech is now researched
-        hasResearched = await managementFacet.returnPlayerResearchedTech(
-          7,
-          4,
-          randomUser.address
-        );
+        hasResearched =
+          await managementFacet.returnPlayerResearchedTech(
+            7,
+            4,
+            randomUser.address
+          );
         expect(hasResearched).to.be.true;
 
         //outmining with buff:
-        beforeAsteroidMining = await buildingsFacet.getPlanetResources(
-          planetId,
-          0
-        );
+        beforeAsteroidMining =
+          await buildingsFacet.getPlanetResources(planetId, 0);
 
         await shipsFacet
           .connect(randomUser)
@@ -592,8 +679,9 @@ describe("Research Technology Testing", function () {
           0
         );
 
-        let buffedAsteroidMetalGain =
-          afterAsteroidMining.sub(beforeAsteroidMining);
+        let buffedAsteroidMetalGain = afterAsteroidMining.sub(
+          beforeAsteroidMining
+        );
 
         // Check if asteroid mining output increased after research by 10%
         expect(buffedAsteroidMetalGain).to.be.equal(
@@ -602,8 +690,13 @@ describe("Research Technology Testing", function () {
       });
 
       it("Rapid Asteroid Mining Procedures accelerates Users asteroid mining speed by 25% (6hours faster)", async function () {
-        const { owner, randomUser, randomUserTwo, randomUserThree, AdminUser } =
-          await loadFixture(deployUsers);
+        const {
+          owner,
+          randomUser,
+          randomUserTwo,
+          randomUserThree,
+          AdminUser,
+        } = await loadFixture(deployUsers);
 
         const registration = await registerFacet
           .connect(randomUser)
@@ -638,39 +731,46 @@ describe("Research Technology Testing", function () {
 
         expect(
           shipsFacet.connect(randomUser).resolveOutMining(1)
-        ).to.be.revertedWith("ShipsFacet: Mining hasnt concluded yet!");
+        ).to.be.revertedWith(
+          "ShipsFacet: Mining hasnt concluded yet!"
+        );
 
         let travelTime = Number(
           await shipsFacet.checkTravelTime(planetId, 215, 0)
         );
 
         //advance by 2hours + travelTime ( 24h mining time+ travelTime)
-        await advanceTimeAndBlockByAmount(60 * 60 * 3 + travelTime + 60);
+        await advanceTimeAndBlockByAmount(
+          60 * 60 * 3 + travelTime + 60
+        );
 
         await shipsFacet.connect(randomUser).resolveOutMining(1);
 
         // User researches Enhanced Planetary Mining
-        await managementFacet.connect(randomUser).researchTech(7, 4, planetId); // TechId, TechTree, PlanetId
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(7, 4, planetId); // TechId, TechTree, PlanetId
 
         //advance by 2 days
         await advanceTimeAndBlockByAmount(60 * 60 * 24 * 2);
 
         // User researches  Rapid Asteroid Mining Procedures
-        await managementFacet.connect(randomUser).researchTech(8, 4, planetId); // TechId, TechTree, PlanetId
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(8, 4, planetId); // TechId, TechTree, PlanetId
 
         // Check if the user has already researched the tech
-        let hasResearched = await managementFacet.returnPlayerResearchedTech(
-          8,
-          4,
-          randomUser.address
-        );
+        let hasResearched =
+          await managementFacet.returnPlayerResearchedTech(
+            8,
+            4,
+            randomUser.address
+          );
         expect(hasResearched).to.be.true;
 
         //outmining with speed buff:
-        let beforeAsteroidMining = await buildingsFacet.getPlanetResources(
-          planetId,
-          0
-        );
+        let beforeAsteroidMining =
+          await buildingsFacet.getPlanetResources(planetId, 0);
 
         await shipsFacet
           .connect(randomUser)
@@ -681,17 +781,19 @@ describe("Research Technology Testing", function () {
 
         expect(
           shipsFacet.connect(randomUser).resolveOutMining(2)
-        ).to.be.revertedWith("ShipsFacet: Mining hasnt concluded yet!");
+        ).to.be.revertedWith(
+          "ShipsFacet: Mining hasnt concluded yet!"
+        );
 
         //advance by 8 hours + travel time ( total 18h + travelTime)
-        await advanceTimeAndBlockByAmount(60 * 60 * 8 + travelTime + 60);
+        await advanceTimeAndBlockByAmount(
+          60 * 60 * 8 + travelTime + 60
+        );
 
         await shipsFacet.connect(randomUser).resolveOutMining(2);
 
-        let afterAsteroidMining = await buildingsFacet.getPlanetResources(
-          planetId,
-          0
-        );
+        let afterAsteroidMining =
+          await buildingsFacet.getPlanetResources(planetId, 0);
 
         expect(beforeAsteroidMining).to.be.below(afterAsteroidMining);
         //console.log(unbuffedAsteroidMetalGain);
@@ -699,8 +801,13 @@ describe("Research Technology Testing", function () {
       });
 
       it("Advanced Asteroid Mining Extraction increases Users asteroid mining output by another 20%", async function () {
-        const { owner, randomUser, randomUserTwo, randomUserThree, AdminUser } =
-          await loadFixture(deployUsers);
+        const {
+          owner,
+          randomUser,
+          randomUserTwo,
+          randomUserThree,
+          AdminUser,
+        } = await loadFixture(deployUsers);
 
         const registration = await registerFacet
           .connect(randomUser)
@@ -725,10 +832,8 @@ describe("Research Technology Testing", function () {
         );
 
         //outmining without buff:
-        let beforeAsteroidMining = await buildingsFacet.getPlanetResources(
-          planetId,
-          0
-        );
+        let beforeAsteroidMining =
+          await buildingsFacet.getPlanetResources(planetId, 0);
 
         await shipsFacet
           .connect(randomUser)
@@ -739,24 +844,23 @@ describe("Research Technology Testing", function () {
           .connect(randomUser)
           .resolveOutMining(1);
 
-        let afterAsteroidMining = await buildingsFacet.getPlanetResources(
-          planetId,
-          0
-        );
+        let afterAsteroidMining =
+          await buildingsFacet.getPlanetResources(planetId, 0);
 
-        let unbuffedAsteroidMetalGain =
-          afterAsteroidMining.sub(beforeAsteroidMining);
+        let unbuffedAsteroidMetalGain = afterAsteroidMining.sub(
+          beforeAsteroidMining
+        );
 
         // check that asteroid mining was successful
 
         // User researches Enhanced Planetary Mining
-        await managementFacet.connect(randomUser).researchTech(7, 4, planetId); // TechId, TechTree, PlanetId
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(7, 4, planetId); // TechId, TechTree, PlanetId
 
         //outmining with buff:
-        beforeAsteroidMining = await buildingsFacet.getPlanetResources(
-          planetId,
-          0
-        );
+        beforeAsteroidMining =
+          await buildingsFacet.getPlanetResources(planetId, 0);
 
         await shipsFacet
           .connect(randomUser)
@@ -772,35 +876,39 @@ describe("Research Technology Testing", function () {
           0
         );
 
-        let buffedAsteroidMetalGain =
-          afterAsteroidMining.sub(beforeAsteroidMining);
+        let buffedAsteroidMetalGain = afterAsteroidMining.sub(
+          beforeAsteroidMining
+        );
 
         // Check if mining output increased after research by 10%
         expect(buffedAsteroidMetalGain).to.be.equal(
           unbuffedAsteroidMetalGain.mul(110).div(100)
         );
 
-        await managementFacet.connect(randomUser).researchTech(8, 4, planetId); // TechId, TechTree, PlanetId
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(8, 4, planetId); // TechId, TechTree, PlanetId
 
         await advanceTimeAndBlock(10000);
 
         // User researches Advanced Asteroid Resource Extraction 20% buff
-        await managementFacet.connect(randomUser).researchTech(9, 4, planetId); // TechId, TechTree, PlanetId
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(9, 4, planetId); // TechId, TechTree, PlanetId
         await advanceTimeAndBlock(10000);
 
         // Verify the tech is now researched
-        let hasResearched = await managementFacet.returnPlayerResearchedTech(
-          9,
-          4,
-          randomUser.address
-        );
+        let hasResearched =
+          await managementFacet.returnPlayerResearchedTech(
+            9,
+            4,
+            randomUser.address
+          );
         expect(hasResearched).to.be.true;
 
         //outmining with buff:
-        beforeAsteroidMining = await buildingsFacet.getPlanetResources(
-          planetId,
-          0
-        );
+        beforeAsteroidMining =
+          await buildingsFacet.getPlanetResources(planetId, 0);
 
         await shipsFacet
           .connect(randomUser)
@@ -814,7 +922,9 @@ describe("Research Technology Testing", function () {
           0
         );
 
-        buffedAsteroidMetalGain = afterAsteroidMining.sub(beforeAsteroidMining);
+        buffedAsteroidMetalGain = afterAsteroidMining.sub(
+          beforeAsteroidMining
+        );
 
         // Check if mining output increased after research by 10%
         expect(buffedAsteroidMetalGain).to.be.equal(
@@ -823,8 +933,13 @@ describe("Research Technology Testing", function () {
       });
 
       it("Miner Ship Combat Deputization doubles Users newly built Mining Ships Combat Capabilities", async function () {
-        const { owner, randomUser, randomUserTwo, randomUserThree, AdminUser } =
-          await loadFixture(deployUsers);
+        const {
+          owner,
+          randomUser,
+          randomUserTwo,
+          randomUserThree,
+          AdminUser,
+        } = await loadFixture(deployUsers);
 
         const registration = await registerFacet
           .connect(randomUser)
@@ -849,10 +964,8 @@ describe("Research Technology Testing", function () {
         );
 
         //outmining without buff:
-        let beforeAsteroidMining = await buildingsFacet.getPlanetResources(
-          planetId,
-          0
-        );
+        let beforeAsteroidMining =
+          await buildingsFacet.getPlanetResources(planetId, 0);
 
         await shipsFacet
           .connect(randomUser)
@@ -863,24 +976,23 @@ describe("Research Technology Testing", function () {
           .connect(randomUser)
           .resolveOutMining(1);
 
-        let afterAsteroidMining = await buildingsFacet.getPlanetResources(
-          planetId,
-          0
-        );
+        let afterAsteroidMining =
+          await buildingsFacet.getPlanetResources(planetId, 0);
 
-        let unbuffedAsteroidMetalGain =
-          afterAsteroidMining.sub(beforeAsteroidMining);
+        let unbuffedAsteroidMetalGain = afterAsteroidMining.sub(
+          beforeAsteroidMining
+        );
 
         // check that asteroid mining was successful
 
         // User researches Enhanced Planetary Mining
-        await managementFacet.connect(randomUser).researchTech(7, 4, planetId); // TechId, TechTree, PlanetId
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(7, 4, planetId); // TechId, TechTree, PlanetId
 
         //outmining with buff:
-        beforeAsteroidMining = await buildingsFacet.getPlanetResources(
-          planetId,
-          0
-        );
+        beforeAsteroidMining =
+          await buildingsFacet.getPlanetResources(planetId, 0);
 
         await shipsFacet
           .connect(randomUser)
@@ -896,48 +1008,52 @@ describe("Research Technology Testing", function () {
           0
         );
 
-        let buffedAsteroidMetalGain =
-          afterAsteroidMining.sub(beforeAsteroidMining);
+        let buffedAsteroidMetalGain = afterAsteroidMining.sub(
+          beforeAsteroidMining
+        );
 
         // Check if mining output increased after research by 10%
         expect(buffedAsteroidMetalGain).to.be.equal(
           unbuffedAsteroidMetalGain.mul(110).div(100)
         );
 
-        await managementFacet.connect(randomUser).researchTech(8, 4, planetId); // TechId, TechTree, PlanetId
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(8, 4, planetId); // TechId, TechTree, PlanetId
 
         await advanceTimeAndBlock(10000);
 
-        await managementFacet.connect(randomUser).researchTech(9, 4, planetId); // TechId, TechTree, PlanetId
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(9, 4, planetId); // TechId, TechTree, PlanetId
         await advanceTimeAndBlock(10000);
 
         // User researches  Miner Ship Combat Deputization for Doubling of Combat Stats
-        await managementFacet.connect(randomUser).researchTech(10, 4, planetId); // TechId, TechTree, PlanetId
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(10, 4, planetId); // TechId, TechTree, PlanetId
         await advanceTimeAndBlock(10000);
 
         // Verify the tech is now researched
-        let hasResearched = await managementFacet.returnPlayerResearchedTech(
-          10,
-          4,
-          randomUser.address
-        );
+        let hasResearched =
+          await managementFacet.returnPlayerResearchedTech(
+            10,
+            4,
+            randomUser.address
+          );
         expect(hasResearched).to.be.true;
 
         //craft buffed Miner Ship
         await craftAndClaimFleet(randomUser, 7, planetId, 1);
 
-        const shipIdPlayer1buffed = await shipNfts.tokenOfOwnerByIndex(
-          randomUser.address,
-          1
-        );
+        const shipIdPlayer1buffed =
+          await shipNfts.tokenOfOwnerByIndex(randomUser.address, 1);
 
-        const statsBeforeResearch = await shipsFacet.getShipStatsDiamond(
-          shipIdPlayer1
-        );
+        const statsBeforeResearch =
+          await shipsFacet.getShipStatsDiamond(shipIdPlayer1);
 
-        const statsAfterResearch = await shipsFacet.getShipStatsDiamond(
-          shipIdPlayer1buffed
-        );
+        const statsAfterResearch =
+          await shipsFacet.getShipStatsDiamond(shipIdPlayer1buffed);
 
         expect(statsAfterResearch.health).to.be.above(
           statsBeforeResearch.health
@@ -981,7 +1097,9 @@ describe("Research Technology Testing", function () {
 
         //check if prerequisite for Ship Attack Enhancement works correctly
         expect(
-          managementFacet.connect(randomUser).researchTech(3, 2, planetId)
+          managementFacet
+            .connect(randomUser)
+            .researchTech(3, 2, planetId)
         ).to.be.revertedWith(
           "ManagementFacet: prerequisite tech not researched"
         );
@@ -993,33 +1111,37 @@ describe("Research Technology Testing", function () {
             .startOutMining(planetId, 215, [shipIdPlayer1]);
           await advanceTimeAndBlock(100);
 
-          await shipsFacet.connect(randomUser).resolveOutMining(1 + i);
+          await shipsFacet
+            .connect(randomUser)
+            .resolveOutMining(1 + i);
         }
 
-        await managementFacet.connect(randomUser).researchTech(1, 2, planetId); // TechId, TechTree, PlanetId
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(1, 2, planetId); // TechId, TechTree, PlanetId
         await advanceTimeAndBlock(10000);
 
-        await managementFacet.connect(randomUser).researchTech(2, 2, planetId); // TechId, TechTree, PlanetId
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(2, 2, planetId); // TechId, TechTree, PlanetId
         await advanceTimeAndBlock(10000);
 
-        await managementFacet.connect(randomUser).researchTech(3, 2, planetId); // TechId, TechTree, PlanetId
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(3, 2, planetId); // TechId, TechTree, PlanetId
         await advanceTimeAndBlock(10000);
 
         //craft buffed  Ship
         await craftAndClaimFleet(randomUser, 7, planetId, 1);
 
-        const shipIdPlayer1buffed = await shipNfts.tokenOfOwnerByIndex(
-          randomUser.address,
-          1
-        );
+        const shipIdPlayer1buffed =
+          await shipNfts.tokenOfOwnerByIndex(randomUser.address, 1);
 
-        const statsBeforeResearch = await shipsFacet.getShipStatsDiamond(
-          shipIdPlayer1
-        );
+        const statsBeforeResearch =
+          await shipsFacet.getShipStatsDiamond(shipIdPlayer1);
 
-        const statsAfterResearch = await shipsFacet.getShipStatsDiamond(
-          shipIdPlayer1buffed
-        );
+        const statsAfterResearch =
+          await shipsFacet.getShipStatsDiamond(shipIdPlayer1buffed);
 
         expect(statsAfterResearch.defenseTypes[0]).to.be.above(
           statsBeforeResearch.defenseTypes[0]
@@ -1058,7 +1180,9 @@ describe("Research Technology Testing", function () {
 
         //check if prerequisite for Ship Attack Enhancement works correctly
         expect(
-          managementFacet.connect(randomUser).researchTech(3, 2, planetId)
+          managementFacet
+            .connect(randomUser)
+            .researchTech(3, 2, planetId)
         ).to.be.revertedWith(
           "ManagementFacet: prerequisite tech not researched"
         );
@@ -1074,36 +1198,42 @@ describe("Research Technology Testing", function () {
             ]);
           await advanceTimeAndBlock(100);
 
-          await shipsFacet.connect(randomUser).resolveOutMining(1 + i);
+          await shipsFacet
+            .connect(randomUser)
+            .resolveOutMining(1 + i);
         }
 
-        await managementFacet.connect(randomUser).researchTech(1, 2, planetId); // TechId, TechTree, PlanetId
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(1, 2, planetId); // TechId, TechTree, PlanetId
         await advanceTimeAndBlock(10000);
 
-        await managementFacet.connect(randomUser).researchTech(2, 2, planetId); // TechId, TechTree, PlanetId
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(2, 2, planetId); // TechId, TechTree, PlanetId
         await advanceTimeAndBlock(10000);
 
-        await managementFacet.connect(randomUser).researchTech(3, 2, planetId); // TechId, TechTree, PlanetId
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(3, 2, planetId); // TechId, TechTree, PlanetId
         await advanceTimeAndBlock(10000);
 
-        await managementFacet.connect(randomUser).researchTech(4, 2, planetId); // TechId, TechTree, PlanetId
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(4, 2, planetId); // TechId, TechTree, PlanetId
         await advanceTimeAndBlock(10000);
 
         //craft buffed  Ship
         await craftAndClaimFleet(randomUser, 7, planetId, 1);
 
-        const shipIdPlayer1buffed = await shipNfts.tokenOfOwnerByIndex(
-          randomUser.address,
-          3
-        );
+        const shipIdPlayer1buffed =
+          await shipNfts.tokenOfOwnerByIndex(randomUser.address, 3);
 
-        const statsBeforeResearch = await shipsFacet.getShipStatsDiamond(
-          shipIdPlayer1
-        );
+        const statsBeforeResearch =
+          await shipsFacet.getShipStatsDiamond(shipIdPlayer1);
 
-        const statsAfterResearch = await shipsFacet.getShipStatsDiamond(
-          shipIdPlayer1buffed
-        );
+        const statsAfterResearch =
+          await shipsFacet.getShipStatsDiamond(shipIdPlayer1buffed);
 
         expect(statsAfterResearch.defenseTypes[0]).to.be.above(
           statsBeforeResearch.defenseTypes[0]
@@ -1140,24 +1270,22 @@ describe("Research Technology Testing", function () {
           0
         );
 
-        await managementFacet.connect(randomUser).researchTech(5, 2, planetId); // TechId, TechTree, PlanetId
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(5, 2, planetId); // TechId, TechTree, PlanetId
         await advanceTimeAndBlock(10000);
 
         //craft buffed Miner Ship
         await craftAndClaimFleet(randomUser, 1, planetId, 1);
 
-        const shipIdPlayer1buffed = await shipNfts.tokenOfOwnerByIndex(
-          randomUser.address,
-          1
-        );
+        const shipIdPlayer1buffed =
+          await shipNfts.tokenOfOwnerByIndex(randomUser.address, 1);
 
-        const statsBeforeResearch = await shipsFacet.getShipStatsDiamond(
-          shipIdPlayer1
-        );
+        const statsBeforeResearch =
+          await shipsFacet.getShipStatsDiamond(shipIdPlayer1);
 
-        const statsAfterResearch = await shipsFacet.getShipStatsDiamond(
-          shipIdPlayer1buffed
-        );
+        const statsAfterResearch =
+          await shipsFacet.getShipStatsDiamond(shipIdPlayer1buffed);
 
         expect(statsAfterResearch.health).to.be.above(
           statsBeforeResearch.health
@@ -1191,32 +1319,34 @@ describe("Research Technology Testing", function () {
 
         //check if prerequisite for Ship Attack Enhancement works correctly
         expect(
-          managementFacet.connect(randomUser).researchTech(6, 2, planetId)
+          managementFacet
+            .connect(randomUser)
+            .researchTech(6, 2, planetId)
         ).to.be.revertedWith(
           "ManagementFacet: prerequisite tech not researched"
         );
 
-        await managementFacet.connect(randomUser).researchTech(5, 2, planetId); // TechId, TechTree, PlanetId
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(5, 2, planetId); // TechId, TechTree, PlanetId
         await advanceTimeAndBlock(10000);
 
-        await managementFacet.connect(randomUser).researchTech(6, 2, planetId); // TechId, TechTree, PlanetId
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(6, 2, planetId); // TechId, TechTree, PlanetId
         await advanceTimeAndBlock(10000);
 
         //craft buffed Miner Ship
         await craftAndClaimFleet(randomUser, 1, planetId, 1);
 
-        const shipIdPlayer1buffed = await shipNfts.tokenOfOwnerByIndex(
-          randomUser.address,
-          1
-        );
+        const shipIdPlayer1buffed =
+          await shipNfts.tokenOfOwnerByIndex(randomUser.address, 1);
 
-        const statsBeforeResearch = await shipsFacet.getShipStatsDiamond(
-          shipIdPlayer1
-        );
+        const statsBeforeResearch =
+          await shipsFacet.getShipStatsDiamond(shipIdPlayer1);
 
-        const statsAfterResearch = await shipsFacet.getShipStatsDiamond(
-          shipIdPlayer1buffed
-        );
+        const statsAfterResearch =
+          await shipsFacet.getShipStatsDiamond(shipIdPlayer1buffed);
 
         expect(statsAfterResearch.attackTypes[0]).to.be.above(
           statsBeforeResearch.attackTypes[0]
@@ -1264,15 +1394,21 @@ describe("Research Technology Testing", function () {
 
         //check if prerequisite for Ship Attack Enhancement works correctly
         expect(
-          managementFacet.connect(randomUser).researchTech(6, 2, planetId)
+          managementFacet
+            .connect(randomUser)
+            .researchTech(6, 2, planetId)
         ).to.be.revertedWith(
           "ManagementFacet: prerequisite tech not researched"
         );
 
-        await managementFacet.connect(randomUser).researchTech(5, 2, planetId); // TechId, TechTree, PlanetId
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(5, 2, planetId); // TechId, TechTree, PlanetId
         await advanceTimeAndBlock(10000);
 
-        await managementFacet.connect(randomUser).researchTech(6, 2, planetId); // TechId, TechTree, PlanetId
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(6, 2, planetId); // TechId, TechTree, PlanetId
         await advanceTimeAndBlock(10000);
 
         //asteroid mine enough aether for advanced research
@@ -1282,32 +1418,36 @@ describe("Research Technology Testing", function () {
             .startOutMining(planetId, 215, [shipIdPlayer1Miner]);
           await advanceTimeAndBlock(100);
 
-          await shipsFacet.connect(randomUser).resolveOutMining(1 + i);
+          await shipsFacet
+            .connect(randomUser)
+            .resolveOutMining(1 + i);
         }
 
-        await managementFacet.connect(randomUser).researchTech(7, 2, planetId); // TechId, TechTree, PlanetId
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(7, 2, planetId); // TechId, TechTree, PlanetId
         await advanceTimeAndBlock(10000);
 
-        await buildingsFacet.connect(randomUser).mineResources(planetId);
+        await buildingsFacet
+          .connect(randomUser)
+          .mineResources(planetId);
 
-        await managementFacet.connect(randomUser).researchTech(8, 2, planetId); // TechId, TechTree, PlanetId
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(8, 2, planetId); // TechId, TechTree, PlanetId
         await advanceTimeAndBlock(10000);
 
         //craft buffed Miner Ship
         await craftAndClaimFleet(randomUser, 1, planetId, 1);
 
-        const shipIdPlayer1buffed = await shipNfts.tokenOfOwnerByIndex(
-          randomUser.address,
-          2
-        );
+        const shipIdPlayer1buffed =
+          await shipNfts.tokenOfOwnerByIndex(randomUser.address, 2);
 
-        const statsBeforeResearch = await shipsFacet.getShipStatsDiamond(
-          shipIdPlayer1
-        );
+        const statsBeforeResearch =
+          await shipsFacet.getShipStatsDiamond(shipIdPlayer1);
 
-        const statsAfterResearch = await shipsFacet.getShipStatsDiamond(
-          shipIdPlayer1buffed
-        );
+        const statsAfterResearch =
+          await shipsFacet.getShipStatsDiamond(shipIdPlayer1buffed);
 
         //attack should be raised by 10%
         expect(
@@ -1332,34 +1472,46 @@ describe("Research Technology Testing", function () {
         // Craft a building without the tech
         await buildingsFacet
           .connect(randomUser)
-          .craftBuilding(buildingTypeToCraft, planetId, buildingAmountToCraft);
+          .craftBuilding(
+            buildingTypeToCraft,
+            planetId,
+            buildingAmountToCraft
+          );
 
         // Get the craft time for comparison
-        let craftItemWithoutTech = await buildingsFacet.getCraftBuildings(
-          planetId
-        );
+        let craftItemWithoutTech =
+          await buildingsFacet.getCraftBuildings(planetId);
         let standardCraftTime = craftItemWithoutTech.craftTimeItem;
 
         // Advance time and claim the building
-        const timestampBefore = await ethers.provider.getBlock("latest");
+        const timestampBefore = await ethers.provider.getBlock(
+          "latest"
+        );
         const timeToAdvance = craftItemWithoutTech.readyTimestamp.sub(
           timestampBefore.timestamp
         );
         await advanceTimeAndBlock(timeToAdvance.toNumber());
-        await buildingsFacet.connect(randomUser).claimBuilding(planetId);
+        await buildingsFacet
+          .connect(randomUser)
+          .claimBuilding(planetId);
 
         // Research the "Rapid Infrastructure Development" tech
-        await managementFacet.connect(randomUser).researchTech(1, 3, planetId); // TechId 1 in Governance Tech Tree // TechId, TechTree, PlanetId
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(1, 3, planetId); // TechId 1 in Governance Tech Tree // TechId, TechTree, PlanetId
 
         // Craft another building after researching the tech
         await buildingsFacet
           .connect(randomUser)
-          .craftBuilding(buildingTypeToCraft, planetId, buildingAmountToCraft);
+          .craftBuilding(
+            buildingTypeToCraft,
+            planetId,
+            buildingAmountToCraft
+          );
 
         // Get the new craft time
-        let craftItemWithTech = await buildingsFacet.getCraftBuildings(
-          planetId
-        );
+        let craftItemWithTech =
+          await buildingsFacet.getCraftBuildings(planetId);
         let reducedCraftTime = craftItemWithTech.craftTimeItem;
 
         let researchCooldown =
@@ -1388,21 +1540,23 @@ describe("Research Technology Testing", function () {
         // Craft a building without the tech
         await buildingsFacet
           .connect(randomUser)
-          .craftBuilding(buildingTypeToCraft, planetId, buildingAmountToCraft);
+          .craftBuilding(
+            buildingTypeToCraft,
+            planetId,
+            buildingAmountToCraft
+          );
 
         //resource cost before
 
-        let beforeFleetCraftUnbuffed = await buildingsFacet.getPlanetResources(
-          planetId,
-          0
-        );
+        let beforeFleetCraftUnbuffed =
+          await buildingsFacet.getPlanetResources(planetId, 0);
 
-        await shipsFacet.connect(randomUser).craftFleet(1, planetId, 1);
+        await shipsFacet
+          .connect(randomUser)
+          .craftFleet(1, planetId, 1);
 
-        let afterFleetCraftUnbuffed = await buildingsFacet.getPlanetResources(
-          planetId,
-          0
-        );
+        let afterFleetCraftUnbuffed =
+          await buildingsFacet.getPlanetResources(planetId, 0);
 
         let UnbuffedCostMetal = beforeFleetCraftUnbuffed.sub(
           afterFleetCraftUnbuffed
@@ -1410,7 +1564,9 @@ describe("Research Technology Testing", function () {
         //resource cost after calc diff
 
         // Get the craft time for comparison
-        let craftItemWithoutTech = await shipsFacet.getCraftFleets(planetId);
+        let craftItemWithoutTech = await shipsFacet.getCraftFleets(
+          planetId
+        );
 
         let standardCraftTime = craftItemWithoutTech.craftTimeItem;
 
@@ -1418,35 +1574,43 @@ describe("Research Technology Testing", function () {
 
         await shipsFacet.connect(randomUser).claimFleet(planetId);
 
-        await buildingsFacet.connect(randomUser).claimBuilding(planetId);
+        await buildingsFacet
+          .connect(randomUser)
+          .claimBuilding(planetId);
 
         // Research the "Rapid Infrastructure Development" tech
-        await managementFacet.connect(randomUser).researchTech(1, 3, planetId); // TechId 1 in Governance Tech Tree // TechId, TechTree, PlanetId
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(1, 3, planetId); // TechId 1 in Governance Tech Tree // TechId, TechTree, PlanetId
 
         await advanceTimeAndBlock(100);
         await advanceTimeAndBlock(100);
         // Research the "Fleet Fabrication Mastery" tech
-        await managementFacet.connect(randomUser).researchTech(2, 3, planetId); // TechId 1 in Governance Tech Tree // TechId, TechTree, PlanetId
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(2, 3, planetId); // TechId 1 in Governance Tech Tree // TechId, TechTree, PlanetId
 
         //resource cost before
 
-        let beforeFleetCraftBuffed = await buildingsFacet.getPlanetResources(
-          planetId,
-          0
-        );
+        let beforeFleetCraftBuffed =
+          await buildingsFacet.getPlanetResources(planetId, 0);
 
-        await shipsFacet.connect(randomUser).craftFleet(1, planetId, 1);
+        await shipsFacet
+          .connect(randomUser)
+          .craftFleet(1, planetId, 1);
         //resource cost after calc diff
 
-        let afterFleetCraftBuffed = await buildingsFacet.getPlanetResources(
-          planetId,
-          0
+        let afterFleetCraftBuffed =
+          await buildingsFacet.getPlanetResources(planetId, 0);
+
+        let BuffedCostMetal = beforeFleetCraftBuffed.sub(
+          afterFleetCraftBuffed
         );
 
-        let BuffedCostMetal = beforeFleetCraftBuffed.sub(afterFleetCraftBuffed);
-
         // Get the new craft time
-        let craftItemWithTech = await shipsFacet.getCraftFleets(planetId);
+        let craftItemWithTech = await shipsFacet.getCraftFleets(
+          planetId
+        );
         let reducedCraftTime = craftItemWithTech.craftTimeItem;
 
         // Compare the craft times
@@ -1470,21 +1634,23 @@ describe("Research Technology Testing", function () {
         // Craft a building without the tech
         await buildingsFacet
           .connect(randomUser)
-          .craftBuilding(buildingTypeToCraft, planetId, buildingAmountToCraft);
+          .craftBuilding(
+            buildingTypeToCraft,
+            planetId,
+            buildingAmountToCraft
+          );
 
         //resource cost before
 
-        let beforeFleetCraftUnbuffed = await buildingsFacet.getPlanetResources(
-          planetId,
-          0
-        );
+        let beforeFleetCraftUnbuffed =
+          await buildingsFacet.getPlanetResources(planetId, 0);
 
-        await shipsFacet.connect(randomUser).craftFleet(7, planetId, 1);
+        await shipsFacet
+          .connect(randomUser)
+          .craftFleet(7, planetId, 1);
 
-        let afterFleetCraftUnbuffed = await buildingsFacet.getPlanetResources(
-          planetId,
-          0
-        );
+        let afterFleetCraftUnbuffed =
+          await buildingsFacet.getPlanetResources(planetId, 0);
 
         let UnbuffedCostMetal = beforeFleetCraftUnbuffed.sub(
           afterFleetCraftUnbuffed
@@ -1492,7 +1658,9 @@ describe("Research Technology Testing", function () {
         //resource cost after calc diff
 
         // Get the craft time for comparison
-        let craftItemWithoutTech = await shipsFacet.getCraftFleets(planetId);
+        let craftItemWithoutTech = await shipsFacet.getCraftFleets(
+          planetId
+        );
 
         let standardCraftTime = craftItemWithoutTech.craftTimeItem;
 
@@ -1500,15 +1668,21 @@ describe("Research Technology Testing", function () {
 
         await shipsFacet.connect(randomUser).claimFleet(planetId);
 
-        await buildingsFacet.connect(randomUser).claimBuilding(planetId);
+        await buildingsFacet
+          .connect(randomUser)
+          .claimBuilding(planetId);
 
         // Research the "Rapid Infrastructure Development" tech
-        await managementFacet.connect(randomUser).researchTech(1, 3, planetId); // TechId 1 in Governance Tech Tree // TechId, TechTree, PlanetId
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(1, 3, planetId); // TechId 1 in Governance Tech Tree // TechId, TechTree, PlanetId
 
         await advanceTimeAndBlock(200);
 
         // Research the "Fleet Fabrication Mastery" tech
-        await managementFacet.connect(randomUser).researchTech(2, 3, planetId); // TechId 2 in Governance Tech Tree // TechId, TechTree, PlanetId
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(2, 3, planetId); // TechId 2 in Governance Tech Tree // TechId, TechTree, PlanetId
 
         await advanceTimeAndBlock(200);
 
@@ -1523,31 +1697,37 @@ describe("Research Technology Testing", function () {
             .startOutMining(planetId, 215, [shipIdPlayer1]);
           await advanceTimeAndBlock(100);
 
-          await shipsFacet.connect(randomUser).resolveOutMining(1 + i);
+          await shipsFacet
+            .connect(randomUser)
+            .resolveOutMining(1 + i);
         }
 
         // Research the "Resource-Savvy Constructions" tech
-        await managementFacet.connect(randomUser).researchTech(3, 3, planetId); // TechId 3 in Governance Tech Tree // TechId, TechTree, PlanetId
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(3, 3, planetId); // TechId 3 in Governance Tech Tree // TechId, TechTree, PlanetId
 
         //resource cost before
 
-        let beforeFleetCraftBuffed = await buildingsFacet.getPlanetResources(
-          planetId,
-          0
-        );
+        let beforeFleetCraftBuffed =
+          await buildingsFacet.getPlanetResources(planetId, 0);
 
-        await shipsFacet.connect(randomUser).craftFleet(7, planetId, 1);
+        await shipsFacet
+          .connect(randomUser)
+          .craftFleet(7, planetId, 1);
         //resource cost after calc diff
 
-        let afterFleetCraftBuffed = await buildingsFacet.getPlanetResources(
-          planetId,
-          0
+        let afterFleetCraftBuffed =
+          await buildingsFacet.getPlanetResources(planetId, 0);
+
+        let BuffedCostMetal = beforeFleetCraftBuffed.sub(
+          afterFleetCraftBuffed
         );
 
-        let BuffedCostMetal = beforeFleetCraftBuffed.sub(afterFleetCraftBuffed);
-
         // Get the new craft time
-        let craftItemWithTech = await shipsFacet.getCraftFleets(planetId);
+        let craftItemWithTech = await shipsFacet.getCraftFleets(
+          planetId
+        );
         let reducedCraftTime = craftItemWithTech.craftTimeItem;
 
         // Compare the craft times
@@ -1559,8 +1739,13 @@ describe("Research Technology Testing", function () {
 
     describe.skip("Ships Tech Tree", function () {
       it("User can research Technology and buff their ships", async function () {
-        const { owner, randomUser, randomUserTwo, randomUserThree, AdminUser } =
-          await loadFixture(deployUsers);
+        const {
+          owner,
+          randomUser,
+          randomUserTwo,
+          randomUserThree,
+          AdminUser,
+        } = await loadFixture(deployUsers);
 
         const registration = await registerFacet
           .connect(randomUser)
@@ -1575,7 +1760,9 @@ describe("Research Technology Testing", function () {
           0
         );
 
-        await buildingsFacet.connect(randomUser).craftBuilding(10, planetId, 1);
+        await buildingsFacet
+          .connect(randomUser)
+          .craftBuilding(10, planetId, 1);
 
         const blockBefore = await ethers.provider.getBlock(
           await ethers.provider.getBlockNumber()
@@ -1583,13 +1770,17 @@ describe("Research Technology Testing", function () {
 
         const timestampBefore = blockBefore.timestamp;
 
-        await ethers.provider.send("evm_mine", [timestampBefore + 120000 * 1]);
+        await ethers.provider.send("evm_mine", [
+          timestampBefore + 120000 * 1,
+        ]);
 
         const claimBuild = await buildingsFacet
           .connect(randomUser)
           .claimBuilding(planetId);
 
-        await shipsFacet.connect(randomUser).craftFleet(1, planetId, 1);
+        await shipsFacet
+          .connect(randomUser)
+          .craftFleet(1, planetId, 1);
 
         let checkOwnershipShipsPlayer = await shipNfts.balanceOf(
           randomUser.address
@@ -1597,7 +1788,9 @@ describe("Research Technology Testing", function () {
 
         expect(checkOwnershipShipsPlayer).to.equal(0);
 
-        await ethers.provider.send("evm_mine", [timestampBefore + 120000 * 2]);
+        await ethers.provider.send("evm_mine", [
+          timestampBefore + 120000 * 2,
+        ]);
 
         await shipsFacet.connect(randomUser).claimFleet(planetId);
 
@@ -1612,15 +1805,20 @@ describe("Research Technology Testing", function () {
           0
         );
 
-        const statsBeforeResearch = await shipsFacet.getShipStatsDiamond(
-          shipIdPlayer1
-        );
+        const statsBeforeResearch =
+          await shipsFacet.getShipStatsDiamond(shipIdPlayer1);
 
-        await shipsFacet.connect(randomUser).craftFleet(1, planetId, 1);
+        await shipsFacet
+          .connect(randomUser)
+          .craftFleet(1, planetId, 1);
 
-        await ethers.provider.send("evm_mine", [timestampBefore + 120000 * 3]);
+        await ethers.provider.send("evm_mine", [
+          timestampBefore + 120000 * 3,
+        ]);
 
-        await managementFacet.connect(randomUser).researchTech(1, 1, planetId); // TechId, TechTree, PlanetId
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(1, 1, planetId); // TechId, TechTree, PlanetId
 
         await shipsFacet.connect(randomUser).claimFleet(planetId);
 
@@ -1629,9 +1827,8 @@ describe("Research Technology Testing", function () {
           1
         );
 
-        const statsAfterResearch = await shipsFacet.getShipStatsDiamond(
-          shipId2Player1
-        );
+        const statsAfterResearch =
+          await shipsFacet.getShipStatsDiamond(shipId2Player1);
 
         expect(statsAfterResearch.attackTypes[0]).to.be.above(
           statsBeforeResearch.attackTypes[0]
@@ -1639,8 +1836,13 @@ describe("Research Technology Testing", function () {
       });
 
       it("User can research Advanced Shielding Techniques and buff their ships", async function () {
-        const { owner, randomUser, randomUserTwo, randomUserThree, AdminUser } =
-          await loadFixture(deployUsers);
+        const {
+          owner,
+          randomUser,
+          randomUserTwo,
+          randomUserThree,
+          AdminUser,
+        } = await loadFixture(deployUsers);
 
         const registration = await registerFacet
           .connect(randomUser)
@@ -1655,7 +1857,9 @@ describe("Research Technology Testing", function () {
           0
         );
 
-        await buildingsFacet.connect(randomUser).craftBuilding(10, planetId, 1);
+        await buildingsFacet
+          .connect(randomUser)
+          .craftBuilding(10, planetId, 1);
 
         const blockBefore = await ethers.provider.getBlock(
           await ethers.provider.getBlockNumber()
@@ -1663,13 +1867,17 @@ describe("Research Technology Testing", function () {
 
         const timestampBefore = blockBefore.timestamp;
 
-        await ethers.provider.send("evm_mine", [timestampBefore + 120000 * 1]);
+        await ethers.provider.send("evm_mine", [
+          timestampBefore + 120000 * 1,
+        ]);
 
         const claimBuild = await buildingsFacet
           .connect(randomUser)
           .claimBuilding(planetId);
 
-        await shipsFacet.connect(randomUser).craftFleet(1, planetId, 1);
+        await shipsFacet
+          .connect(randomUser)
+          .craftFleet(1, planetId, 1);
 
         let checkOwnershipShipsPlayer = await shipNfts.balanceOf(
           randomUser.address
@@ -1678,9 +1886,13 @@ describe("Research Technology Testing", function () {
         expect(checkOwnershipShipsPlayer).to.equal(0);
 
         //research first one
-        await managementFacet.connect(randomUser).researchTech(2, 1, planetId); // TechId, TechTree, PlanetId
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(2, 1, planetId); // TechId, TechTree, PlanetId
 
-        await ethers.provider.send("evm_mine", [timestampBefore + 120000 * 2]);
+        await ethers.provider.send("evm_mine", [
+          timestampBefore + 120000 * 2,
+        ]);
 
         await shipsFacet.connect(randomUser).claimFleet(planetId);
 
@@ -1695,17 +1907,24 @@ describe("Research Technology Testing", function () {
           0
         );
 
-        const statsBeforeResearch = await shipsFacet.getShipStatsDiamond(
-          shipIdPlayer1
-        );
+        const statsBeforeResearch =
+          await shipsFacet.getShipStatsDiamond(shipIdPlayer1);
 
-        await shipsFacet.connect(randomUser).craftFleet(1, planetId, 1);
+        await shipsFacet
+          .connect(randomUser)
+          .craftFleet(1, planetId, 1);
 
-        await ethers.provider.send("evm_mine", [timestampBefore + 120000 * 3]);
+        await ethers.provider.send("evm_mine", [
+          timestampBefore + 120000 * 3,
+        ]);
 
         //cooldown research
-        await ethers.provider.send("evm_mine", [timestampBefore + 120000 * 12]);
-        await managementFacet.connect(randomUser).researchTech(3, 1, planetId); // TechId, TechTree, PlanetId
+        await ethers.provider.send("evm_mine", [
+          timestampBefore + 120000 * 12,
+        ]);
+        await managementFacet
+          .connect(randomUser)
+          .researchTech(3, 1, planetId); // TechId, TechTree, PlanetId
 
         await shipsFacet.connect(randomUser).claimFleet(planetId);
 
@@ -1714,9 +1933,8 @@ describe("Research Technology Testing", function () {
           1
         );
 
-        const statsAfterResearch = await shipsFacet.getShipStatsDiamond(
-          shipId2Player1
-        );
+        const statsAfterResearch =
+          await shipsFacet.getShipStatsDiamond(shipId2Player1);
 
         expect(statsAfterResearch.health).to.be.above(
           statsBeforeResearch.health
